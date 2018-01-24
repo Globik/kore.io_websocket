@@ -1,0 +1,85 @@
+<!DOCTYPE>
+<html>
+<head>
+<script>
+var socket = null;
+var sent = 0;
+var recv = 0;
+var length = 2;//5536;
+	var id=fuser();
+	
+//var mout=document.getElementById("mout");
+	//mout.innerHTML="";
+function open(evt) {
+	vuser.textContent=id;
+	var msg = "";
+	mout.innerHTML+="websocket opened<br>";
+	var alphabet = "abcdefghijklmnopqrstuvwxyz";
+	var users=["alice","bob","john","willy"];
+
+	//for (i = 0; i < users.length; i++)
+	//{
+		//msg+=users[Math.floor(Math.random()*users.length)];
+		//msg += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+	
+	//}
+msg=id+'\0';
+	socket.send(msg);
+}
+
+function fuser(){
+var users=["alice","bob","john","willy"];	
+return users[Math.floor(Math.random()*users.length)];
+}
+function message(msg) {
+	//socket.send(msg);
+	sent = sent + 1;
+	id=msg;
+	update();
+	console.log('msg: ',msg);
+	
+	mout.innerHTML+=msg+"<br>";
+}
+
+function update() {
+	var cnt = document.getElementById("counter");
+
+	cnt.innerHTML = "Recv: " + recv + " Sent: " + sent+" id: "+id;
+}
+
+function onmessage(evt) {
+	recv = recv + 1;
+	update();
+
+	message(evt.data);
+}
+
+function connect() {
+	socket = new WebSocket("ws://127.0.0.1:8888/connect");///"+id);
+
+	socket.onopen = function(evt) { open(evt) };
+	socket.onclose = function(evt) { mout.innerHTML+="closed<br>"; };
+	socket.onmessage = function(evt) { onmessage(evt) };
+	socket.onerror = function(evt) { mout.innerHTML+="onerror<br>"; };
+}
+	//var f=document.getElementById("f");
+	function send_message(){
+	socket.send(f.value+'\0');
+	}
+</script>
+</head>
+
+<body>
+	User: <b id="vuser"></b><br>
+<output id="mout"></output>
+<form action="/" onsubmit="connect(); return false;">
+<input type="submit" value="connect">
+</form>
+	<input type="text" id="f" value="alice"/>
+	<button onclick="send_message();">send message</button>
+
+<div id="counter">
+</div>
+
+</body>
+</html>
