@@ -12,30 +12,43 @@ https://github.com/xhs/librtcdc
 #define yellow "\x1b[33m"
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
+static GMainLoop *mainloop;
 static void free_all(struct rtcdc_data_channel*);
 void *rtcdc_e_loop(void*peer){
 struct rtcdc_peer_connection*p=(struct rtcdc_peer_connection*)peer;
+	printf("MOOOOOOOOOOO\n");
 rtcdc_loop(p);
+	printf("dooooooooooooooo\n");
+	rtcdc_destroy_peer_connection(p);
 }
-int ABBA = 0;
+
 struct rtcdc_data_channel *channel, *channel2;
 int main(){
 struct rtcdc_peer_connection*alice, *bob;
+GMainContext *context=NULL;
+	GSource *source_alice,*source_bob;
+	
 int dc_open=0;
 	
 	void onmessage(struct rtcdc_data_channel*channel,int datatype,void*data,size_t len,void*user_data){
 	printf(red "\n Data  received => %s\n" rst,(char*)data);
-	ABBA++;
-	//if(ABBA == 10){ free_all(channel);}
-    rtcdc_destroy_data_channel(channel);
-//rtcdc_destroy_peer_connection(peer);
+	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
+	char*message2="Hi! Wow. On_message.\0";
+    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message2,strlen(message2)+1); 
+		}
+		//if(alice !=NULL)rtcdc_destroy_data_channel(channel);
 		
+//rtcdc_destroy_peer_connection(alice);
+
 	}
 	void onopen(struct rtcdc_data_channel*channel,void*user_data){
 	printf(green "\n Data channel opened!\n" rst);
 	dc_open=1;
+	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
 	char*message="Hi! I'm Bob. On_open.\0";
-    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1); 	
+    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1); 
+			
+		}
 	}
 	void onclose(struct rtcdc_data_channel*channel,void*user_data){
 	printf("\nData channel closed!\n");
@@ -48,6 +61,7 @@ int dc_open=0;
 	void onchannel(struct rtcdc_peer_connection*peer,struct rtcdc_data_channel*channel,void *user_data){
 	printf("\nChannel created! With a channel->label: %s\n",channel->label);
 	channel->on_message=onmessage;
+		//rtcdc_destroy_peer_connection(peer);
 	}
 	void on_candidate(struct rtcdc_peer_connection*peer,const char*candidate,void*user_data){
 	printf(yellow "ON CANDIDATE! %s\n" rst, candidate);
@@ -60,6 +74,13 @@ printf(green "\n Creating peer connection, Bob and Alice.\n" rst);
 
 //struct rtcdc_peer_connection*
 	bob=rtcdc_create_peer_connection(onchannel,on_candidate,onconnect,"stun.services.mozilla.com",3478,user_data);
+	mainloop=g_main_loop_new(context,FALSE);
+	//g_source_attach(source_alice,context);
+	//g_source_attach(source_bob,context);
+	
+	GThread *al=g_thread_new("talice", &rtcdc_e_loop,(void*)alice);
+	GThread *bo=g_thread_new("tbob", &rtcdc_e_loop,(void*)bob);
+	
 	char*offer_sdp=rtcdc_generate_offer_sdp(alice);
 	char*local_cand_sdp=rtcdc_generate_local_candidate_sdp(alice);
 	printf(yellow "offer_sdp:\n %s\n" rst,offer_sdp);
@@ -99,52 +120,14 @@ printf(green "\n Creating peer connection, Bob and Alice.\n" rst);
 	_exit(1);
 	}
 	
-int status_adr,status_adr2, s;
-pthread_t tid,tid2;
-s = pthread_create(&tid,NULL,rtcdc_e_loop, (void*)alice);
-	if(s !=0) _exit(1);
-s = pthread_create(&tid2,NULL,rtcdc_e_loop, (void*)bob);
-	if(s !=0) _exit(1);
-printf("HERE after pthreads.\n");
-	
-//struct rtcdc_data_channel *channel, *channel2;
-//while(1==1){
-if(alice->initialized>0){
-printf("Alice initialized = %d\n", dc_open);
-if(dc_open==1){
-printf("dc_open: %d\n",dc_open);
-channel=alice->channels[0];
-if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
-char*message="I'm Alice.\0";
-printf(yellow "Sending a message %s\n" rst,message);
-rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1);
-}else{printf("DATACHANNEL CLOSED WHERE IS ALICE.\n");}
-}
-}
-		
-if(bob->initialized>0){
-printf("HERE BOB INITIALIZED! %d\n",bob->initialized);
-if(dc_open==1){
-printf("HERE4\n");
-channel2=bob->channels[0];
-if(channel2->state > RTCDC_CHANNEL_STATE_CLOSED){
-char*message="Hi! I'm Bob.\0";
-rtcdc_send_message(channel2,RTCDC_DATATYPE_STRING,message,strlen(message)+1);
-}else{printf("DATACHANNEL CLOSED WHERE IS ALICE\n");}
-}
-}
-sleep(1);
-//}
-pthread_join(tid,(void**)&status_adr);
-pthread_join(tid2,(void**)&status_adr2);
-printf("tid tid2 %d = %d\n",status_adr,status_adr2);
-return 0;
-}
+g_main_loop_run(mainloop);
+	g_thread_join(al);
+	g_thread_join(bo);
+	g_thread_unref(al);
+	g_thread_unref(bo);
+	g_main_loop_unref(mainloop);
 
-void free_all(struct rtcdc_data_channel*ch){
-printf("AAAAAAAAAAAAAAAAAAAA\n");
-rtcdc_destroy_data_channel(ch);
-//rtcdc_destroy_peer_connection(peer);
+return EXIT_SUCCESS;
 }
 
 /*	
