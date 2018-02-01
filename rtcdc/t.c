@@ -35,11 +35,7 @@ int dc_open=0;
 	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
 	char*message2="Hi! Wow. On_message.\0";
     rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message2,strlen(message2)+1); 
-		}
-		//if(alice !=NULL)rtcdc_destroy_data_channel(channel);
-		
-//rtcdc_destroy_peer_connection(alice);
-
+	}
 	}
 	void onopen(struct rtcdc_data_channel*channel,void*user_data){
 	printf(green "\n Data channel opened!\n" rst);
@@ -47,8 +43,7 @@ int dc_open=0;
 	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
 	char*message="Hi! I'm Bob. On_open.\0";
     rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1); 
-			
-		}
+	}
 	}
 	void onclose(struct rtcdc_data_channel*channel,void*user_data){
 	printf("\nData channel closed!\n");
@@ -132,7 +127,8 @@ return EXIT_SUCCESS;
 
 /*	
 
-offer no encode v=0
+offer no encode 
+v=0
 o=- 5663417401290824 2 IN IP4 127.0.0.1
 s=-
 t=0 0

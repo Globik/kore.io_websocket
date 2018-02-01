@@ -28,6 +28,11 @@
 #define WEBSOCKET_PAYLOAD_SINGLE	125
 #define WEBSOCKET_PAYLOAD_EXTEND_1	126
 #define WEBSOCKET_PAYLOAD_EXTEND_2	127
+
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
 //struct rstate{struct kore_task task;};
 struct kore_task pipe_task;
 GMainLoop*loop;
@@ -49,18 +54,27 @@ int init(int);
 int pipe_reader(struct kore_task *);
 int rtc_loop(struct kore_task *);
 void pipe_data_available(struct kore_task *);
-/* Websocket callbacks. 
-struct kore_wscbs wscbs = {
-	websocket_connect,
-	websocket_message,
-	websocket_disconnect
-};*/
+
+static void *rtcdc_e_loop(void*);
+static void onmessage(struct rtcdc_data_channel*,int, void*,size_t,void*);
+static void onopen(struct rtcdc_data_channel*,void*);
+static void onclose(struct rtcdc_data_channel*,void*);
+static void onconnect(struct rtcdc_peer_connection*,void*);
+static void onchannel(struct rtcdc_peer_connection*,struct rtcdc_data_channel*,void *);
+static void on_candidate(struct rtcdc_peer_connection*, const char*, void*);
+void handle_candidate(char*);
+void handle_offer(json_t*, struct connection*);
+void handle_answer(json_t*);
+void create_pc(struct connection*);
+
+int dc_open=0;
+struct rtcdc_peer_connection *bob=NULL;
 
 int init(state){
-	printf("SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKA\n");
+	printf("Entering init.\n");
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	//if(worker->id !=1) return (KORE_RESULT_OK);
-	printf("sukkkkkkkkkkkkka2\n");
+	printf("after state.\n");
 	//kore_task_create(&pipe_task,pipe_reader);
 	kore_task_create(&pipe_task,rtc_loop);
 	kore_task_bind_callback(&pipe_task,pipe_data_available);
@@ -162,36 +176,161 @@ websocket_connect(struct connection *c)
 	}
 	ab++;
 kore_log(LOG_NOTICE, "%p: connected", c);
-	//kore_websocket_send(c, 1, c->hdlr_extra,5);
+	json_t *reply=json_object();
+	json_object_set_new(reply,"type",json_string("message"));
+	
+	json_object_set_new(reply,"msg",json_string("Hallo jason!"));
+	size_t size=json_dumpb(reply,NULL,0,0);
+	if(size==0){printf("Size is null\n");}
+	char*buf=alloca(size);
+	size=json_dumpb(reply,buf,size,0);
+	printf("buffer: %s\n",buf);
+	kore_websocket_send(c, 1, buf,size);
+	json_decref(reply);
+	//free((charbuf);
 	}
-void oncandidate(struct rtcdc_peer_connection*peer,const char*candidate,void*user_data){
-	printf("ON CANDIDATE &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&!%s\n",candidate);
-	}
+
 void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len)
 {
 	if(data==NULL) return;
+	//kore_log(LOG_NOTICE,"some message: %s",(char*)data);
+	
+	//fwrite((char*)data,1,len,stdout);
+	//printf("\n");
+	/*
+	char*offer_sdp=(char*)data;
+	
+char*offer="v=0 \n"\
+"o=- 2701145278607694824 2 IN IP4 127.0.0.1 \n" \
+"s=- \n"              \
+"t=0 0 \n"             \
+"a=group:BUNDLE data \n" \
+"a=msid-semantic: WMS \n" \
+"m=application 9 DTLS/SCTP 5000 \n"\
+"c=IN IP4 0.0.0.0 \n"\
+"a=ice-ufrag:nGsD \n"\
+"a=ice-pwd:hZPKMtow1DEM4fL7iUppDJHA\n"\
+"a=ice-options:trickle \n"\
+"a=fingerprint:sha-256 C1:50:3F:D4:C7:F8:E1:F6:FF:67:DA:73:40:5E:0C:89:76:C3:58:AF:23:F3:07:05:6E:02:2E:05:C6:2E:F8:4E "\
+"a=setup:actpass \n"\
+"a=mid:data \n"\
+"a=sctpmap:5000 webrtc-datachannel 1024\n";
+*/
+	/*
+	with internet connection
+v=0
+o=- 8848996438182133161 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:LV9g
+a=ice-pwd:CoCdNISUrqZTDOLqW8T3uXsh
+a=ice-options:trickle
+a=fingerprint:sha-256 87:A3:AC:7B:60:38:77:EA:55:5C:89:F9:85:E4:47:9D:BD:5B:BA:CC:E0:3E:3E:53:1C:BC:E1:20:B0:9B:EA:2D
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+a=candidate:1047372208 1 udp 2113937151 10.34.73.56 49670 typ host generation 0 ufrag LV9g network-cost 50
+*/
+/*	
+v=0
+o=- 5663417401290824 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=msid-semantic: WMS
+m=application 1 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=ice-ufrag:5Ld6
+a=ice-pwd:m9qMJjGpa0mpbfd0uzQYY5
+a=fingerprint:sha-256 EA
+a=setup:active
+a=mid:data
+a=sctp-port:45699
+*/	/*
+	printf("OFFERRRRRRRRRRR!: %s\n",offer);
 	
 	
-	fwrite((char*)data,1,len,stdout);
-	printf("\n");
+	int a=rtcdc_parse_offer_sdp(bob, offer_sdp);
+	if(a >= 0){
+	printf(green "parse offer by Bob OK = %d\n" rst, a);
+	}else{
+	printf(red "parse offer by Bob NOT OK = %d\n" rst, a);
+	//_exit(1);
+	return;
+	}
+	*/
+	//char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
+	//kore_websocket_send(c, 1, remote_cand_sdp,strlen(remote_cand_sdp));
+	//char*remote_offer_sdp
+		//offer_sdp=rtcdc_generate_offer_sdp(bob);
+	//char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
+	//printf("CANDIDATE ON SERVER: \n %s\n",remote_cand_sdp);
+	//printf("REMOTE OFFER ON SERVER: \n %s\n",remote_offer_sdp);
+	/*
+	int x = rtcdc_parse_candidate_sdp(bob, remote_cand_sdp);
+	if(x > 0){
+	printf(green "Remote Candidate OK by Bob = %d\n" rst, x);
+	}else{
+	printf("Remote Candidate NOT OK by Bob = %d\n", x);
+	return;
+	}
+	*/
+	/*
+	int a=rtcdc_parse_offer_sdp(bob, offer_sdp);
+	if(a >= 0){
+	printf(green "parse offer by Bob OK = %d\n" rst, a);
+	}else{
+	printf(red "parse offer by Bob NOT OK = %d\n" rst, a);
+	//_exit(1);
+	return;
+	}*/
+	
+	//kore_websocket_send(c, 1, offer_sdp,strlen(offer_sdp));
+	
+
+	
 	//printf("DATA: %s\n",(const char*)data);
+	
 	json_t *root = load_json((const char*)data, len);
 	if(root){
 	 char*foo=json_dumps(root,0);
 	kore_log(LOG_NOTICE,"incoming message: %s",foo);
-		
+		int send_to_clients=0;
 	
 	json_t *t=json_object_get(root,"type");
 	const char*t_txt=json_string_value(t);
 		if(!strcmp(t_txt,"message")){
 		kore_log(LOG_NOTICE,"type message");
-			//do_loop();
+	
 		}else if(!strcmp(t_txt,"login")){
 		kore_log(LOG_NOTICE,"type login");
+		}else if(!strcmp(t_txt,"candidate")){
+		kore_log(LOG_NOTICE,"type candidate.");
+		//handle_candidate(root);
+		json_t*f=json_object_get(root,"cand");
+		char*fu=json_string_value(f);
+		printf("HERE CANDIDATE: %s\n",fu);
+			//handle_candidate(fu);
+		send_to_clients=1;
+		}else if(!strcmp(t_txt,"offer")){
+		kore_log(LOG_NOTICE,"type offer");
+        handle_offer(root,c);	
+		send_to_clients=1;
+		}else if(!strcmp(t_txt,"answer")){
+		kore_log(LOG_NOTICE,"type answer");
+		
+			
+		handle_answer(root);
+		send_to_clients=1;
 		}else{
 		kore_log(LOG_NOTICE,"unknown type");
+		send_to_clients=1;
 		}
-kore_websocket_send(c,op,data,len);	
+		
+if(send_to_clients==0)kore_websocket_send(c,op,data,len);	
 free(foo);
 	}else{}
 
@@ -204,24 +343,111 @@ websocket_disconnect(struct connection *c)
 	kore_log(LOG_NOTICE, "%p: disconnecting", c);
 }
 
-void* helloworld(void*args){
-printf("hello_world\n");
-	   return 0;
+void handle_candidate(char*obj){
+/*json_error_t error;
+char*type_m;
+ char*cand;
+int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"cand",&cand);
+	printf("is ok ab: %d\n",aber);
+	if(aber==-1){
+	printf("error: %s\n",error.text);
+	printf("source: %s\n",error.source);
+	printf("line: %d\n",error.line);
+	printf("position: %d\n",error.position);
+	printf("column: %d\n",error.column);
+	return;
+	}
+	printf("type: %s\n",type_m);
+	*/
+	printf("candidate: %s\n", obj);
+	int x = rtcdc_parse_candidate_sdp(bob, obj);
+	if(x > 0){
+	printf(green "Remote Candidate OK by Bob = %d\n" rst, x);
+	}else{
+	printf("Remote Candidate NOT OK by Bob = %d\n", x);
+	return;
+	}
 }
 
+void create_pc(struct connection*c){
+	/*
+	bob=rtcdc_create_peer_connection(onchannel,on_candidate,onconnect,
+										"stun.services.mozilla.com",3478, c);
+	GThread *boba=g_thread_new("tobob", &rtcdc_e_loop,(void*)bob);
+	g_thread_join(boba);
+   g_thread_unref(boba);*/
+//return 0;
+}
+
+void handle_offer(json_t*obj,struct connection*c){
+json_error_t error;
+char*type_m;
+ char*remote_offer_sdp;
+int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"sdp",&remote_offer_sdp);
+	printf("is ok aber from handle_offer: %d\n",aber);
+	if(aber==-1){
+	printf("error: %s\n",error.text);
+	printf("source: %s\n",error.source);
+	printf("line: %d\n",error.line);
+	printf("position: %d\n",error.position);
+	printf("column: %d\n",error.column);
+	return;
+	}
+	//create_pc(c);
+	int y = rtcdc_parse_offer_sdp(bob, remote_offer_sdp);
+	if(y >= 0){
+	printf(green "Parse offer by Bob OK = %d\n" rst, y);
+	}else{
+	printf(red "Parse offer by Bob NOT OK = %d\n" rst, y);
+	return;
+	}
+	char*suka=rtcdc_generate_local_candidate_sdp(bob);
+	printf("SUKA: %s\n",suka);
+	char*sdp=rtcdc_generate_offer_sdp(bob);
+	//{type:answer,answer:remote_offer_sdp}
+	json_t *reply=json_object();
+	json_object_set_new(reply,"type",json_string("answer"));
+	//json_object_set_new(reply,"session_id",json_integer(5));
+	json_object_set_new(reply,"answer",json_string(sdp));
+  // const char*line=json_dumps(reply,0);
+	//size_t siz = json_object_size(reply);
+	size_t size=json_dumpb(reply,NULL,0,0);
+	if(size==0){printf("Size is null\n");return;}
+	char*buf=alloca(size);
+	size=json_dumpb(reply,buf,size,0);
+	printf("buffer: %s\n",buf);
+	kore_websocket_send(c, 1, buf,size);
+	json_decref(reply);	
+	//json_decref(reply);
+}
+
+void handle_answer(json_t*obj){
+json_error_t error;
+char*type_m;
+ char*answer;
+int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"answer",&answer);
+	printf("is ok aber: %d\n",aber);
+	if(aber==-1){
+	printf("error: %s\n",error.text);
+	printf("source: %s\n",error.source);
+	printf("line: %d\n",error.line);
+	printf("position: %d\n",error.position);
+	printf("column: %d\n",error.column);
+	return;
+	}
+	int y = rtcdc_parse_offer_sdp(bob, answer);
+	if(y >= 0){
+	printf(green "Parse answer by Bob OK = %d\n" rst, y);
+	}else{
+	printf(red "Parse answer by Bob NOT OK = %d\n" rst, y);
+	return;
+	}
+	
+}
 
 int page(struct http_request *req)
 {
-	int status;
-	int status_adr;
-	pthread_t thread;
-	status=pthread_create(&thread,NULL,helloworld,NULL);
-	if(status !=0){http_response(req,500,"fuu",3);
-		return (KORE_RESULT_OK);}
-	status=pthread_join(thread,(void**)&status_adr);
-	if(status !=0){http_response(req,500,"fuu",3);
-		return (KORE_RESULT_OK);}
-	kore_log(LOG_NOTICE,"status address %d",status_adr);
+	
 	
 	/*
 	struct rstate *state;
@@ -289,156 +515,95 @@ int page_ws_connect(struct http_request *req)
 
 	return (KORE_RESULT_OK);
 }
-gboolean cb(gpointer arg){
-struct	kore_task *t=(struct kore_task*)arg;
-g_print("hello world\n");
-g_message("msg");
-kore_task_channel_write(t,"channel\0",8);
-	//fflush();
-if(--count==0){
-g_print("g main loop quit\n");
-	printf("zifr %d\n",count);
-g_main_loop_quit(loop);
-	//count=10;
-return FALSE;
-}
-return TRUE;
-}
-//int do_loop(void){
 
-int pipe_reader(struct kore_task *t){
-	kore_log(LOG_NOTICE,"fuuuuuuuuuuuuuuuuuck");
-	do_loop(t);
-	kore_task_channel_write(t,"papa\0",5);
-	g_print("g main loop unref\n");
-	
-	return (KORE_RESULT_OK);
-}
 void pipe_data_available(struct kore_task *t){
 	size_t len;
 	u_int8_t buf[BUFSIZ];
+	/*
 if(kore_task_finished(t)){
-kore_log(LOG_NOTICE,"bla bla bla");
+kore_log(LOG_NOTICE,"Task finished.");
 return;
 }
+*/
 	len=kore_task_channel_read(t,buf,sizeof(buf));
-	//if(len > buf){printf("len great than buf\n");}
-	kore_log(LOG_NOTICE,"task msg: %s",buf);
+	if(len > buf){printf("len great than buf\n");}
+	kore_log(LOG_NOTICE,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTask msg: %s",buf);
 }
-//int pipe_reader(kore_task*t){}
-int do_loop(struct kore_task *t){
-g_print("g main loop new\n");
-	loop=g_main_loop_new(NULL,FALSE);
-	g_timeout_add(100,cb,t);
-	g_print("g main loop run\n");
-	g_main_loop_run(loop);
-	g_print("g main loop unref\n");
-	g_main_loop_unref(loop);
-	return 0;
+
+static void *rtcdc_e_loop(void*peer){
+struct rtcdc_peer_connection*p=(struct rtcdc_peer_connection*)peer;
+printf("rtcdc_loop started.\n");
+rtcdc_loop(p);
+//rtcdc_destroy_peer_connection(p);
 }
+
 
 int rtc_loop(struct kore_task*t){
-int dc_open=0;
-	struct rtcdc_peer_connection*rtcdc_pc; 
-	void onmessage(struct rtcdc_data_channel*channel,int datatype,void*data,size_t len,void*user_data){
-	printf("\n data  received %s\n",(char*)data);
-	}
-	void onopen(struct rtcdc_data_channel*channel,void*user_data){
-	printf("\n data channel opened\n");
-		dc_open=1;
-	}
-	void onclose(struct rtcdc_data_channel*channel,void*user_data){
-	printf("\ndata channel closed\n");
-		dc_open=0;
-	}
-	void onconnect(struct rtcdc_peer_connection*peer,void*user_data){
-	printf("\npeer connection established\n");
-		rtcdc_create_data_channel(peer,"test-dc","",onopen,onmessage,onclose,user_data);
-	}
-	void onchannel(struct rtcdc_peer_connection*peer,struct rtcdc_data_channel*channel,void *user_data){
-	printf("\nchannel created %s\n",channel->label);
-		channel->on_message=onmessage;
-	}
-	/*
-	void oncandidate(struct rtcdc_peer_connection*peer,const char*candidate,void*user_data){
-	printf("ON CANDIDATE!\n");
-	}
-	*/
-	//void*user_data;
 	
-	printf("\ncreating peer connection\n");
-	//rtcdc_pc=rtcdc_create_peer_connection(onchannel,oncandidate,onconnect,"stun.services.mozilla.com",3478,user_data);
-	rtcdc_pc=rtcdc_create_peer_connection(onchannel,oncandidate,onconnect,NULL,3478,/*user_data*/NULL);
+printf("\n Creating peer connection, Alice.\n");
+//void*user_data;
+GMainContext *context=NULL;
+// struct rtcdc_peer_connection *
+bob=rtcdc_create_peer_connection(onchannel,on_candidate,onconnect,"stun.services.mozilla.com",3478, t);
+GMainLoop *mainloop=g_main_loop_new(context,FALSE);
+GThread *abob=g_thread_new("tbob", &rtcdc_e_loop,(void*)bob);
+g_main_loop_run(mainloop);
+g_thread_join(abob);
+g_thread_unref(abob);
+g_main_loop_unref(mainloop);
 
-	char*offer=rtcdc_generate_offer_sdp(rtcdc_pc);
-	char*lcsdp=rtcdc_generate_local_candidate_sdp(rtcdc_pc);
-	printf("offer no encode %s\n",offer);
-	printf("lcsdp: %s\n",lcsdp);
-	gchar*b_offer=g_base64_encode((const guchar*)offer,strlen(offer));
-	printf("\noffer sdp: %s\n",b_offer);
-	gchar*b_lcsdp=g_base64_encode(lcsdp,strlen(lcsdp));
-	printf("\n Local candidate: %s\n",b_lcsdp);
-	sleep(3);
-	
-	//char*lcsdp2=rtcdc_generate_local_candidate_sdp(per);
-	//gchar*b_lcsdp2=g_base64_encode(lcsdp2,strlen(lcsdp2));
-	//
-	
-	
-	
-	
-	
-	gsize dec_remote_sdp_len=0;
-	printf("\nenter remote sdp twice: \n");
-	//const gchar*remote_sdp_offer=getlines();
-	const char*dec_remote_sdp_offer=g_base64_decode(b_offer,&dec_remote_sdp_len);
-	int parse_offer=rtcdc_parse_offer_sdp(rtcdc_pc,dec_remote_sdp_offer);
-	if(parse_offer >=0){
-	offer=rtcdc_generate_offer_sdp(rtcdc_pc);
-	b_offer=g_base64_encode((const guchar*)offer,strlen(offer));
-		printf("\n new offer sdp %s\n",b_offer);
-	}else{
-	printf("\n invalid sdp offer %d\n",parse_offer);
-		_exit(1);
-	}
-	printf("\n enter remote candidate: \n");
-	const gchar*remote_candidate=b_lcsdp;//getlines();
-	gsize dec_candidate_len;
-	 gchar*dec_remote_candidate=g_base64_decode(remote_candidate,&dec_candidate_len);
-	int parse_candidate=rtcdc_parse_candidate_sdp(rtcdc_pc,dec_remote_candidate);
-	if(parse_candidate>0){
-		printf("valid candidate\n");
-	}else{
-	printf("invalid candidate\n");
-		//_exit(1);
-		//return (KORE_RESULT_ERROR);
-	}
-	//pthread_t tid;int status_adr;
-	//pthread_create(&tid,NULL,rtcdc_e_loop,(void*)rtcdc_pc);
-	rtcdc_loop(rtcdc_pc);
-	printf("HERE1\n");
-	struct rtcdc_data_channel*channel=NULL;
-	while(1==1){
-	if(rtcdc_pc->initialized>0){
-		//printf("HERE2=%d\n",dc_open);
-		//printf("DC_OPEN : %d\n",dc_open);
-	
-		if(dc_open==1){
-			printf("HERE3\n");
-		channel=rtcdc_pc->channels[0];
-			if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
-			printf("enter a message\n");
-				gchar*message="fuuuu channel\0";//getlines();
-				rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message));
-				printf("message sent\n");
-				g_free(message);
-			}
-		}
-	}
-		sleep(1);
-	}
-	//pthread_join(tid,(void**)&status_adr);
-	g_free((gpointer*)dec_remote_sdp_offer);
-	g_free((void*)dec_remote_candidate);
 return (KORE_RESULT_OK);
 }
+
+/*
+
+void onmessage(struct rtcdc_data_channel*,int, void*,size_t,void*);
+void onopen(struct rtcdc_data_channel*,void*);
+void onclose(struct rtcdc_data_channel*,void*);
+void onconnect(struct rtcdc_peer_connection*,void*);
+void onchannel(struct rtcdc_peer_connection*,struct rtcdc_data_channel*,void *);
+void on_candidate(struct rtcdc_peer_connection*, const char*, void*);
+
+*/
+
+void onmessage(struct rtcdc_data_channel*channel,int datatype,void*data,size_t len,void*user_data){
+	printf(red "\n Data  received => %s\n" rst,(char*)data);
+	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
+	char*message2="Hi! Wow. On_message.\0";
+    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message2,strlen(message2)+1); 
+	}
+	}
+	void onopen(struct rtcdc_data_channel*channel,void*user_data){
+	printf(green "\n Data channel opened!\n" rst);
+	dc_open=1;
+	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
+	char*message="Hi! I'm Bob. On_open.\0";
+    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1); 
+	}
+	}
+	void onclose(struct rtcdc_data_channel*channel,void*user_data){
+	printf("\nData channel closed!\n");
+	dc_open=0;
+	}
+	void onconnect(struct rtcdc_peer_connection*peer,void*user_data){
+	printf(green "\nPeer connection established!\n" rst);
+	rtcdc_create_data_channel(peer,"test-dc","",onopen,onmessage,onclose,user_data);
+	}
+	void onchannel(struct rtcdc_peer_connection*peer,struct rtcdc_data_channel*channel,void *user_data){
+	printf("\nChannel created! With a channel->label: %s\n",channel->label);
+	channel->on_message=onmessage;
+	}
+	void on_candidate(struct rtcdc_peer_connection*peer,const char*candidate,void*user_data){
+	
+	struct kore_task*t=(struct kore_task*)user_data;
+		printf(yellow "ON CANDIDATE SUKA! %s\n" rst, candidate);
+	//json_t *reply=json_object();
+	//json_object_set_new(reply,"type",json_string("candidate"));
+	//json_object_set_new(reply,"session_id",json_integer(5));
+	//json_object_set_new(reply,"cand",json_string(candidate));
+  // const char*line=json_dumps(reply,0);
+	//size_t siz = json_object_size(reply);
+	kore_task_channel_write(t,candidate,strlen(candidate)+1);
+	//kore_websocket_send(c,1,reply, siz);
+	//json_decref(reply);
+	}

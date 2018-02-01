@@ -1,6 +1,7 @@
 <!DOCTYPE>
 <html>
-<body>
+<body onload="start()" onunload="stop()">
+<!--
 	User: <b id="vuser"></b><br>
 
 <form action="/" onsubmit="connect(); return false;">
@@ -10,8 +11,144 @@
 	<button onclick="send_message();">send message</button>
 	<div id="counter"></div>
 <output id="mout"></output>
-
+-->
+	<span id="outputtext"></span>
+    <hr />
+    <textarea id="inputtext" style="width:100%" onkeypress="onUserKeyPressEvent(event)"></textarea>
 	<script>
+		
+		var connection = null;
+        var datachannel = null;
+        var configuration = { "iceServers": [/*{{{ICESERVERS}}}*/] };
+        var currentoffer = null;
+        var requester;
+        var sdp = "";
+        var outputtextbox = document.getElementById("outputtext");
+        var inputtextbox = document.getElementById("inputtext");
+
+        var wsocket = null;
+
+        function stop() { connection.close(); }
+
+        function start() {
+            msg("Starting...");
+
+            if (typeof mozRTCPeerConnection !== 'undefined') { connection = new mozRTCPeerConnection(configuration); }
+            else if (typeof RTCPeerConnection !== 'undefined') { connection = new RTCPeerConnection(configuration); }
+            else if (typeof webkitRTCPeerConnection !== 'undefined') { connection = new webkitRTCPeerConnection(configuration); }
+            else return false;
+
+            datachannel = connection.createDataChannel("test-dc", { reliable: true });
+            datachannel.onmessage = function (event) { msg("Remote: " + event.data); };
+            datachannel.onopen = function () { msg("Web RTC Connected."); };
+
+             connection.ondatachannel = onNewDataChannel;
+            connection.onicecandidate = onIceCandidate;
+            connection.createOffer(onOfferDone, onError, { mandatory: { OfferToReceiveAudio: false, OfferToReceiveVideo: false } });
+            connection.oniceconnectionstatechange = function ()
+            {
+                if (connection.iceConnectionState == 'disconnected')
+                {
+                    msg('DISCONNECTED');
+                }
+            }
+        }
+
+        function onNewDataChannel(e)
+        {
+            msg("Channel [" + e.channel.label + "] created");
+            datachannel = e.channel;
+            datachannel.onmessage = function (event) { msg("Remote: " + event.data); }
+        }
+
+        function onUserKeyPressEvent(event) {
+            if (event.keyCode == 13) {
+                datachannel.send(inputtextbox.value);
+                msg("Local: " + inputtextbox.value);
+                inputtextbox.value = "";
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopPropagation) e.stopPropagation();
+                return false;
+            }
+        }
+
+        
+	wsocket=new WebSocket("ws://127.0.0.1:8888/connect");
+    wsocket.onopen = function (evt) { msg("WebSocket connected");}
+	wsocket.onclose=function(){console.log("websocket closed");}
+    wsocket.onmessage = function (evt){
+		console.log("evt.data: ",evt.data);
+	try{var m=JSON.parse(evt.data);}catch(e){console.log(e);return;}
+	
+	if(m.type=="message"){console.log("message type");
+						 }else if(m.type=="candidate"){
+							 handle_candidate(m.cand);
+						 }else if(m.type=="offer"){
+							 handle_offer(m.offer);
+						 }else if(m.type=="answer"){
+							 handle_answer(m.answer);
+						 }else{console.warn("UNknown type: ",m.type);}
+            
+	}
+
+	
+	function onIceCandidate(ev){
+	if(ev.candidate){
+	if(wsocket)wsocket.send(JSON.stringify({type:"candidate",cand:ev.candidate.candidate}))
+		}
+	}
+	
+		
+	function handle_candidate(cand){
+	if(connection){
+	connection.addIceCandidate(cand).then(function(){alert("a?");}).catch(function(e){console.error("err add ice candidate: ",e);})
+		}else{console.warn("no connection");}
+	}
+		function handle_offer(n){
+		console.warn("OFFER?");
+		}
+		
+		function handle_answer(a){
+			console.log("answer came: ",a);
+			
+			var ax = new RTCSessionDescription({ type: "answer", sdp: a })
+		connection.setRemoteDescription(ax).then(function(){console.log("answer came success");}).catch(function(e){
+		console.log("some err in handle_answer: ",e);
+		});
+		}
+        function onCandidateAdded(e) { debug('onCandidateAdded: ' + e); }
+
+        function onOfferDone(offer)
+        {
+            // debug(offer.sdp);
+            currentoffer = offer;
+			connection.setLocalDescription(offer, onSetLocalDescriptionDone, onError);
+            sdp = currentoffer.sdp;
+        }
+
+        function onSetLocalDescriptionDone() {
+	//	wsocket.send(JSON.stringify({type:"offer",offer:connection.localDescription}))
+			wsocket.send(JSON.stringify(connection.localDescription));
+		}
+
+        function initiatorErrorResponse() { msg('Could not contact server.'); }
+
+        function onSetRemoteDescriptionDone() { debug('setRemoteDescription() completed'); }
+        function stop() { connection.close(); }
+        function onError(e) { if (e.message){ 
+			//alert("onError: " + e.message);
+		console.error("onError: ",e.message);
+		} else{ 
+			//alert(e);
+			console.error("simple e: ",e);
+		
+		} }
+        function debug(m) {  console.warn(m);  }
+        function msg(m) { outputtextbox.innerHTML += (m + "<br />"); }
+		
+		
+		
+		/*
 var socket = null;
 var sent = 0;
 var recv = 0;
@@ -87,6 +224,8 @@ function connect() {
 		//alert(su);
 	if(socket)socket.send(su);
 	}
+	
+	*/
 	</script>
 
 </body>
