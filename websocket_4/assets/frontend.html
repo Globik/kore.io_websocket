@@ -19,7 +19,7 @@
 		
 		var connection = null;
         var datachannel = null;
-        var configuration = { "iceServers": [/*{{{ICESERVERS}}}*/] };
+        var configuration = { "iceServers": [/*{{{ICESERVERS}}}*/{'url':'stun:stun.services.mozilla.com:3478'}] };
         var currentoffer = null;
         var requester;
         var sdp = "";
@@ -38,7 +38,7 @@
             else if (typeof webkitRTCPeerConnection !== 'undefined') { connection = new webkitRTCPeerConnection(configuration); }
             else return false;
 
-            datachannel = connection.createDataChannel("test-dc", { reliable: true });
+            datachannel = connection.createDataChannel("test-dc", {/* reliable: true*/ });
             datachannel.onmessage = function (event) { msg("Remote: " + event.data); };
             datachannel.onopen = function () { msg("Web RTC Connected."); };
 
@@ -47,6 +47,7 @@
             connection.createOffer(onOfferDone, onError, { mandatory: { OfferToReceiveAudio: false, OfferToReceiveVideo: false } });
             connection.oniceconnectionstatechange = function ()
             {
+				alert(1);
                 if (connection.iceConnectionState == 'disconnected')
                 {
                     msg('DISCONNECTED');
@@ -94,19 +95,30 @@
 	
 	function onIceCandidate(ev){
 	if(ev.candidate){
-	if(wsocket)wsocket.send(JSON.stringify({type:"candidate",cand:ev.candidate.candidate}))
+		console.warn("HERE CANDIDATE: ",ev.candidate.candidate);
+	if(wsocket)wsocket.send(JSON.stringify({type:"candidate",cand:"a="+ev.candidate.candidate}))
 		}
 	}
 	
 		
 	function handle_candidate(cand){
 	if(connection){
-	connection.addIceCandidate(cand).then(function(){alert("a?");}).catch(function(e){console.error("err add ice candidate: ",e);})
+		try{
+			var obi={};
+			obi.candidate="a=candidate:1 1 UDP 2013266431 10.34.70.158 59114 typ host";///cand;
+			obi.sdpMid="data";
+			obi.dpMLineIndex=0;
+		var sm=new RTCIceCandidate(obi);
+		}catch(e){console.error(e);}
+	connection.addIceCandidate(sm).then(function(){console.log("a?");}).catch(function(e){console.error("err add ice candidate: ",e);})
 		}else{console.warn("no connection");}
 	}
 		function handle_offer(n){
 		console.warn("OFFER?");
 		}
+		
+		//70:0E:28:47:6C:53:00:9F:5A:AF:0D:86:DA:8B:84:5B:27:D0:DA:C0:A4:A8:99:8B:F7:EA:E2:23:38:9A:23:A5
+		//03:63:62:CE:EB:9F:56:22:12:BA:86:CF:92:EC:21:DA:D9:21:DA:90:8E:86:FE:A7:85:B0:34:4C:F4:D2:5E:10
 		
 		function handle_answer(a){
 			console.log("answer came: ",a);

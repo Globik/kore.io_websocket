@@ -313,7 +313,9 @@ a=sctp-port:45699
 		json_t*f=json_object_get(root,"cand");
 		char*fu=json_string_value(f);
 		printf("HERE CANDIDATE: %s\n",fu);
-			//handle_candidate(fu);
+			char *fuc="a=candidate:1 1 UDP 2013266431 10.34.66.177 53484 typ host\r\n";
+			handle_candidate(fu);
+			//lllsdss
 		send_to_clients=1;
 		}else if(!strcmp(t_txt,"offer")){
 		kore_log(LOG_NOTICE,"type offer");
@@ -377,6 +379,7 @@ void create_pc(struct connection*c){
 	g_thread_join(boba);
    g_thread_unref(boba);*/
 //return 0;
+	//.....
 }
 
 void handle_offer(json_t*obj,struct connection*c){
@@ -393,7 +396,7 @@ int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"sdp",
 	printf("column: %d\n",error.column);
 	return;
 	}
-	//create_pc(c);
+	//create_pc(c);jiji
 	int y = rtcdc_parse_offer_sdp(bob, remote_offer_sdp);
 	if(y >= 0){
 	printf(green "Parse offer by Bob OK = %d\n" rst, y);
@@ -418,6 +421,23 @@ int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"sdp",
 	printf("buffer: %s\n",buf);
 	kore_websocket_send(c, 1, buf,size);
 	json_decref(reply);	
+	
+	char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
+	printf(red"BOB: CAND_SDP: \n %s\n"rst,remote_cand_sdp);
+	
+	json_t *reply2=json_object();
+	json_object_set_new(reply2,"type",json_string("candidate"));
+	//json_object_set_new(reply,"session_id",json_integer(5));
+	json_object_set_new(reply2,"cand",json_string(remote_cand_sdp));
+  // const char*line=json_dumps(reply,0);
+	//size_t siz = json_object_size(reply);
+	size_t size2=json_dumpb(reply2,NULL,0,0);
+	if(size==0){printf("Size is null\n");return;}
+	char*buf2=alloca(size2);
+	size=json_dumpb(reply2,buf2,size2,0);
+	//printf("buffer: %s\n",buf);
+	kore_websocket_send(c, 1, buf2,size2);
+	json_decref(reply2);	
 	//json_decref(reply);
 }
 
@@ -587,6 +607,7 @@ void onmessage(struct rtcdc_data_channel*channel,int datatype,void*data,size_t l
 	}
 	void onconnect(struct rtcdc_peer_connection*peer,void*user_data){
 	printf(green "\nPeer connection established!\n" rst);
+	printf("peer->role: %d\n",peer->role);
 	rtcdc_create_data_channel(peer,"test-dc","",onopen,onmessage,onclose,user_data);
 	}
 	void onchannel(struct rtcdc_peer_connection*peer,struct rtcdc_data_channel*channel,void *user_data){
@@ -603,7 +624,7 @@ void onmessage(struct rtcdc_data_channel*channel,int datatype,void*data,size_t l
 	//json_object_set_new(reply,"cand",json_string(candidate));
   // const char*line=json_dumps(reply,0);
 	//size_t siz = json_object_size(reply);
-	kore_task_channel_write(t,candidate,strlen(candidate)+1);
+	kore_task_channel_write(t,(void*)candidate,100);
 	//kore_websocket_send(c,1,reply, siz);
 	//json_decref(reply);
 	}

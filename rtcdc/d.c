@@ -33,6 +33,7 @@ int dc_open=0;
 	}
 	void onopen(struct rtcdc_data_channel*channel,void*user_data){
 	printf(green "\n Data channel opened!\n" rst);
+		
 	dc_open=1;
 	char*message="Hi! I'm Bob. On_open.\0";
     rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1); 	
@@ -43,10 +44,15 @@ int dc_open=0;
 	}
 	void onconnect(struct rtcdc_peer_connection*peer,void*user_data){
 	printf(green "\nPeer connection established!\n" rst);
+		printf(green"PEER->ROLE: %d\n"rst,peer->role);
+		printf("role_client=1\n");
+		printf("role_server=2\n");
+		
 	rtcdc_create_data_channel(peer,"test-dc","",onopen,onmessage,onclose,user_data);
 	}
 	void onchannel(struct rtcdc_peer_connection*peer,struct rtcdc_data_channel*channel,void *user_data){
 	printf("\nChannel created! With a channel->label: %s\n",channel->label);
+		//printf("remote sctp port: %d\n", peer->transport->sctp.remote_port);
 	channel->on_message=onmessage;
 	}
 	void on_candidate(struct rtcdc_peer_connection*peer,const char*candidate,void*user_data){
@@ -62,8 +68,8 @@ printf(green "\n Creating peer connection, Bob and Alice.\n" rst);
 	bob=rtcdc_create_peer_connection(onchannel,on_candidate,onconnect,"stun.services.mozilla.com",3478,user_data);
 	char*offer_sdp=rtcdc_generate_offer_sdp(alice);
 	char*local_cand_sdp=rtcdc_generate_local_candidate_sdp(alice);
-	printf(yellow "offer_sdp:\n %s\n" rst,offer_sdp);
-	printf("local_cand_sdp:\n %s\n",local_cand_sdp);
+	printf(yellow "\noffer_sdp BY ALICE:\n %s\n" rst,offer_sdp);
+	printf(yellow"local_cand_sdp BY Alice:\n %s\n" rst,local_cand_sdp);
 	
 	int a=rtcdc_parse_offer_sdp(bob, offer_sdp);
 	if(a >= 0){
@@ -75,9 +81,11 @@ printf(green "\n Creating peer connection, Bob and Alice.\n" rst);
 	char*remote_offer_sdp=rtcdc_generate_offer_sdp(bob);
 	
 	char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
-	
+	printf(red"BOB: OFFER_SDP: \n %s\n"rst,remote_offer_sdp);
+	printf(red"BOB: CAND_OFFER_SDP  TO ALICE: \n %s\n"rst,remote_cand_sdp);
 	int y = rtcdc_parse_offer_sdp(alice, remote_offer_sdp);
 	if(y >= 0){
+//printf("REMOTE_CAND_OFFER_SDP  TO ALICE: \n %s\n",remote_offer_sdp);
 	printf(green "Parse offer by Alice OK = %d\n" rst, y);
 	}else{
 	printf(red "Parse offer by Alice NOT OK = %d\n" rst, y);
@@ -86,18 +94,23 @@ printf(green "\n Creating peer connection, Bob and Alice.\n" rst);
 	
 	int pr = rtcdc_parse_candidate_sdp(alice, remote_cand_sdp);
 	if(pr > 0){
-	printf(green "Remote Candidate sdp by Alice OK = %d\n" rst, pr);
+//printf(red"REMOTE_CAND_SDP TO ALICE: \n %s\n"rst,remote_cand_sdp); /whatdddddsssseeee
+	printf(green "\nRemote Candidate sdp by Alice OK = %d\n" rst, pr);
+
 	}else{
 	printf("Remote Candidate by Alice NOT OK = %d\n", pr);
 	_exit(1);
 	}
+	
 	int x = rtcdc_parse_candidate_sdp(bob, local_cand_sdp);
 	if(x > 0){
-	printf(green "Remote Candidate OK by Bob = %d\n" rst, x);
+//printf(green"LOCAL_CAND_SDP TO BOB: \n %s\n"rst, local_cand_sdp);
+	printf(green "\nRemote Candidate OK by Bob = %d\n" rst, x);
 	}else{
 	printf("Remote Candidate NOT OK by Bob = %d\n", x);
 	_exit(1);
 	}
+	
 	
 int status_adr,status_adr2, s;
 pthread_t tid,tid2;
@@ -166,4 +179,51 @@ a=sctp-port:45699
 lcsdp: a=candidate:1 1 UDP 2013266431 10.34.42.237 60618 typ host
 a=candidate:2 1 TCP 1019216383 10.34.42.237 9 typ host tcptype active
 a=candidate:3 1 TCP 1015022079 10.34.42.237 56045 typ host tcptype passive
+*/
+
+/*
+FIRST IS ALICE - she sends an offer??
+ALICE OFFER
+v=0
+o=- 6937046047950530 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=msid-semantic: WMS
+m=application 1 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=ice-ufrag:BagX
+a=ice-pwd:s5qbut3FBHtSBt79pDJRxR
+a=fingerprint:sha-256 4C
+a=setup:active
+a=mid:data
+a=sctp-port:56640
+
+THEN BOB PARSES OFFER.
+THEN BOB GENERATE AN ANSWER???:
+
+v=0
+o=- 6937046047950530 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=msid-semantic: WMS
+m=application 1 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=ice-ufrag:CYO0
+a=ice-pwd:XbDW8NBgJa6zbndMg/sr6j
+a=fingerprint:sha-256 4C
+a=setup:passive
+a=mid:data
+a=sctp-port:56640
+
+a=candidate:1 1 UDP 2013266431 10.34.66.177 40888 typ host
+a=candidate:2 1 TCP 1019216383 10.34.66.177 9 typ host tcptype active
+a=candidate:3 1 TCP 1015022079 10.34.66.177 56243 typ host tcptype passive
+
+
+BOB: CAND_OFFER_SDP  TO ALICE: 
+ a=candidate:1 1 UDP 2013266431 10.34.66.177 48033 typ host
+a=candidate:2 1 TCP 1019216383 10.34.66.177 9 typ host tcptype active
+a=candidate:3 1 TCP 1015022079 10.34.66.177 39305 typ host tcptype passive
+
+
 */
