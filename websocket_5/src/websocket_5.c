@@ -18,12 +18,21 @@
 #include <kore/http.h>
 #include <kore/tasks.h>
 #include <limits.h>
-#include <glib.h>
+//include <glib.h>
 #include <pthread.h>
 #include <jansson.h>
 #include "assets.h"
 
-#include "rtcdc.h"
+
+
+
+#include "Microstack/ILibParsers.h"
+#include "Microstack/ILibAsyncSocket.h"
+#include "Microstack/ILibWebRTC.h"
+#include "core/utils.h"
+#include "Microstack/ILibWrapperWebRTC.h"
+#include "SimpleRendezvousServer.h"
+
 
 #define WEBSOCKET_PAYLOAD_SINGLE	125
 #define WEBSOCKET_PAYLOAD_EXTEND_1	126
@@ -34,10 +43,144 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 //struct rstate{struct kore_task task;};
+//char *stunServerList[] = { "stun.ekiga.net", "stun.ideasip.com", "stun.schlund.de", "stunserver.org", "stun.softjoys.com", "stun.voiparound.com", "stun.voipbuster.com", "stun.voipstunt.com", "stun.voxgratia.org" };
+int useStun = 0;
+
+ILibWrapper_WebRTC_ConnectionFactory mConnectionFactory;
+ILibWrapper_WebRTC_Connection mConnection;
+ILibWrapper_WebRTC_DataChannel *mDataChannel = NULL;
+SimpleRendezvousServer mServer;
+
+void* chain;
+char *stunServerList[] = { "stun.ekiga.net", "stun.ideasip.com", "stun.schlund.de", "stunserver.org", "stun.softjoys.com", "stun.voiparound.com", "stun.voipbuster.com", "stun.voipstunt.com", "stun.voxgratia.org" };
+//int useStun = 0;
+void OnDataChannelData(ILibWrapper_WebRTC_DataChannel *,char *,int);
+void OnDataChannelClosed(ILibWrapper_WebRTC_DataChannel *);
+void OnDataChannelAck(ILibWrapper_WebRTC_DataChannel *);
+void WebRTCConnectionSink(ILibWrapper_WebRTC_Connection, int);
+void WebRTCDataChannelSink(ILibWrapper_WebRTC_Connection, ILibWrapper_WebRTC_DataChannel *);
+void WebRTCConnectionSendOkSink(ILibWrapper_WebRTC_Connection);
+
+
+void OnDataChannelData(ILibWrapper_WebRTC_DataChannel *dataChannel,char *buffer,int bufferLen){
+buffer[bufferLen] = 0;
+printf("Received data on [%s]: %s\r\n", dataChannel->channelName, buffer);
+}
+void OnDataChannelClosed(ILibWrapper_WebRTC_DataChannel *dataChannel)
+{
+	printf("DataChannel [%s]:%u was closed\r\n", dataChannel->channelName, dataChannel->streamId);
+}
+void OnDataChannelAck(ILibWrapper_WebRTC_DataChannel *dataChannel)
+{
+	mDataChannel = dataChannel;
+	printf("DataChannel [%s] was successfully ACK'ed\r\n", dataChannel->channelName);
+	mDataChannel->OnStringData = (ILibWrapper_WebRTC_DataChannel_OnData)&OnDataChannelData;
+	mDataChannel->OnClosed = (ILibWrapper_WebRTC_DataChannel_OnClosed)&OnDataChannelClosed;
+}
+
+void WebRTCConnectionSink(ILibWrapper_WebRTC_Connection connection, int connected)
+{
+	if(connected)
+	{
+		printf("WebRTC connection Established. [%s]\r\n", ILibWrapper_WebRTC_Connection_DoesPeerSupportUnreliableMode(connection)==0?"RELIABLE Only":"UNRELIABLE Supported");
+		ILibWrapper_WebRTC_DataChannel_Create(connection, "MyDataChannel", 13, &OnDataChannelAck);
+	}
+	else
+	{
+		printf("WebRTC connection is closed.\r\n");
+		mConnection = NULL;
+		mDataChannel = NULL;
+	}
+}
+
+// This is called when the remote side created a data channel
+
+void WebRTCDataChannelSink(ILibWrapper_WebRTC_Connection connection, ILibWrapper_WebRTC_DataChannel *dataChannel)
+{
+	printf("WebRTC Data Channel (%u:%s) was created.\r\n", dataChannel->streamId, dataChannel->channelName);
+	mDataChannel = dataChannel;
+	mDataChannel->OnStringData = (ILibWrapper_WebRTC_DataChannel_OnData)&OnDataChannelData;
+	mDataChannel->OnClosed = (ILibWrapper_WebRTC_DataChannel_OnClosed)&OnDataChannelClosed;
+}
+
+void WebRTCConnectionSendOkSink(ILibWrapper_WebRTC_Connection connection)
+{
+	UNREFERENCED_PARAMETER(connection);
+}
+
+/*
+void OnWebSocket(SimpleRendezvousServerToken sender, int InterruptFlag, struct packetheader *header, char *bodyBuffer,
+				 int bodyBufferLen, SimpleRendezvousServer_WebSocket_DataTypes bodyBufferType, SimpleRendezvousServer_DoneFlag done)
+{	
+	printf(red"on websocket\n"rst);
+	
+	if(done == SimpleRendezvousServer_DoneFlag_NotDone)
+	{
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		printf(yellow"We have the entire offer\n"rst);
+			char *offer;
+		if (mConnection == NULL)
+		{
+			printf(yellow"The browser initiated the SDP offer, so we have to create a connection and set the offer\n"rst);
+			mConnection = ILibWrapper_WebRTC_ConnectionFactory_CreateConnection(mConnectionFactory, 
+																				&WebRTCConnectionSink, 
+																				&WebRTCDataChannelSink, 
+																				&WebRTCConnectionSendOkSink);
+			ILibWrapper_WebRTC_Connection_SetStunServers(mConnection, stunServerList, 9);
+
+			if (useStun==0)
+			{
+				printf(red"stun is 0\n"rst);
+				offer = ILibWrapper_WebRTC_Connection_SetOffer(mConnection, bodyBuffer, bodyBufferLen, NULL);
+				SimpleRendezvousServer_WebSocket_Send(sender, SimpleRendezvousServer_WebSocket_DataType_TEXT, offer, strlen(offer), ILibAsyncSocket_MemoryOwnership_CHAIN, SimpleRendezvousServer_FragmentFlag_Complete);
+			}
+			else
+			{
+				printf(yellow"We're freeing this, becuase we'll generate the offer in the candidate callback...\n"rst);
+				// The best way, is to return this offer, and update the candidate incrementally, but that is for another sample
+				ILibWrapper_WebRTC_Connection_SetUserData(mConnection, NULL, sender, NULL);
+				free(ILibWrapper_WebRTC_Connection_SetOffer(mConnection, bodyBuffer, bodyBufferLen, &CandidateSink));
+			}
+		}
+		else
+		{
+			printf(yellow"We inititiated the SDP exchange, so the browser is just giving us a response... Even tho, this will generate a counter-response\n"rst);
+			// we don't need to send it back to the browser, so we'll just drop it.
+			printf(red"Setting Offer...\r\n"rst);
+			free(ILibWrapper_WebRTC_Connection_SetOffer(mConnection, bodyBuffer, bodyBufferLen, NULL));	
+		}
+	
+	
+	
+	
+	
+	
+	
+	
+	}
+}
+*/
+
+//#if defined(_POSIX)
+void BreakSink(int s)
+{
+	UNREFERENCED_PARAMETER( s );
+
+	signal(SIGINT, SIG_IGN);	// To ignore any more ctrl c interrupts
+	
+	ILibStopChain(chain); // Shutdown the Chain
+}
+//#endif
 struct kore_task pipe_task;
-GMainLoop*loop;
-gint count=10;
-gboolean cb(gpointer);
+
 int do_loop(struct kore_task*);
 int run_curl(struct kore_task*);
 int		page(struct http_request *);
@@ -55,20 +198,6 @@ int pipe_reader(struct kore_task *);
 int rtc_loop(struct kore_task *);
 void pipe_data_available(struct kore_task *);
 
-static void *rtcdc_e_loop(void*);
-static void onmessage(struct rtcdc_data_channel*,int, void*,size_t,void*);
-static void onopen(struct rtcdc_data_channel*,void*);
-static void onclose(struct rtcdc_data_channel*,void*);
-static void onconnect(struct rtcdc_peer_connection*,void*);
-static void onchannel(struct rtcdc_peer_connection*,struct rtcdc_data_channel*,void *);
-static void on_candidate(struct rtcdc_peer_connection*, const char*, void*);
-void handle_candidate(char*);
-void handle_offer(json_t*, struct connection*);
-void handle_answer(json_t*);
-void create_pc(struct connection*);
-
-int dc_open=0;
-struct rtcdc_peer_connection *bob=NULL;
 
 int init(state){
 	printf("Entering init.\n");
@@ -176,6 +305,7 @@ websocket_connect(struct connection *c)
 	}
 	ab++;
 kore_log(LOG_NOTICE, "%p: connected", c);
+	/*
 	json_t *reply=json_object();
 	json_object_set_new(reply,"type",json_string("message"));
 	
@@ -186,8 +316,17 @@ kore_log(LOG_NOTICE, "%p: connected", c);
 	size=json_dumpb(reply,buf,size,0);
 	printf("buffer: %s\n",buf);
 	kore_websocket_send(c, 1, buf,size);
-	json_decref(reply);
+	*/
+	//json_decref(reply);
 	//free((charbuf);
+	
+	
+	
+	
+	
+	
+	
+	
 	}
 
 void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len)
@@ -195,104 +334,52 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 	if(data==NULL) return;
 	//kore_log(LOG_NOTICE,"some message: %s",(char*)data);
 	
-	//fwrite((char*)data,1,len,stdout);
-	//printf("\n");
-	/*
-	char*offer_sdp=(char*)data;
-	
-char*offer="v=0 \n"\
-"o=- 2701145278607694824 2 IN IP4 127.0.0.1 \n" \
-"s=- \n"              \
-"t=0 0 \n"             \
-"a=group:BUNDLE data \n" \
-"a=msid-semantic: WMS \n" \
-"m=application 9 DTLS/SCTP 5000 \n"\
-"c=IN IP4 0.0.0.0 \n"\
-"a=ice-ufrag:nGsD \n"\
-"a=ice-pwd:hZPKMtow1DEM4fL7iUppDJHA\n"\
-"a=ice-options:trickle \n"\
-"a=fingerprint:sha-256 C1:50:3F:D4:C7:F8:E1:F6:FF:67:DA:73:40:5E:0C:89:76:C3:58:AF:23:F3:07:05:6E:02:2E:05:C6:2E:F8:4E "\
-"a=setup:actpass \n"\
-"a=mid:data \n"\
-"a=sctpmap:5000 webrtc-datachannel 1024\n";
-*/
-	/*
-	with internet connection
-v=0
-o=- 8848996438182133161 2 IN IP4 127.0.0.1
-s=-
-t=0 0
-a=group:BUNDLE data
-a=msid-semantic: WMS
-m=application 9 DTLS/SCTP 5000
-c=IN IP4 0.0.0.0
-a=ice-ufrag:LV9g
-a=ice-pwd:CoCdNISUrqZTDOLqW8T3uXsh
-a=ice-options:trickle
-a=fingerprint:sha-256 87:A3:AC:7B:60:38:77:EA:55:5C:89:F9:85:E4:47:9D:BD:5B:BA:CC:E0:3E:3E:53:1C:BC:E1:20:B0:9B:EA:2D
-a=setup:actpass
-a=mid:data
-a=sctpmap:5000 webrtc-datachannel 1024
-a=candidate:1047372208 1 udp 2113937151 10.34.73.56 49670 typ host generation 0 ufrag LV9g network-cost 50
-*/
-/*	
-v=0
-o=- 5663417401290824 2 IN IP4 127.0.0.1
-s=-
-t=0 0
-a=msid-semantic: WMS
-m=application 1 UDP/DTLS/SCTP webrtc-datachannel
-c=IN IP4 0.0.0.0
-a=ice-ufrag:5Ld6
-a=ice-pwd:m9qMJjGpa0mpbfd0uzQYY5
-a=fingerprint:sha-256 EA
-a=setup:active
-a=mid:data
-a=sctp-port:45699
-*/	/*
-	printf("OFFERRRRRRRRRRR!: %s\n",offer);
+	fwrite((char*)data,1,len,stdout);
+	printf("\n");
+
+	printf(yellow"We have the entire offer\n"rst);
+			char *offer;
+		if (mConnection == NULL)
+		{
+			printf(yellow"The browser initiated the SDP offer, so we have to create a connection and set the offer\n"rst);
+			mConnection = ILibWrapper_WebRTC_ConnectionFactory_CreateConnection(mConnectionFactory, 
+																				&WebRTCConnectionSink, 
+																				&WebRTCDataChannelSink, 
+																				&WebRTCConnectionSendOkSink);
+			//ILibWrapper_WebRTC_Connection_SetStunServers(mConnection, stunServerList, 9);
+
+			if (useStun==0)
+			{
+				printf(red"stun is 0\n"rst);
+				offer = ILibWrapper_WebRTC_Connection_SetOffer(mConnection, data, len, NULL);
+				printf(red"Offer:\n %s\n"rst,offer);
+				//SimpleRendezvousServer_WebSocket_Send(sender, SimpleRendezvousServer_WebSocket_DataType_TEXT, offer, 
+				//strlen(offer), ILibAsyncSocket_MemoryOwnership_CHAIN, SimpleRendezvousServer_FragmentFlag_Complete);
+				kore_websocket_send(c, 1, offer,strlen(offer));
+			}
+			else
+			{
+				//printf(yellow"We're freeing this, becuase we'll generate the offer in the candidate callback...\n"rst);
+				// The best way, is to return this offer, and update the candidate incrementally, but that is for another sample
+				//ILibWrapper_WebRTC_Connection_SetUserData(mConnection, NULL, sender, NULL);
+				//free(ILibWrapper_WebRTC_Connection_SetOffer(mConnection, bodyBuffer, bodyBufferLen, &CandidateSink));
+			}
+		}
+		else
+		{
+			printf(yellow"We inititiated the SDP exchange, so the browser is just giving us a response... Even tho, this will generate a counter-response\n"rst);
+			// we don't need to send it back to the browser, so we'll just drop it.
+			printf(red"Setting Offer...\r\n"rst);
+			//free(ILibWrapper_WebRTC_Connection_SetOffer(mConnection, bodyBuffer, bodyBufferLen, NULL));	
+		}
 	
 	
-	int a=rtcdc_parse_offer_sdp(bob, offer_sdp);
-	if(a >= 0){
-	printf(green "parse offer by Bob OK = %d\n" rst, a);
-	}else{
-	printf(red "parse offer by Bob NOT OK = %d\n" rst, a);
-	//_exit(1);
-	return;
-	}
-	*/
-	//char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
-	//kore_websocket_send(c, 1, remote_cand_sdp,strlen(remote_cand_sdp));
-	//char*remote_offer_sdp
-		//offer_sdp=rtcdc_generate_offer_sdp(bob);
-	//char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
-	//printf("CANDIDATE ON SERVER: \n %s\n",remote_cand_sdp);
-	//printf("REMOTE OFFER ON SERVER: \n %s\n",remote_offer_sdp);
-	/*
-	int x = rtcdc_parse_candidate_sdp(bob, remote_cand_sdp);
-	if(x > 0){
-	printf(green "Remote Candidate OK by Bob = %d\n" rst, x);
-	}else{
-	printf("Remote Candidate NOT OK by Bob = %d\n", x);
-	return;
-	}
-	*/
-	/*
-	int a=rtcdc_parse_offer_sdp(bob, offer_sdp);
-	if(a >= 0){
-	printf(green "parse offer by Bob OK = %d\n" rst, a);
-	}else{
-	printf(red "parse offer by Bob NOT OK = %d\n" rst, a);
-	//_exit(1);
-	return;
-	}*/
+	
 	
 	//kore_websocket_send(c, 1, offer_sdp,strlen(offer_sdp));
 	
-
 	
-	//printf("DATA: %s\n",(const char*)data);
+	/*
 	
 	json_t *root = load_json((const char*)data, len);
 	if(root){
@@ -337,6 +424,7 @@ free(foo);
 	}else{}
 
 	json_decref(root);
+	*/
 }
 
 void
@@ -345,157 +433,9 @@ websocket_disconnect(struct connection *c)
 	kore_log(LOG_NOTICE, "%p: disconnecting", c);
 }
 
-void handle_candidate(char*obj){
-/*json_error_t error;
-char*type_m;
- char*cand;
-int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"cand",&cand);
-	printf("is ok ab: %d\n",aber);
-	if(aber==-1){
-	printf("error: %s\n",error.text);
-	printf("source: %s\n",error.source);
-	printf("line: %d\n",error.line);
-	printf("position: %d\n",error.position);
-	printf("column: %d\n",error.column);
-	return;
-	}
-	printf("type: %s\n",type_m);
-	*/
-	printf("candidate: %s\n", obj);
-	int x = rtcdc_parse_candidate_sdp(bob, obj);
-	if(x > 0){
-	printf(green "Remote Candidate OK by Bob = %d\n" rst, x);
-	}else{
-	printf("Remote Candidate NOT OK by Bob = %d\n", x);
-	return;
-	}
-}
 
-void create_pc(struct connection*c){
-	/*
-	bob=rtcdc_create_peer_connection(onchannel,on_candidate,onconnect,
-										"stun.services.mozilla.com",3478, c);
-	GThread *boba=g_thread_new("tobob", &rtcdc_e_loop,(void*)bob);
-	g_thread_join(boba);
-   g_thread_unref(boba);*/
-//return 0;
-	//.....
-}
 
-void handle_offer(json_t*obj,struct connection*c){
-json_error_t error;
-char*type_m;
- char*remote_offer_sdp;
-	char*cand;
-int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s,s:s}","type",&type_m,"sdp",&remote_offer_sdp,"candidate",&cand);
-	printf("is ok aber from handle_offer: %d\n",aber);
-	if(aber==-1){
-	printf("error: %s\n",error.text);
-	printf("source: %s\n",error.source);
-	printf("line: %d\n",error.line);
-	printf("position: %d\n",error.position);
-	printf("column: %d\n",error.column);
-	return;
-	}
-	//create_pc(c);jiji
-	printf("CAND_CAND!:\n %s\n",cand);
-	int y = rtcdc_parse_offer_sdp(bob, remote_offer_sdp);
-	if(y >= 0){
-	printf(green "Parse offer by Bob OK = %d\n" rst, y);
-	}else{
-	printf(red "Parse offer by Bob NOT OK = %d\n" rst, y);
-	return;
-	}
-	
-	int x = rtcdc_parse_candidate_sdp(bob, cand);
-	if(x > 0){
-	printf(green "Remote Candidate OK by Bob = %d\n" rst, x);
-	}else{
-	printf("Remote Candidate NOT OK by Bob = %d\n", x);
-	return;
-	}
-	
-char*super="v=0\r\n" \
-"o=- 3881566885448255 2 IN IP4 127.0.0.1\r\n" \
-"s=-\r\n" \
-"t=0 0\r\n" \
-"a=msid-semantic: WMS\r\n" \
-"m=application 1 UDP/DTLS/SCTP webrtc-datachannel\r\n" \
-"c=IN IP4 0.0.0.0\r\n" \
-"a=ice-ufrag:EHu6\r\n" \
-"a=ice-pwd:uI4DHhP+FJZFEzw0APYecA\r\n" \
-"a=fingerprint:sha-256 70:0E:28:47:6C:53:00:9F:5A:AF:0D:86:DA:8B:84:5B:27:D0:DA:C0:A4:A8:99:8B:F7:EA:E2:23:38:9A:23:A5\r\n" \
-"a=setup:passive\r\n" \
-"a=mid:data\r\n" \
-"a=sctpmap:5000 webrtc-datachannel 1024\r\n"\
-"a=candidate:0 1 UDP 2128609535 10.34.49.165 57159 typ host\r\n"\
-"a=candidate:0 2 UDP 2128609535 10.34.49.165 57159 typ host\r\n";
-/*
-	"a=candidate:4252177992 1 udp 2113937151 10.34.16.238 37847 typ host generation 0 ufrag A6t4 network-cost 50\r\n" \
-"a=candidate:1 1 UDP 2013266431 10.34.16.238 59948 typ host\r\n";
-*/	
-	
-	
-	char*suka=rtcdc_generate_local_candidate_sdp(bob);
-	printf("SUKA: %s\n",suka);
-	char*sdp=rtcdc_generate_offer_sdp(bob);
-	//{type:answer,answer:remote_offer_sdp}
-	json_t *reply=json_object();
-	json_object_set_new(reply,"type",json_string("answer"));
-	//json_object_set_new(reply,"session_id",json_integer(5));
-	json_object_set_new(reply,"answer",json_string(super));
-  // const char*line=json_dumps(reply,0);
-	//size_t siz = json_object_size(reply);
-	size_t size=json_dumpb(reply,NULL,0,0);
-	if(size==0){printf("Size is null\n");return;}
-	char*buf=alloca(size);
-	size=json_dumpb(reply,buf,size,0);
-	printf("buffer: %s\n",buf);
-	kore_websocket_send(c, 1, buf,size);
-	json_decref(reply);	
-	
-	char*remote_cand_sdp=rtcdc_generate_local_candidate_sdp(bob);
-	printf(red"BOB: CAND_SDP: \n %s\n"rst,remote_cand_sdp);
-	
-	json_t *reply2=json_object();
-	json_object_set_new(reply2,"type",json_string("candidate"));
-	//json_object_set_new(reply,"session_id",json_integer(5));
-	json_object_set_new(reply2,"cand",json_string(remote_cand_sdp));
-  // const char*line=json_dumps(reply,0);
-	//size_t siz = json_object_size(reply);
-	size_t size2=json_dumpb(reply2,NULL,0,0);
-	if(size==0){printf("Size is null\n");return;}
-	char*buf2=alloca(size2);
-	size=json_dumpb(reply2,buf2,size2,0);
-	//printf("buffer: %s\n",buf);
-	//kore_websocket_send(c, 1, buf2,size2);
-	json_decref(reply2);	
-	//json_decref(reply);
-}
 
-void handle_answer(json_t*obj){
-json_error_t error;
-char*type_m;
- char*answer;
-int aber=json_unpack_ex(obj,&error,JSON_STRICT,"{s:s,s:s}","type",&type_m,"answer",&answer);
-	printf("is ok aber: %d\n",aber);
-	if(aber==-1){
-	printf("error: %s\n",error.text);
-	printf("source: %s\n",error.source);
-	printf("line: %d\n",error.line);
-	printf("position: %d\n",error.position);
-	printf("column: %d\n",error.column);
-	return;
-	}
-	int y = rtcdc_parse_offer_sdp(bob, answer);
-	if(y >= 0){
-	printf(green "Parse answer by Bob OK = %d\n" rst, y);
-	}else{
-	printf(red "Parse answer by Bob NOT OK = %d\n" rst, y);
-	return;
-	}
-	
-}
 
 int page(struct http_request *req)
 {
@@ -542,7 +482,7 @@ int page(struct http_request *req)
 	return (KORE_RESULT_OK);
 }
 
-
+/*
 int run_curl(struct kore_task *t){
 char user[64];
 	u_int32_t len;
@@ -556,7 +496,7 @@ char user[64];
 	kore_task_channel_write(t,"papa\0",5);
 	return (KORE_RESULT_OK);
 }
-
+*/
 int page_ws_connect(struct http_request *req)
 {
 	//req->hdlr_extra=0;
@@ -582,16 +522,26 @@ return;
 	kore_log(LOG_NOTICE,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTask msg: %s",buf);
 }
 
-static void *rtcdc_e_loop(void*peer){
-struct rtcdc_peer_connection*p=(struct rtcdc_peer_connection*)peer;
-printf("rtcdc_loop started.\n");
-rtcdc_loop(p);
-//rtcdc_destroy_peer_connection(p);
+void Run()
+{
+	char temp[1024];
+	char* line;
+
+	while(ILibIsChainBeingDestroyed(chain)==0)
+	{
+		line = fgets(temp, 1024, stdin);
+
+		if (mDataChannel != NULL && line!=NULL)
+		{
+			ILibWrapper_WebRTC_DataChannel_Close(mDataChannel);
+			//ILibWrapper_WebRTC_DataChannel_SendString(mDataChannel, line, strlen(line)); // Send string data over the WebRTC Data Channel
+		}
+	}
 }
 
 
 int rtc_loop(struct kore_task*t){
-	
+/*	
 printf("\n Creating peer connection, Alice.\n");
 //void*user_data;
 GMainContext *context=NULL;
@@ -603,63 +553,32 @@ g_main_loop_run(mainloop);
 g_thread_join(abob);
 g_thread_unref(abob);
 g_main_loop_unref(mainloop);
+*/
+	
+	signal(SIGPIPE, SIG_IGN); // Set a SIGNAL on Linux to listen for Ctrl-C
 
+	// Shutdown on Ctrl + C
+	signal(SIGINT, BreakSink);
+	{
+		struct sigaction act; 
+		act.sa_handler = SIG_IGN; 
+		sigemptyset(&act.sa_mask); 
+		act.sa_flags = 0; 
+		sigaction(SIGPIPE, &act, NULL);
+	}
+	
+	chain = ILibCreateChain();	// Create the MicrostackChain, to which we'll attach the WebRTC ConnectionFactory
+	mConnectionFactory = ILibWrapper_WebRTC_ConnectionFactory_CreateConnectionFactory(chain, 0); 
+	ILibSpawnNormalThread(&Run, NULL); // Spawn a thread to listen for user input
+	ILibStartChain(chain); 
+	
+	
+	printf("Application exited gracefully.\r\n");
+	
 return (KORE_RESULT_OK);
 }
 
-/*
 
-void onmessage(struct rtcdc_data_channel*,int, void*,size_t,void*);
-void onopen(struct rtcdc_data_channel*,void*);
-void onclose(struct rtcdc_data_channel*,void*);
-void onconnect(struct rtcdc_peer_connection*,void*);
-void onchannel(struct rtcdc_peer_connection*,struct rtcdc_data_channel*,void *);
-void on_candidate(struct rtcdc_peer_connection*, const char*, void*);
-
-*/
-
-void onmessage(struct rtcdc_data_channel*channel,int datatype,void*data,size_t len,void*user_data){
-	printf(red "\n Data  received => %s\n" rst,(char*)data);
-	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
-	char*message2="Hi! Wow. On_message.\0";
-    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message2,strlen(message2)+1); 
-	}
-	}
-	void onopen(struct rtcdc_data_channel*channel,void*user_data){
-	printf(green "\n Data channel opened!\n" rst);
-	dc_open=1;
-	if(channel->state > RTCDC_CHANNEL_STATE_CLOSED){
-	char*message="Hi! I'm Bob. On_open.\0";
-    rtcdc_send_message(channel,RTCDC_DATATYPE_STRING,message,strlen(message)+1); 
-	}
-	}
-	void onclose(struct rtcdc_data_channel*channel,void*user_data){
-	printf("\nData channel closed!\n");
-	dc_open=0;
-	}
-	void onconnect(struct rtcdc_peer_connection*peer,void*user_data){
-	printf(green "\nPeer connection established!\n" rst);
-	printf("peer->role: %d\n",peer->role);
-	rtcdc_create_data_channel(peer,"test-dc","",onopen,onmessage,onclose,user_data);
-	}
-	void onchannel(struct rtcdc_peer_connection*peer,struct rtcdc_data_channel*channel,void *user_data){
-	printf("\nChannel created! With a channel->label: %s\n",channel->label);
-	channel->on_message=onmessage;
-	}
-	void on_candidate(struct rtcdc_peer_connection*peer,const char*candidate,void*user_data){
-	
-	struct kore_task*t=(struct kore_task*)user_data;
-		printf(yellow "ON CANDIDATE SUKA! %s\n" rst, candidate);
-	//json_t *reply=json_object();
-	//json_object_set_new(reply,"type",json_string("candidate"));
-	//json_object_set_new(reply,"session_id",json_integer(5));
-	//json_object_set_new(reply,"cand",json_string(candidate));
-  // const char*line=json_dumps(reply,0);
-	//size_t siz = json_object_size(reply);
-	kore_task_channel_write(t,(void*)candidate,100);
-	//kore_websocket_send(c,1,reply, siz);
-	//json_decref(reply);
-	}
 /*
 librtcdc
 offer_sdp BY ALICE:
