@@ -1,0 +1,150 @@
+./configure -D_PLUGINDIR=./plugins --enable-libsrtp2 --disable-plugin-echotest --disable-plugin-recordplay  --disable-plugin-sip  --disable-plugin-streaming  --disable-plugin-videocall --disable-plugin-videoroom --disable-plugin-voicemail
+make -D_PLUGINDIR=./plugins
+disable-rabbitmq      Disable RabbitMQ integration
+  --disable-mqtt          Disable MQTT integration
+  --disable-unix-sockets 
+
+disable-plugin-echotest
+                          Disable echotest plugin
+  --disable-plugin-recordplay
+                          Disable record&play plugin
+  --disable-plugin-sip    Disable sip plugin
+  --disable-plugin-streaming
+                          Disable streaming plugin
+  --disable-plugin-textroom
+                          Disable textroom plugin
+  --disable-plugin-videocall
+                          Disable videocall plugin
+  --disable-plugin-videoroom
+                          Disable videoroom plugin
+  --disable-plugin-voicemail
+
+Janus commit: 9e55e3da35f29ea10063570cc4dfa6a7399765c3
+Compiled on:  Mon Feb  5 12:00:14 EST 2018
+
+---------------------------------------------------
+  Starting Meetecho Janus (WebRTC Gateway) v0.2.5
+---------------------------------------------------
+
+Checking command line arguments...
+
+
+Crypto: OpenSSL pre-1.1.0
+Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+
+
+Initializing library
+janus.js:314 Library initialized: true
+janus.js:338 Using WebSockets to contact Janus: ws://localhost:8188
+janus.js:666 Created session: 4903764952192458
+janus.js:871 Created handle: 8744608785570887
+textroomtest.js:92 Plugin attached! (janus.plugin.textroom, id=8744608785570887)
+janus.js:1321 Creating PeerConnection
+janus.js:1329 Preparing local SDP and gathering candidates (trickle=true)
+janus.js:1375 Creating data channel
+janus.js:1405 Remote description accepted!
+janus.js:1881 Creating answer (iceDone=false)
+janus.js:1919 Setting local description
+janus.js:1337 End of candidates.
+janus.js:1382 State change on data channel: open
+textroomtest.js:137 The DataChannel is available!
+textroomtest.js:108 Janus says our WebRTC PeerConnection is up now
+janus.js:1180 Sending string on data channel: {"textroom":"join","transaction":"wLQM0wBNdvBw","room":1234,"username":"K0MlTs30yn6n","display":"alice"}
+janus.js:1377 Received message on data channel: {
+   "textroom": "join",
+   "room": 1234,
+   "username": "K0MlTs30yn6n",
+   "display": "alice"
+}
+janus.js:1377 Received message on data channel: {
+   "textroom": "success",
+   "participants": [],
+   "transaction": "wLQM0wBNdvBw"
+}
+textroomtest.js:305 Participants: []
+janus.js:1180 Sending string on data channel: {"textroom":"message","transaction":"UPmaIf6phZBP","room":1234,"text":"hi"}
+janus.js:1377 Received message on data channel: {
+   "textroom": "message",
+   "room": 1234,
+   "from": "K0MlTs30yn6n",
+   "date": "2018-02-05T12:30:59-0500",
+   "text": "hi"
+}
+janus.js:1377 Received message on data channel: {
+   "textroom": "success",
+   "transaction": "UPmaIf6phZBP"
+}******************************************************8
+
+http://localhost:3000/textroomtest.html, { iceServers: [stun:stun.l.google.com:19302], iceTransportPolicy: all, bundlePolicy: balanced, rtcpMuxPolicy: require, iceCandidatePoolSize: 0 }, 
+{advanced: [{enableDtlsSrtp: {exact: true}}]}
+
+ >> Merged (548 bytes)
+ -------------------------------------------
+v=0
+o=- 1517853784672411 1517853784672409 IN IP4 10.34.88.3
+s=Janus TextRoom plugin
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.88.3
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:ZASY
+a=ice-pwd:7s2uE1qVf3GolxJUSCZDjt
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:actpass
+a=candidate:1 1 udp 2013266431 10.34.88.3 32972 typ host
+a=end-of-candidates
+
+{type: "offer", sdp: "v=0↵o=- 1517854190888502 1517854190888500 IN IP4 … 10.34.88.3 48466 typ host↵a=end-of-candidates↵"}
+sdp
+:
+"v=0↵o=- 1517854190888502 1517854190888500 IN IP4 10.34.88.3↵s=Janus TextRoom plugin↵t=0 0↵a=group:BUNDLE data↵a=msid-semantic: WMS janus↵m=application 9 DTLS/SCTP 5000↵c=IN IP4 10.34.88.3↵a=sendrecv↵a=sctpmap:5000 webrtc-datachannel 16↵a=mid:data↵a=ice-ufrag:Tlvg↵a=ice-pwd:CwA4EZQSwidAj5L664tf57↵a=ice-options:trickle↵a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38↵a=setup:actpass↵a=candidate:1 1 udp 2013266431 10.34.88.3 48466 typ host↵a=end-of-candidates↵"
+type
+:
+"offer"
+
+
+{type: "answer", sdp: "v=0↵o=- 567314223846175235 2 IN IP4 127.0.0.1↵s=…id:data↵a=sctpmap:5000 webrtc-datachannel 1024↵"}
+sdp
+:
+"v=0↵o=- 567314223846175235 2 IN IP4 127.0.0.1↵s=-↵t=0 0↵a=group:BUNDLE data↵a=msid-semantic: WMS↵m=application 9 DTLS/SCTP 5000↵c=IN IP4 0.0.0.0↵b=AS:30↵a=ice-ufrag:2Cch↵a=ice-pwd:uT5tI/9JC5r8vBCsRRPlyb+c↵a=ice-options:trickle↵a=fingerprint:sha-256 AB:53:4F:27:0A:A9:76:3C:B3:79:8A:CF:B8:F5:AA:90:23:E8:C9:4F:C7:BC:FD:0B:98:9A:37:F2:43:2C:14:66↵a=setup:active↵a=mid:data↵a=sctpmap:5000 webrtc-datachannel 1024↵"
+type
+:
+"answer"
+
+cand {"candidate":"candidate:2391212211 1 udp 2122260223 10.34.88.3 53107 typ host generation 0 ufrag 2Cch network-id 1 network-cost 50","sdpMid":"data","sdpMLineIndex":0}
+
+{candidate: "candidate:2391212211 1 udp 2122260223 10.34.88.3 5…eration 0 ufrag 2Cch network-id 1 network-cost 50", sdpMid: "data", sdpMLineIndex: 0}
+candidate
+:
+"candidate:2391212211 1 udp 2122260223 10.34.88.3 53107 typ host generation 0 ufrag 2Cch network-id 1 network-cost 50"
+sdpMLineIndex
+:
+0
+sdpMid
+:
+"data"
+
+
+[7528637397293755] Remote SDP: BY BROWSER??
+v=0
+o=- 8390502800549818343 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+b=AS:30
+a=ice-ufrag:DnTf
+a=ice-pwd:NlPxfbTtKe9O4U9iXWyNAZpz
+a=ice-options:trickle
+a=fingerprint:sha-256 E2:2E:0E:FA:29:9F:0F:06:D8:21:92:FA:CC:12:1A:A9:EB:F7:64:D9:55:9E:56:76:60:0B:41:A2:0D:4C:07:33
+a=setup:active
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+
