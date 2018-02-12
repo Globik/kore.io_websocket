@@ -1,0 +1,50 @@
+<!DOCTYPE>
+<html>
+	<head><title>ajax</title>
+</head>
+
+<body>
+	<button onclick="getax();">getax</button><br>
+	<button onclick="postax();">postax</button><br>
+<div id="log"></div>
+	<form method="POST" action="/morr?same=Vadik">
+		  <input type="text" name="id" value="123123">
+		<input type="submit">
+	</form>
+	<script>
+		function getax(){
+		var xhr=new XMLHttpRequest();
+			xhr.open("get","/fuck?id=4");
+			xhr.onload=function(s){
+				
+			if(xhr.status==200){
+			console.log("response: ",this.response);
+			}else{
+			console.warn(this.status,' ',this.response);
+			}
+			}
+			xhr.onerror=function(s){console.error('error: ',s);}
+			xhr.send();
+		}
+		
+		function postax(){
+		var xhr=new XMLHttpRequest();
+			xhr.open("POST","/morr?same=Vadik");
+			var params='id='+encodeURIComponent('134134');
+			//alert(params);
+			//xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+			xhr.onload=function(s){
+				
+			if(xhr.status==200){
+			console.log("response: ",this.response);
+			}else{
+			console.warn(this.status,' ',this.response);
+			}
+			}
+			xhr.onerror=function(s){console.error('error: ',s);}
+			xhr.send(params);
+		}
+	</script>
+
+</body>
+</html>
