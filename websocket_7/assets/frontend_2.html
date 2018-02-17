@@ -1,0 +1,259 @@
+<!DOCTYPE>
+<html>
+<body onload="start()" onunload="stop()">
+<!--
+	User: <b id="vuser"></b><br>
+
+<form action="/" onsubmit="connect(); return false;">
+<input type="submit" value="connect">
+</form>
+	<input type="text" id="f" value="alice"/>
+	<button onclick="send_message();">send message</button>
+	<div id="counter"></div>
+<output id="mout"></output>
+-->
+	<span id="outputtext"></span>
+    <hr />
+    <textarea id="inputtext" style="width:100%" onkeypress="onUserKeyPressEvent(event)"></textarea>
+	<script>
+		var figa="";var muka="";
+		var connection = null;
+        var datachannel = null;
+        var configuration = { "iceServers": [/*{{{ICESERVERS}}}*/{'url':'stun:stun.services.mozilla.com:3478'}] };
+        var currentoffer = null;
+        var requester;
+        var sdp = "";
+        var outputtextbox = document.getElementById("outputtext");
+        var inputtextbox = document.getElementById("inputtext");
+
+        var wsocket = null;
+
+        function stop() { connection.close(); }
+
+        function start() {
+            msg("Starting...");
+
+            if (typeof mozRTCPeerConnection !== 'undefined') { connection = new mozRTCPeerConnection(configuration); }
+            else if (typeof RTCPeerConnection !== 'undefined') { connection = new RTCPeerConnection(configuration); }
+            else if (typeof webkitRTCPeerConnection !== 'undefined') { connection = new webkitRTCPeerConnection(configuration); }
+            else return false;
+
+            datachannel = connection.createDataChannel("test-dc", { reliable: true });
+            datachannel.onmessage = function (event) { msg("Remote: " + event.data); };
+            datachannel.onopen = function () { msg("Web RTC Connected."); };
+
+             connection.ondatachannel = onNewDataChannel;
+            connection.onicecandidate = onIceCandidate;
+            connection.createOffer(onOfferDone, onError, { mandatory: { OfferToReceiveAudio: false, OfferToReceiveVideo: false } });
+            connection.oniceconnectionstatechange = function ()
+            {
+				//alert(1);
+				console.warn("oniceconnectionstatechange",connection.iceConnectionState);
+				
+                if (connection.iceConnectionState == 'disconnected')
+                {
+                    msg('DISCONNECTED');
+                }
+            }
+        }
+
+        function onNewDataChannel(e)
+        {
+            msg("Channel [" + e.channel.label + "] created");
+            datachannel = e.channel;
+            datachannel.onmessage = function (event) { msg("Remote: " + event.data); }
+        }
+
+        function onUserKeyPressEvent(event) {
+            if (event.keyCode == 13) {
+                datachannel.send(inputtextbox.value);
+                msg("Local: " + inputtextbox.value);
+                inputtextbox.value = "";
+                if (e.preventDefault) e.preventDefault();
+                if (e.stopPropagation) e.stopPropagation();
+                return false;
+            }
+        }
+
+        
+	wsocket=new WebSocket("ws://127.0.0.1:8888/connect");
+    wsocket.onopen = function (evt) { msg("WebSocket connected");}
+	wsocket.onclose=function(){console.log("websocket closed");}
+    wsocket.onmessage = function (evt){
+		console.log("evt.data: ",evt.data);
+	try{var m=JSON.parse(evt.data);}catch(e){console.log(e);return;}
+	
+	if(m.type=="message"){console.log("message type");
+						 }else if(m.type=="candidate"){
+							// handle_candidate(m.cand);
+						 }else if(m.type=="offer"){
+							 handle_offer(m.offer);
+						 }else if(m.type=="answer"){
+							 handle_answer(m.answer);
+						 }else{console.warn("UNknown type: ",m.type);}
+            
+	}
+
+	
+	function onIceCandidate(ev){
+	if(ev.candidate){
+		console.warn("HERE CANDIDATE: ",ev.candidate.candidate);
+		figa="a="+ev.candidate.candidate;
+	//if(wsocket)wsocket.send(JSON.stringify({type:"candidate",cand:"a="+ev.candidate.candidate}))
+		suka();
+		}
+	}
+	
+		
+	function handle_candidate(cand){
+	if(connection){
+		try{
+			var obi={};
+			obi.candidate="a=candidate:1 1 UDP 2013266431 10.34.70.158 59114 typ host";///cand;
+			obi.sdpMid="data";
+			obi.dpMLineIndex=0;
+		var sm=new RTCIceCandidate(obi);
+		}catch(e){console.error(e);}
+	connection.addIceCandidate(sm).then(function(){console.log("a?");}).catch(function(e){console.error("err add ice candidate: ",e);})
+		}else{console.warn("no connection");}
+	}
+		function handle_offer(n){
+		console.warn("OFFER?");
+		}
+		
+		//70:0E:28:47:6C:53:00:9F:5A:AF:0D:86:DA:8B:84:5B:27:D0:DA:C0:A4:A8:99:8B:F7:EA:E2:23:38:9A:23:A5
+		//03:63:62:CE:EB:9F:56:22:12:BA:86:CF:92:EC:21:DA:D9:21:DA:90:8E:86:FE:A7:85:B0:34:4C:F4:D2:5E:10
+		
+		function handle_answer(a){
+			console.log("answer came: ",a);
+			
+			var ax = new RTCSessionDescription({ type: "answer", sdp: a })
+		connection.setRemoteDescription(ax).then(function(){console.log("answer came success");}).catch(function(e){
+		console.log("some err in handle_answer: ",e);
+		});
+		}
+        function onCandidateAdded(e) { debug('onCandidateAdded: ' + e); }
+
+        function onOfferDone(offer)
+        {
+            // debug(offer.sdp);
+            currentoffer = offer;
+			connection.setLocalDescription(offer, onSetLocalDescriptionDone, onError);
+            sdp = currentoffer.sdp;
+        }
+
+        function onSetLocalDescriptionDone() {
+	//	wsocket.send(JSON.stringify({type:"offer",offer:connection.localDescription}))
+			console.warn("figa: ",figa);
+			//connection.cand=figa;
+			//wsocket.send(JSON.stringify(connection.localDescription));
+			muka=connection.localDescription;
+			suka();
+		}
+function suka(){
+	if(!figa){console.log("NO FIGA, RETURN");return;}
+	console.error("sdp: ",muka," figa: ",figa);
+			   console.warn("sdp2: ",muka.sdp);
+				if(figa.length>0){
+				wsocket.send(JSON.stringify({type:"offer",sdp:muka.sdp,candidate:figa}));
+				}
+			   }
+        function initiatorErrorResponse() { msg('Could not contact server.'); }
+
+        function onSetRemoteDescriptionDone() { debug('setRemoteDescription() completed'); }
+        function stop() { connection.close(); }
+        function onError(e) { if (e.message){ 
+			//alert("onError: " + e.message);
+		console.error("onError: ",e.message);
+		} else{ 
+			//alert(e);
+			console.error("simple e: ",e);
+		
+		} }
+        function debug(m) {  console.warn(m);  }
+        function msg(m) { outputtextbox.innerHTML += (m + "<br />"); }
+		
+		
+		
+		/*
+var socket = null;
+var sent = 0;
+var recv = 0;
+var length = 2;//5536;
+var id=fuser();
+	function gid(i){return document.getElementById(i);}
+//var mout=document.getElementById("mout");
+	//mout.innerHTML="";
+function open(evt) {
+vuser.textContent=id;
+var m = {};
+mout.innerHTML+="websocket opened<br>";
+m.name=id;
+m.type="login";
+var lu=JSON.stringify(m);
+//socket.send(lu+'\0');
+	if(socket)socket.send(lu);
+}
+
+function fuser(){
+var users=["alice","bob","john","willy"];	
+return users[Math.floor(Math.random()*users.length)];
+}
+function message(msg) {
+	var mout=gid("mout");
+	mout.innerHTML+=msg+"<br>";
+	try{
+	var mi=JSON.parse(msg);
+	}catch(e){console.error(e);return;}
+	sent = sent + 1;
+	//id=msg;
+	update();
+	console.log('msg: ',msg);
+	if(mi.type=="login"){
+	console.log("login");
+	}else if(mi.type=="message"){
+		//message
+	console.log("message");
+	mout.innerHTML+=msg+"<br>";
+	}else{
+	mout.innerHTML+="uknown type: "+mi.type+" raw data: "+msg+"<br>";
+	}
+	}
+
+function update() {
+	var cnt = document.getElementById("counter");
+
+	cnt.innerHTML = "Recv: " + recv + " Sent: " + sent+" id: "+id;
+}
+
+function onmessage(evt) {
+	recv = recv + 1;
+	update();
+
+	message(evt.data);
+}
+
+function connect() {
+	socket = new WebSocket("ws://127.0.0.1:8888/connect");///"+id);
+
+	socket.onopen = function(evt) { open(evt) };
+	socket.onclose = function(evt) { mout.innerHTML+="closed<br>"; };
+	socket.onmessage = function(evt) { onmessage(evt) };
+	socket.onerror = function(evt) { mout.innerHTML+="onerror<br>"; };
+}
+	//var f=document.getElementById("f");
+	function send_message(){
+	var d={};
+		d.type="message";
+		d.id=id;
+		d.msg=f.value;
+		var su=JSON.stringify(d);
+		//alert(su);
+	if(socket)socket.send(su);
+	}
+	
+	*/
+	</script>
+
+</body>
+</html>

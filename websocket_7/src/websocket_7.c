@@ -385,7 +385,7 @@ kore_log(LOG_NOTICE,"Task finished.");
 
 	len=kore_task_channel_read(t,buf,sizeof(buf));
 	if(len > sizeof(buf)){printf("len great than buf\n");}
-	//kore_log(LOG_NOTICE,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTask msg: %s",buf);
+	kore_log(LOG_NOTICE,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTask msg: %s",buf);
 }
 
 /* GLIB */
@@ -518,6 +518,7 @@ GMainLoop *loop=(GMainLoop *)user_data;
 */
 static void j_termination_handler(void) {}
 
+
 int rtc_loop(struct kore_task*t){
 	signal(SIGINT, j_handle_signal);
 	signal(SIGTERM, j_handle_signal);
@@ -541,7 +542,7 @@ int rtc_loop(struct kore_task*t){
 	if(resu->type==J_PLUGIN_OK){g_print("j_plugin_ok\n");}
 	if(resu->type==J_PLUGIN_OK_WAIT){
 	g_print("J_PLUGIN_OK_WAIT: %s\n",resu->text);
-	//kore_task_channel_write(t,(void*)resu->text,7);
+	kore_task_channel_write(t,(void*)resu->text,7);
 	}
 	
 	int res=gw->push_event(plur,"Fucker");

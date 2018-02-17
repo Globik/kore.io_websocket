@@ -1,0 +1,29 @@
+<!DOCTYPE><html><head><title>thread</title></head><body>
+	<h4>Connenct websocket.</h4>
+	<b>Do connect!: </b><button onclick="connect();">connect</button>
+	<h4>Send a message</h4>
+	<input type="text" id="f" value="your_message"/>
+	<button onclick="send_message();">send message</button>
+<h4>output:</h4>
+<output id="mout"></output>
+	<script>
+var socket = null;
+		mout.innerHTML="";
+	function gid(i){return document.getElementById(i);}
+var f=gid("f");
+function onmessage(msg) {
+mout.innerHTML+="<b>msg: </b>"+msg+"<br>";
+}
+
+function connect() {
+	socket = new WebSocket("ws://127.0.0.1:8888/connect");
+socket.onopen = function(evt) { mout.innerHTML+= "<b>websocket opened</b><br>";};
+	socket.onclose = function(evt) { mout.innerHTML+="<b>websocket closed</b><br>"; };
+	socket.onmessage = function(evt) { onmessage(evt.data) };
+	socket.onerror = function(evt) { mout.innerHTML+="<b>onerror:</b>"+evt+"<br>"; };
+}
+	function send_message(){
+	if(!f.value)return;
+	if(socket)socket.send(f.value);
+	}
+</script></body></html>

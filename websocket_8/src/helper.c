@@ -39,7 +39,28 @@ void kore_websocket_broadcast_room(struct connection *src, u_int8_t op, const vo
 
 	kore_buf_free(frame);
 }
+void kore_websocket_broadcast_room_char(const char*src, u_int8_t op, const void *data, size_t len, int scope)
+{
+	struct connection	*c;
+	struct kore_buf		*frame;
 
+	frame = kore_buf_alloc(len);
+	websocket_frame_build(frame, op, data, len);
+
+	TAILQ_FOREACH(c, &connections, list) {
+		if (c->hdlr_extra==src && c->proto == CONN_PROTO_WEBSOCKET) {
+			net_send_queue(c, frame->data, frame->offset);
+			net_send_flush(c);
+		}
+	}
+
+	if (scope == WEBSOCKET_BROADCAST_GLOBAL) {
+		kore_msg_send(KORE_MSG_WORKER_ALL,
+		    KORE_MSG_WEBSOCKET, frame->data, frame->offset);
+	}
+
+	kore_buf_free(frame);
+}
 
 
 static void websocket_frame_build(struct kore_buf *frame, u_int8_t op, const void *data,size_t len)
