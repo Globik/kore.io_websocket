@@ -17,12 +17,19 @@
 #include <kore/kore.h>
 #include <kore/http.h>
 #include <limits.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdio.h>
 #include <jansson.h>
 #include "assets.h"
 #define WEBSOCKET_PAYLOAD_SINGLE	125
 #define WEBSOCKET_PAYLOAD_EXTEND_1	126
 #define WEBSOCKET_PAYLOAD_EXTEND_2	127
+#define MY_MESSAGE_ID 100
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 
+int init(int);
+void received_message(struct kore_msg*,const void*);
 int		page(struct http_request *);
 int		page_ws_connect(struct http_request *);
 
@@ -34,12 +41,18 @@ json_t *load_json(const char *, size_t);
 void kore_websocket_broadcast_room(struct connection *, u_int8_t, const void *,size_t, int);
 static void websocket_frame_build(struct kore_buf *, u_int8_t, const void *,size_t);
 
-/* Websocket callbacks. */
-struct kore_wscbs wscbs = {
-	websocket_connect,
-	websocket_message,
-	websocket_disconnect
-};
+int init(int state){
+if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_OK);
+(void)kore_msg_register(MY_MESSAGE_ID, received_message);
+return (KORE_RESULT_OK);
+}
+
+void received_message(struct kore_msg*msg,const void*data){
+printf("gggggggggggggggggggggggggggggggggggggggggggg\n");
+kore_log(LOG_INFO,"got message from %u (%d bytes): %.*s",msg->src, msg->length,msg->length,(const char*)data);
+}
+
+
 json_t *load_json(const char *text,size_t buflen) {
     json_t *root;
     json_error_t error;
@@ -118,10 +131,11 @@ websocket_frame_build(struct kore_buf *frame, u_int8_t op, const void *data,
 	kore_buf_append(frame, data, len);
 }
 /* Called whenever we get a new websocket connection. */
-int32_t ab=0;
+int ab=0;
 void
 websocket_connect(struct connection *c)
 {
+int as=0;
 	char*mumu="alice";
 	char*fish="fisch";
 	
@@ -132,9 +146,15 @@ websocket_connect(struct connection *c)
 	kore_log(LOG_NOTICE, "fisch");
 		c->hdlr_extra=fish;
 	}
+pthread_mutex_lock(&mutex);
 	ab++;
-kore_log(LOG_NOTICE, "%p: connected", c);
-	//kore_websocket_send(c, 1, c->hdlr_extra,5);
+kore_msg_send(KORE_MSG_WORKER_ALL,MY_MESSAGE_ID,"hello",5);
+kore_msg_send(2, MY_MESSAGE_ID, "hello number 2",14);
+kore_log(LOG_NOTICE, "%p: connected, int %d ", c,ab);
+
+
+
+	kore_websocket_send(c, 1, c->hdlr_extra,5);
 	}
 
 void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len)
@@ -189,7 +209,7 @@ page_ws_connect(struct http_request *req)
 	/* Perform the websocket handshake, passing our callbacks. */
 	kore_log(LOG_NOTICE,"some path %s",req->path);
 	kore_log(LOG_NOTICE, "%p: http_request", req);
-	kore_websocket_handshake(req, &wscbs);
+	kore_websocket_handshake(req, "websocket_connect","websocket_message","websocket_disconnect");
 
 	return (KORE_RESULT_OK);
 }
