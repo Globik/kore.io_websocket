@@ -71,6 +71,7 @@ int init(int);
 int pipe_reader(struct kore_task *);
 int rtc_loop(struct kore_task *);
 void pipe_data_available(struct kore_task *);
+int inc_req(json_t);
 
 
 int init(state){
@@ -100,36 +101,64 @@ json_t *load_json(const char *text,size_t buflen) {
 }
 
 
-int32_t ab=0;
-void
-websocket_connect(struct connection *c)
+int ab=0;
+typedef struct{
+int id;
+int b;
+}ex;
+typedef struct{
+	int a;
+	void*data;
+}suka;
+void websocket_connect(struct connection *c)
 {
-	char*mumu="alice";
-	char*fish="fisch";
+	suka*m=malloc(sizeof(suka));
+	m->a=1;
+	m->data=NULL;
 	
-	/*if(ab>1){
-	kore_log(LOG_NOTICE, "Alice");
-		c->hdlr_extra=mumu;
-	}else{
-	kore_log(LOG_NOTICE, "fisch");
-		c->hdlr_extra=fish;
-	}*/
-	c->hdlr_extra=mumu;
+	ex*l=malloc(sizeof(ex));
+	l->id=3;
+	l->b=4;
+	
+	//m->data=malloc(sizeof(m->data));
+	m->data=l;
+	l=m->data;
+	int val=l->b;
+	int val2=l->id;
+	
+	//int val3=m->data->l->b;
+	printf("GGGGGGG %d %d\n",val,val2);
+	
+	c->hdlr_extra=l;
+	
+		//m->data=kore_malloc(sizeof(m->data));
+	//m->data=l;
+	//m->data->l->b++;
+	//printf("%d\n",m->data->l->b);
+	
+	
+	/*
 	ab++;
-kore_log(LOG_NOTICE, "%p: connected, by name %s: ", c,(char*)c->hdlr_extra);
+	char*room="alice";
+	//struct extra *lik=kore_malloc(sizeof(*lik));
+	struct extra lik={1,"mama"};
+	//lik->uid=ab;
+	//lik->room=room;
+c->hdlr_extra=&lik;
+	c->hdlr_extra&(lik.uid++);
+	*/
 
+//printf("rom: %s\n",c->hdlr_extra->lik.room);
+//kore_log(LOG_NOTICE, "%p: connected, by name %s: ", c,(char*)c->hdlr_extra->room);
+
+//guint64 session_id = 0, handle_id = 0;
+//session_id=janus_random_uint64();
 	
-	if(janus_plugin !=NULL) {
-	j_plugin_res *resu=janus_plugin->handle_message("dudka_DUDKA");
-	if(resu==NULL){g_print("resu is null\n");}
-	if(resu->type==J_PLUGIN_OK){g_print("j_plugin_ok\n");}
-	if(resu->type==J_PLUGIN_OK_WAIT){g_print("J_PLUGIN_OK_WAIT: %s\n",resu->text);}
-	//int res=gw->push_event(&p_m,"Fucker"); in echo.c plugin
-	j_plugin_res_destroy(resu);
-	}
+//if(session_id == 0 && handle_id == 0){
+//janus_session *session = janus_session_create(session_id);
+//if(session == NULL) {kore_log(LOG_NOTICE,"session is NULL");}
 	
-	
-	
+//}
 	
 	
 	/*
@@ -152,6 +181,9 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 {
 	if(data==NULL) return;
 	//kore_log(LOG_NOTICE,"some message: %s",(char*)data);
+	ex * r=c->hdlr_extra;
+	printf("ON message: %d id: %d\n",r->b,r->id);
+	
 	kore_websocket_broadcast_room(c,op,data,len,1);
 	fwrite((char*)data,1,len,stdout);
 	printf("\n");
