@@ -37,15 +37,15 @@ struct shared *sh=NULL;
 //pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
 void kore_parent_configure(void);
 void kore_worker_configure(void);
-void han(void);
+void handler(void);
 void kore_parent_configure(){
 printf("Kore custom parent\n");
 sh=(struct shared*)mmap(NULL,sizeof(struct shared), PROT_READ | PROT_WRITE,MAP_ANONYMOUS | MAP_SHARED,0,0);
 if(sem_init(&sh->m,1,1) !=0){printf("sem_init err\n");return;}
-atexit(han);	
+atexit(handler);	
 }
-void han(){
-printf("at exit h\n");
+void handler(){
+printf("at exit handler\n");
 if(sh !=NULL){
 	printf("sh is not NULL!\n");
 sem_destroy(&sh->m);
