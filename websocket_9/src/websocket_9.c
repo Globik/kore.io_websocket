@@ -102,34 +102,34 @@ json_t *load_json(const char *text,size_t buflen) {
 
 
 int ab=0;
-typedef struct{
+ struct ex{
 int id;
 int b;
-}ex;
+};
 typedef struct{
 	int a;
 	void*data;
 }suka;
 void websocket_connect(struct connection *c)
 {
-	suka*m=malloc(sizeof(suka));
-	m->a=1;
-	m->data=NULL;
-	
-	ex*l=malloc(sizeof(ex));
-	l->id=3;
-	l->b=4;
+	ab++;
+	struct ex *l;
+l=kore_malloc(sizeof(*l));
+	l->id=ab;
+	l->b=46;
 	
 	//m->data=malloc(sizeof(m->data));
-	m->data=l;
-	l=m->data;
-	int val=l->b;
-	int val2=l->id;
+	//m->data=l;
+	//l=m->data;
+	//int val=l->b;
+	//int val2=l->id;
 	
 	//int val3=m->data->l->b;
-	printf("GGGGGGG %d %d\n",val,val2);
+	//printf("GGGGGGG %d %d\n",val,val2);
 	
 	c->hdlr_extra=l;
+	//free(l);
+	//free(m);
 	
 		//m->data=kore_malloc(sizeof(m->data));
 	//m->data=l;
@@ -161,27 +161,32 @@ c->hdlr_extra=&lik;
 //}
 	
 	
-	/*
-	json_t *reply=json_object();
-	json_object_set_new(reply,"type",json_string("message"));
+	
+	json_auto_t *reply=json_object();
+	json_object_set_new(reply,"type",json_string("user_id"));
 	
 	json_object_set_new(reply,"msg",json_string("Hallo jason!"));
+	json_object_set_new(reply,"id",json_integer(l->id));
+	json_object_set_new(reply,"b",json_integer(l->b));
 	size_t size=json_dumpb(reply,NULL,0,0);
 	if(size==0){printf("Size is null\n");}
-	char*buf=alloca(size);
+	//char*buf=alloca(size);
+	char*buf=kore_malloc(size);
 	size=json_dumpb(reply,buf,size,0);
 	printf("buffer: %s\n",buf);
 	kore_websocket_send(c, 1, buf,size);
-	*/
+	
 	//json_decref(reply);
-	//free((charbuf);
+	//kore_buf_free(buf);
+	//kore_free(l);
+	kore_free(buf);
 	
 }
 void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len)
 {
 	if(data==NULL) return;
 	//kore_log(LOG_NOTICE,"some message: %s",(char*)data);
-	ex * r=c->hdlr_extra;
+	struct ex * r=c->hdlr_extra;
 	printf("ON message: %d id: %d\n",r->b,r->id);
 	
 	kore_websocket_broadcast_room(c,op,data,len,1);
@@ -243,8 +248,13 @@ free(foo);
 void
 websocket_disconnect(struct connection *c)
 {
-	c->hdlr_extra=NULL;
+	//c->hdlr_extra=NULL;
 	kore_log(LOG_NOTICE, "%p: disconnecting", c);
+	struct ex*l=c->hdlr_extra;
+	printf("on disconnect: b: %d id: %d\n",l->id,l->b);
+	ab--;
+	kore_free(l);
+c->hdlr_extra=NULL;
 }
 
 
