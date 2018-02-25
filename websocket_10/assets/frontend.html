@@ -1,0 +1,46 @@
+<!DOCTYPE><html><head><title>thread</title></head><body>
+	<h4>Connenct websocket.</h4>
+	<b>Do connect!: </b><button onclick="connect();">connect</button> | <button onclick="disconnect();">disconnect</button><br>
+	<b>your id: </b><span id="yrid"></span><br>
+	<h4>Send a message</h4>
+	<input type="text" id="f" value="your_message"/>
+	<button onclick="send_message();">send message</button>
+<h4>output:</h4>
+<output id="mout"></output>
+	<script>
+var socket = null;
+	var usid=0;
+	yrid.textContent=usid;
+		
+mout.innerHTML="";
+function gid(i){return document.getElementById(i);}
+var f=gid("f");
+function onmessage(msg) {
+mout.innerHTML+="<b>msg: </b>"+msg+"<br>";
+try{var m=JSON.parse(msg);}catch(e){mout.innerHTML+="<b>parse err: </b>"+e+"<br><b>not json: </b>"+msg+"<br>";return;}
+	if(m.type=="user_id"){
+	usid=m.id;
+	yrid.textContent=m.id;
+	}else{
+	mout.innerHTML+="<b>unknown type: </b>"+m.type+"<br>";
+	}
+}
+
+function connect() {
+	if(socket){mout.innerHTML+="<b>already in connection!</b><br>";return;}
+	socket = new WebSocket("ws://127.0.0.1:8888/connect");
+socket.onopen = function(evt) { mout.innerHTML+= "<b>websocket opened</b><br>";};
+	socket.onclose = function(evt) { mout.innerHTML+="<b>websocket closed</b><br>"; };
+	socket.onmessage = function(evt) { onmessage(evt.data) };
+	socket.onerror = function(evt) { mout.innerHTML+="<b>onerror:</b>"+evt+"<br>"; };
+}
+	function send_message(){
+	if(!f.value)return;
+	if(socket)socket.send(f.value);
+	}
+		function disconnect(){
+		if(!socket){mout.innerHTML+="<b>already disconnected!</b><br>";return;}
+			socket.close();
+			socket=null;
+		}
+</script></body></html>
