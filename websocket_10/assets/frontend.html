@@ -8,7 +8,7 @@
 <h4>output:</h4>
 <output id="mout"></output>
 	<script>
-var socket = null;
+var socket = null,transaction=null,session_id=null;
 	var usid=0;
 	yrid.textContent=usid;
 		
@@ -21,6 +21,8 @@ try{var m=JSON.parse(msg);}catch(e){mout.innerHTML+="<b>parse err: </b>"+e+"<br>
 	if(m.type=="user_id"){
 	usid=m.id;
 	yrid.textContent=m.id;
+	transaction=m.transaction;
+	session_id=m.vid;
 	}else{
 	mout.innerHTML+="<b>unknown type: </b>"+m.type+"<br>";
 	}

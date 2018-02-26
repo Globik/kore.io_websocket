@@ -220,23 +220,28 @@ c->hdlr_extra=&lik;
 //printf("rom: %s\n",c->hdlr_extra->lik.room);
 //kore_log(LOG_NOTICE, "%p: connected, by name %s: ", c,(char*)c->hdlr_extra->room);
 
-//guint64 session_id = 0, handle_id = 0;
-//session_id=janus_random_uint64();
+guint64 session_id = 0, handle_id = 0;
+if(session_id==0 && handle_id==0){
+janus_session *session=janus_session_create(session_id);
+if(session==NULL){kore_log(LOG_NOTICE,"session is NULL!");}
+session_id=session->session_id;
+}
 	
-//if(session_id == 0 && handle_id == 0){
-//janus_session *session = janus_session_create(session_id);
-//if(session == NULL) {kore_log(LOG_NOTICE,"session is NULL");}
+if(session_id > 0 && janus_session_find(session_id) !=NULL){
+kore_log(LOG_NOTICE,"The session already in use");
+}
 	
-//}
+
 	
 	
 	
 	json_auto_t *reply=json_object();
 	json_object_set_new(reply,"type",json_string("user_id"));
-	
 	json_object_set_new(reply,"msg",json_string("Hallo jason!"));
 	json_object_set_new(reply,"id",json_integer(l->id));
 	json_object_set_new(reply,"b",json_integer(l->b));
+	json_object_set_new(reply,"vid",json_integer(session_id));
+	json_object_set_new(reply,"transaction",json_string("fuck_transaction"));
 	size_t size=json_dumpb(reply,NULL,0,0);
 	if(size==0){printf("Size is null\n");}
 	//char*buf=alloca(size);
@@ -266,13 +271,26 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 			//kore_websocket_send(c, 1, offer_sdp,strlen(offer_sdp));
 	
 	
-	/*
 	
-	json_t *root = load_json((const char*)data, len);
+	
+	json_auto_t *root = load_json((const char*)data, len);
 	if(root){
 	 char*foo=json_dumps(root,0);
 	kore_log(LOG_NOTICE,"incoming message: %s",foo);
 		int send_to_clients=0;
+		
+		guint64 session_id=0,handle_id=0;
+		json_t *s=json_object_get(root,"vid");
+		if(s && json_is_integer(s)) session_id=json_integer_value(s);
+		json_t *h=json_object_get(root,"handle_id");
+		if(h && json_is_integer(h)) handle_id=json_integer_value(h);
+		
+		janus_session *session=janus_session_find(session_id);
+		if(!session){
+		kore_log(LOG_NOTICE,"The session not found. Returning");return;
+		}
+		session->last_activity=janus_get_monotonic_time();
+		janus_ice_handle *handle=NULL;
 	
 	json_t *t=json_object_get(root,"type");
 	const char*t_txt=json_string_value(t);
@@ -281,37 +299,31 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 	
 		}else if(!strcmp(t_txt,"login")){
 		kore_log(LOG_NOTICE,"type login");
-		}else if(!strcmp(t_txt,"candidate")){
-		kore_log(LOG_NOTICE,"type candidate.");
-		//handle_candidate(root);
-		json_t*f=json_object_get(root,"cand");
-		char*fu=json_string_value(f);
-		printf("HERE CANDIDATE: %s\n",fu);
-			char *fuc="a=candidate:1 1 UDP 2013266431 10.34.66.177 53484 typ host\r\n";
-			handle_candidate(fu);
-			//lllsdss
+		}else if(!strcmp(t_txt,"attach")){
+		kore_log(LOG_NOTICE,"type attach.");
+		//json_t*f=json_object_get(root,"cand");
+		//char*fu=json_string_value(f);
+		//printf(": %s\n",fu);
 		send_to_clients=1;
-		}else if(!strcmp(t_txt,"offer")){
-		kore_log(LOG_NOTICE,"type offer");
-        handle_offer(root,c);	
+		}else if(!strcmp(t_txt,"detach")){
+		kore_log(LOG_NOTICE,"type detach");
+       
 		send_to_clients=1;
 		}else if(!strcmp(t_txt,"answer")){
 		kore_log(LOG_NOTICE,"type answer");
-		
-			
-		handle_answer(root);
 		send_to_clients=1;
 		}else{
 		kore_log(LOG_NOTICE,"unknown type");
 		send_to_clients=1;
 		}
 		
-if(send_to_clients==0)kore_websocket_send(c,op,data,len);	
+//if(send_to_clients==0)
+	kore_websocket_send(c,op,data,len);	
 free(foo);
 	}else{}
 
-	json_decref(root);
-	*/
+	//json_decref(root);
+	
 }
 
 void

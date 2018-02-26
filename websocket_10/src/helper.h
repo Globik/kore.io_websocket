@@ -30,7 +30,7 @@
 #define JANUS_VERSION_STRING	"0.2.5"
 #define JANUS_SERVER_NAME		"MyJanusInstance"
 
-#define DEFAULT_SESSION_TIMEOUT		60
+#define DEFAULT_SESSION_TIMEOUT		3000
 
 #define CONFDIR "/home/globik/kore.io_websocket/websocket_10/configs"
 

@@ -750,3 +750,44 @@ In a hurry? I'm trying to free resources cleanly, here!
 [Sun Feb 25 15:52:18 2018] Closing plugins: PLUGINS_SO IS NULL
 [Sun Feb 25 15:52:18 2018] Closing event handlers:
 Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Mon Feb 26 13:13:48 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, IPv6 support disabled)
+[Mon Feb 26 13:13:48 2018] TURN REST API backend: (disabled)
+[Mon Feb 26 13:13:48 2018] BUNDLE is NOT going to be forced
+[Mon Feb 26 13:13:48 2018] rtcp-mux is NOT going to be forced
+[Mon Feb 26 13:13:48 2018]   -- RTCP component blackhole socket bound to port 53916
+[Mon Feb 26 13:13:48 2018] Setting max NACK queue to 300s
+[Mon Feb 26 13:13:48 2018] [33m[WARN][0m entering no_media_timer
+[Mon Feb 26 13:13:48 2018] Using certificates:
+	/usr/local/share/janus/certs/mycert.pem
+	/usr/local/share/janus/certs/mycert.key
+[Mon Feb 26 13:13:48 2018] Crypto: OpenSSL pre-1.1.0
+[Mon Feb 26 13:13:48 2018] ICE handles watchdog started
+[Mon Feb 26 13:13:48 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Mon Feb 26 13:13:48 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Mon Feb 26 13:13:48 2018] Sessions watchdog started
+[Mon Feb 26 13:13:48 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echtest.so
+[Mon Feb 26 13:13:48 2018] Loading plugin 'libjanus_echtest.so'...
+[Mon Feb 26 13:13:48 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Mon Feb 26 13:13:48 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Mon Feb 26 13:13:48 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Mon Feb 26 13:13:48 2018] [33m[WARN][0m 	   Plugin API version: 8
+[Mon Feb 26 13:14:18 2018] Creating new session: 8283047414513969
+[Mon Feb 26 13:15:21 2018] Timeout expired for session 8283047414513969...
+[Mon Feb 26 13:15:24 2018] Cleaning up session 8283047414513969...
+[Mon Feb 26 13:15:24 2018] Destroying session 8283047414513969
+Stopping gateway, please wait...
+[Mon Feb 26 13:15:51 2018] Ending watchdog mainloop...
+[Mon Feb 26 13:15:51 2018] Destroying sessions...
+[Mon Feb 26 13:15:51 2018] Freeing crypto resources...
+[Mon Feb 26 13:15:51 2018] De-initializing SCTP...
+[Mon Feb 26 13:15:51 2018] Ending ICE handles watchdog mainloop...
+[Mon Feb 26 13:15:51 2018] Closing plugins.
+[Mon Feb 26 13:15:51 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Mon Feb 26 13:15:52 2018] JANUS EchoTest plugin destroyed!
+[Mon Feb 26 13:15:52 2018] Closing plugins: PLUGINS_SO IS NULL
+[Mon Feb 26 13:15:52 2018] Closing event handlers:
+Bye!
