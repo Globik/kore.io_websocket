@@ -41,22 +41,31 @@ void kore_websocket_broadcast_room(struct connection *src, u_int8_t op, const vo
 }
 void kore_websocket_broadcast_room_char(const char*src, u_int8_t op, const void *data, size_t len, int scope)
 {
+	
 	struct connection	*c;
 	struct kore_buf		*frame;
 
 	frame = kore_buf_alloc(len);
 	websocket_frame_build(frame, op, data, len);
-
+	if(worker->active_hdlr==NULL){
+	kore_log(LOG_INFO,"worker->active_hdlr is NULL! id: %d",worker->id);
+	}else{
+	kore_log(LOG_INFO,"worker->active_hdlr is NOT NULL!");
+	}
+if(src !=NULL){kore_log(LOG_INFO,"some src in broadcast : %s",(const char*)src);}else{
+kore_log(LOG_INFO,"src is undefined");
+}
+	/*
 	TAILQ_FOREACH(c, &connections, list) {
-		if (c->hdlr_extra==src && c->proto == CONN_PROTO_WEBSOCKET) {
+		if (c->hdlr_extra !=NULL && c->hdlr_extra==src && c->proto == CONN_PROTO_WEBSOCKET) {
 			net_send_queue(c, frame->data, frame->offset);
 			net_send_flush(c);
 		}
 	}
+	*/
 
 	if (scope == WEBSOCKET_BROADCAST_GLOBAL) {
-		kore_msg_send(KORE_MSG_WORKER_ALL,
-		    KORE_MSG_WEBSOCKET, frame->data, frame->offset);
+	kore_msg_send(KORE_MSG_WORKER_ALL,KORE_MSG_WEBSOCKET, frame->data, frame->offset);
 	}
 
 	kore_buf_free(frame);
@@ -124,7 +133,7 @@ void j_handle_signal(int signum) {
 }
 
 static gboolean j_check_sess(gpointer user_data){
-	g_print("tick-tack\n");
+	//kore_log(LOG_NOTICE,"tick-tack\n");
 return G_SOURCE_CONTINUE;
 }
 
