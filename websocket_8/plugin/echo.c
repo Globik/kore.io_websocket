@@ -87,7 +87,8 @@ j_message *msg=NULL;
 		g_print("got a message: %s\n",msg->transaction);
 		//int res=gw->push_event("FUCKER_Fucker_AS_ANSWER FROM ECHO PLUGIN");
 		int res=gw->push_event(&p_m,"FUCKER_Fucker_AS_ANSWER_FROM_ECHO_PLUGIN");
-		g_print("res of gw->push_event(FUCKER_fucker): %d\n",res);
+		//("res of gw->push_event(FUCKER_fucker): %d\n",res);
+		//plugin_message_free(msg);
 		continue;
 		
 		//plugin_message_free(msg); ???

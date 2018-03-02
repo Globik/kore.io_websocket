@@ -66,20 +66,22 @@ void		websocket_disconnect(struct connection *);
 void		websocket_message(struct connection *, u_int8_t, void *, size_t);
 json_t *load_json(const char *, size_t);
 void go_handle_message(void);
+void kore_worker_configure(void);
 
 int init(int);
 int pipe_reader(struct kore_task *);
 int rtc_loop(struct kore_task *);
 void pipe_data_available(struct kore_task *);
 void received_message(struct kore_msg*,const void*);
+void han(void);
 #define MY_MESSAGE_ID 	100
 
 int init(state){
 	printf("Entering init.\n");
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
-	kore_log(LOG_NOTICE,"Worker ID %d",worker->id);
+	kore_log(LOG_NOTICE,"Worker ID %d : %p",worker->id,worker);
 	(void)kore_msg_register(MY_MESSAGE_ID,received_message);
-	if(worker->id !=1) return (KORE_RESULT_OK);
+	//if(worker->id !=1) return (KORE_RESULT_OK);
 	printf("after state.\n");
 	//kore_task_create(&pipe_task,pipe_reader);
 	kore_task_create(&pipe_task,rtc_loop);
@@ -88,6 +90,13 @@ if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	return (KORE_RESULT_OK);
 }
 
+void kore_worker_configure(){
+kore_log(LOG_INFO,"kore_worker_configure()");
+	atexit(han);
+}
+void han(){
+kore_log(LOG_INFO,"at exit worker 1 occured");
+}
 void go_handle_message(){
 j_plugin_res *resu=janus_plugin->handle_message("dudka_DUDKA");
 	if(resu==NULL){kore_log(LOG_NOTICE,"resu is null\n");}
@@ -98,22 +107,22 @@ j_plugin_res *resu=janus_plugin->handle_message("dudka_DUDKA");
 }
 void received_message(struct kore_msg*msg,const void*data){
 kore_log(LOG_INFO,"Got message from %u (%d bytes): %.*s",msg->src,msg->length,msg->length,(const char*)data);
+	
 	if(janus_plugin==NULL){
 	kore_log(LOG_INFO,"JANUS_PLUGIN IS NULL!!!");
 	}else{
 	kore_log(LOG_INFO,"JANUS_PLUGIN IS NOT NULL!! SENDING SOME INFO TO ECHO PLUGIN");
 		kore_log(LOG_INFO,"Worker id: %d",worker->id);
-		//if(msg->src==1){kore_log(LOG_INFO,"msg src equal 1");}
+		
 		go_handle_message();
-		/*
-	j_plugin_res *resu=janus_plugin->handle_message("dudka_DUDKA");
-	if(resu==NULL){kore_log(LOG_NOTICE,"resu is null\n");}
-	if(resu->type==J_PLUGIN_OK){kore_log(LOG_NOTICE,"j_plugin_ok\n");}
-	if(resu->type==J_PLUGIN_OK_WAIT){kore_log(LOG_NOTICE,"J_PLUGIN_OK_WAIT: %s\n",resu->text);}
-	//int res=gw->push_event(&p_m,"Fucker"); in echo.c plugin
-	j_plugin_res_destroy(resu);
-	*/
+		
 	}
+	if(msg->src==1){
+	kore_log(LOG_INFO,"worker for websocket");
+	kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"rafa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
+	}
+	
+	//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
 }
 
 json_t *load_json(const char *text,size_t buflen) {
@@ -148,15 +157,33 @@ websocket_connect(struct connection *c)
 	c->hdlr_extra=mumu;
 	ab++;
 kore_log(LOG_NOTICE, "%p: connected, by name %s: ", c,(char*)c->hdlr_extra);
-
+//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
 
 //kore_msg_send(KORE_MSG_WORKER_ALL,MY_MESSAGE_ID,"PAPA",4);
+	go_handle_message();
+	/*
 	if(worker->id==1){
 	if(janus_plugin !=NULL) {go_handle_message();}
 	}else{kore_log(LOG_NOTICE,"JANUS_PLUGIN IS NULL!!!");
 		 kore_msg_send(1,MY_MESSAGE_ID,"hello",5);
 		 }
-	
+		 */
+		 
+	/*
+	if(worker->id==1){
+	kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
+	}else{
+	kore_msg_send(1,MY_MESSAGE_ID,"hello",5);
+	}
+	*/
+		 
+	/*
+	int i;
+		 
+		 for(i=0;i<100;i++){
+	kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
+		 }
+		 */
 	/*
 	json_t *reply=json_object();
 	json_object_set_new(reply,"type",json_string("message"));
@@ -296,16 +323,23 @@ int j_plugin_push_event(j_plugin*plugin,const char*transaction);
 static j_cbs j_handler_plugin={
 .push_event=j_plugin_push_event,
 };
-
+int h=0;
 int j_plugin_push_event(j_plugin *plugin,const char*transaction){
 	if(!plugin) return -1;
 	const char*mu="alice";
 	const char*mud="bob";
 kore_log(LOG_NOTICE,"TRANSACTION: %s\n",transaction); 
+	kore_log(LOG_NOTICE,"worker memory %d : %p",worker->id,worker);
+
+kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
+//if(h==0)	
+	//if(worker->id ==1)
 	//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
-	kore_websocket_broadcast_room_char(mu, WEBSOCKET_OP_TEXT, "papa\0",5, WEBSOCKET_BROADCAST_GLOBAL);
+	//	kore_websocket_broadcast_room_char(mu, WEBSOCKET_OP_TEXT, "papa\0",5, WEBSOCKET_BROADCAST_GLOBAL);
+	//h=1;
 	//kore_websocket_broadcast_room_char(mud, WEBSOCKET_OP_TEXT, transaction,strlen(transaction), WEBSOCKET_BROADCAST_GLOBAL);
 	//can't if worker=1 and char !=alice
+	//kore_msg_send(0,MY_MESSAGE_ID,"bubuk",5);
 return 0;
 }
 /*
