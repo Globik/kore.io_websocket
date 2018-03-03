@@ -78,6 +78,7 @@
 #define SHLIB_EXT ".so"
 
 janus_config *config = NULL;
+const char*transi="trans_janus";
 //static dd
 	//char *config_file = NULL;kssde
 //char *configs_folder = NULL;
@@ -240,8 +241,8 @@ kore_log(LOG_NOTICE,"The session already in use");
 	json_object_set_new(reply,"msg",json_string("Hallo jason!"));
 	json_object_set_new(reply,"id",json_integer(l->id));
 	json_object_set_new(reply,"b",json_integer(l->b));
-	json_object_set_new(reply,"vid",json_integer(session_id));
-	json_object_set_new(reply,"transaction",json_string("fuck_transaction"));
+	json_object_set_new(reply,"session_id",json_integer(session_id));
+	json_object_set_new(reply,"transaction",json_string(transi));
 	size_t size=json_dumpb(reply,NULL,0,0);
 	if(size==0){printf("Size is null\n");}
 	//char*buf=alloca(size);
@@ -280,7 +281,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		int send_to_clients=0;
 		
 		guint64 session_id=0,handle_id=0;
-		json_t *s=json_object_get(root,"vid");
+		json_t *s=json_object_get(root,"session_id");
 		if(s && json_is_integer(s)) session_id=json_integer_value(s);
 		json_t *h=json_object_get(root,"handle_id");
 		if(h && json_is_integer(h)) handle_id=json_integer_value(h);
@@ -291,6 +292,12 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		}
 		session->last_activity=janus_get_monotonic_time();
 		janus_ice_handle *handle=NULL;
+		if(handle_id > 0){
+		janus_mutex_lock(&session->mutex);
+			handle=janus_ice_handle_find(session,handle_id);
+			janus_mutex_unlock(&session->mutex);
+			if(!handle){kore_log(LOG_INFO,"handle_id not found");}
+		}
 	
 	json_t *t=json_object_get(root,"type");
 	const char*t_txt=json_string_value(t);
@@ -301,24 +308,90 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		kore_log(LOG_NOTICE,"type login");
 		}else if(!strcmp(t_txt,"attach")){
 		kore_log(LOG_NOTICE,"type attach.");
-		//json_t*f=json_object_get(root,"cand");
-		//char*fu=json_string_value(f);
-		//printf(": %s\n",fu);
-		send_to_clients=1;
+		if(handle !=NULL){kore_log(LOG_INFO,"handle is not null");return;}
+		janus_mutex_lock(&session->mutex);
+		handle=janus_ice_handle_create(session,NULL);
+		if(handle==NULL){
+		kore_log(LOG_INFO,"Failed to create ice handle.");
+		janus_mutex_unlock(&session->mutex);
+		return;
+			}
+			handle_id=handle->handle_id;
+			janus_plugin *plugin_t=janus_plugin_find("janus.plugin.echotest");
+			if(plugin_t==NULL){
+			kore_log(LOG_INFO,"plugin_t is NULL");
+			return;
+			}else{kore_log(LOG_INFO,"plugin_t is NOT NULL");}
+			int error=0;
+			if((error = janus_ice_handle_attach_plugin(session,handle_id,plugin_t)) !=0){
+			janus_ice_handle_destroy(session,handle_id);
+				g_hash_table_remove(session->ice_handles,&handle_id);
+				janus_mutex_unlock(&session->mutex);
+				kore_log(LOG_INFO,"Err attach plugin.");
+				return;
+			}else{kore_log(LOG_INFO,"SUCCESS IN ATTACHING PLUGIN");}
+			janus_mutex_unlock(&session->mutex);
+			json_auto_t*reply=json_object();
+			json_object_set_new(reply,"session_id",json_integer(session_id));
+			json_object_set_new(reply,"transaction",json_string(transi));
+			json_object_set_new(reply,"handle_id",json_integer(handle_id));
+			json_object_set_new(reply,"type",json_string("on_attach"));
+			size_t size=json_dumpb(reply,NULL,0,0);
+	if(size==0){kore_log(LOG_INFO, "json_dumpb Size is null\n");}
+	char*buf=alloca(size);
+	size=json_dumpb(reply,buf,size,0);
+	kore_log(LOG_INFO, "buffer: %s\n", buf);
+	kore_websocket_send(c, 1, buf,size);
+	send_to_clients=1;
 		}else if(!strcmp(t_txt,"detach")){
+			
+			
 		kore_log(LOG_NOTICE,"type detach");
-       
-		send_to_clients=1;
-		}else if(!strcmp(t_txt,"answer")){
-		kore_log(LOG_NOTICE,"type answer");
+		if(handle==NULL){
+		kore_log(LOG_INFO,"handle is NULL. Returning.");
+			return;
+		}
+	if(handle->app==NULL || handle->app_handle==NULL){
+	kore_log(LOG_INFO,"No plugin to detach from?");
+	}
+				janus_mutex_lock(&session->mutex);
+				int error=janus_ice_handle_destroy(session,handle_id);
+				g_hash_table_remove(session->ice_handles,&handle_id);
+				janus_mutex_unlock(&session->mutex);
+				if(error !=0){
+				kore_log(LOG_INFO,"error in ice handle destroy!");
+				}
+				json_auto_t *reply=json_object();
+				json_object_set_new(reply,"type",json_string("on_detach"));
+				json_object_set_new(reply,"session_id",json_integer(session_id));
+				json_object_set_new(reply,"transaction",json_string(transi));
+				size_t size=json_dumpb(reply,NULL,0,0);
+	if(size==0){kore_log(LOG_INFO, "json_dumpb Size is null\n");}
+	char*buf=alloca(size);
+	size=json_dumpb(reply,buf,size,0);
+	kore_websocket_send(c, 1, buf,size);
+    send_to_clients=1;
+		}else if(!strcmp(t_txt,"destroy")){
+		kore_log(LOG_NOTICE,"type destroy");
+			if(handle !=NULL){kore_log(LOG_INFO,"handle is not null. skiping.");return;}
+			janus_session_schedule_destruction(session,TRUE,TRUE,TRUE);
+			json_auto_t *reply=json_object();
+			json_object_set_new(reply,"type",json_string("on_destroy"));
+			json_object_set_new(reply,"session_id",json_integer(session_id));
+			json_object_set_new(reply,"transaction",json_string(transi));
+			size_t size=json_dumpb(reply,NULL,0,0);
+	if(size==0){kore_log(LOG_INFO, "json_dumpb Size is null\n");}
+	char*buf=alloca(size);
+	size=json_dumpb(reply,buf,size,0);
+	kore_websocket_send(c, 1, buf,size);
+			
 		send_to_clients=1;
 		}else{
 		kore_log(LOG_NOTICE,"unknown type");
 		send_to_clients=1;
 		}
 		
-//if(send_to_clients==0)
-	kore_websocket_send(c,op,data,len);	
+if(send_to_clients==0) kore_websocket_send(c,op,data,len);	
 free(foo);
 	}else{}
 

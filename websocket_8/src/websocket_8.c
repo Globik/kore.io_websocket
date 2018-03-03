@@ -53,8 +53,12 @@
 #define SHLIB_EXT ".so"
 
 static GMainContext *sess_watchdog_ctx=NULL;
+static GThreadPool *taski=NULL;
+void j_trans_task(gpointer data,gpointer user_data);
+
 j_plugin * janus_plugin=NULL;
 struct kore_task pipe_task;
+struct kore_task pipe_task2;
 
 int do_loop(struct kore_task*);
 int run_curl(struct kore_task*);
@@ -71,9 +75,16 @@ void kore_worker_configure(void);
 int init(int);
 int pipe_reader(struct kore_task *);
 int rtc_loop(struct kore_task *);
+int rtc_loop2(struct kore_task *);
 void pipe_data_available(struct kore_task *);
+void pipe_data_available2(struct kore_task *);
+
 void received_message(struct kore_msg*,const void*);
 void han(void);
+
+int j_inc_req(void*);
+void *pupkin(void*data);
+
 #define MY_MESSAGE_ID 	100
 
 int init(state){
@@ -87,9 +98,39 @@ if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	kore_task_create(&pipe_task,rtc_loop);
 	kore_task_bind_callback(&pipe_task, pipe_data_available);
 	kore_task_run(&pipe_task);
+	/*
+	kore_task_create(&pipe_task2,rtc_loop2);
+	kore_task_bind_callback(&pipe_task2, pipe_data_available2);
+	kore_task_run(&pipe_task2);
+	*/
+	
 	return (KORE_RESULT_OK);
 }
+void j_trans_task(gpointer data, gpointer user_data){
+kore_log(LOG_INFO,"******************* j_trans_task came data: %p | user_data: %p",data,user_data);
+	
+j_inc_req(data);
+}
 
+void *pupkin(void*data){
+	//kore_log(LOG_NOTICE,"some data came in pupkin: %s",(char*)data);
+	
+	GError *tperror=NULL;
+	g_thread_pool_push(taski,(int*)8,&tperror);
+	if(tperror !=NULL){g_print("err in thread pool push\n");}
+	
+	j_inc_req(80);
+	
+	return NULL;
+
+}
+int j_inc_req(void *m){
+
+kore_log(LOG_INFO,"j_INC_REQ here %d",(int*)m);
+go_handle_message();
+
+return 0;
+}
 void kore_worker_configure(){
 kore_log(LOG_INFO,"kore_worker_configure()");
 	atexit(han);
@@ -97,6 +138,7 @@ kore_log(LOG_INFO,"kore_worker_configure()");
 void han(){
 kore_log(LOG_INFO,"at exit worker 1 occured");
 }
+
 void go_handle_message(){
 j_plugin_res *resu=janus_plugin->handle_message("dudka_DUDKA");
 	if(resu==NULL){kore_log(LOG_NOTICE,"resu is null\n");}
@@ -291,6 +333,33 @@ int page_ws_connect(struct http_request *req)
 }
 
 void pipe_data_available(struct kore_task *t){
+	//size_t len;
+	//u_int8_t buf[BUFSIZ];
+	
+if(kore_task_finished(t)){
+kore_log(LOG_NOTICE,"Task finished.");
+	exit(0);
+return;
+
+}
+
+	size_t len;
+	u_int8_t buf[BUFSIZ];
+len=kore_task_channel_read(t,buf,sizeof(buf));
+	if(len > sizeof(buf)){printf("len great than buf\n");}
+	kore_log(LOG_NOTICE,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTask msg: %s",buf);
+	/*if(kore_task_finished(t)){
+kore_log(LOG_NOTICE,"Task finished.");
+	exit(0);
+return;
+
+}
+*/
+	
+	
+}
+
+void pipe_data_available2(struct kore_task *t){
 	size_t len;
 	u_int8_t buf[BUFSIZ];
 	/*
@@ -301,7 +370,6 @@ return;
 
 }
 */
-
 	len=kore_task_channel_read(t,buf,sizeof(buf));
 	if(len > sizeof(buf)){printf("len great than buf\n");}
 	kore_log(LOG_NOTICE,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTask msg: %s",buf);
@@ -311,8 +379,6 @@ kore_log(LOG_NOTICE,"Task finished.");
 return;
 
 }
-	
-	
 }
 
 /* GLIB */
@@ -329,7 +395,7 @@ int j_plugin_push_event(j_plugin *plugin,const char*transaction){
 	const char*mu="alice";
 	const char*mud="bob";
 kore_log(LOG_NOTICE,"TRANSACTION: %s\n",transaction); 
-	kore_log(LOG_NOTICE,"worker memory %d : %p",worker->id,worker);
+kore_log(LOG_NOTICE,"worker memory %d : %p",worker->id,worker);
 
 kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"papa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
 //if(h==0)	
@@ -392,7 +458,10 @@ GMainLoop *loop=(GMainLoop *)user_data;
 }
 */
 static void j_termination_handler(void) {g_print("at exit handler occured.\n");}
-
+int rtc_loop2(struct kore_task*t){
+kore_task_channel_write(t,"Rama\0",5);
+return (KORE_RESULT_OK);
+}
 
 int rtc_loop(struct kore_task*t){
 	signal(SIGINT, j_handle_signal);
@@ -400,7 +469,7 @@ int rtc_loop(struct kore_task*t){
 	atexit(j_termination_handler);
 
 	g_print(" Setup Glib \n");
-	
+	kore_task_channel_write(t,"mama\0",5);
 	sess_watchdog_ctx=g_main_context_new();
 	GMainLoop *watchdog_loop=g_main_loop_new(sess_watchdog_ctx,FALSE);
 	GError *err=NULL;
@@ -410,9 +479,22 @@ int rtc_loop(struct kore_task*t){
 	//exit(1);
 		return (KORE_RESULT_OK);
 	}
+	GError *error=NULL;
+	GThread *rh=g_thread_try_new("sessreq",&pupkin,t,&error);
+	if(error !=NULL){
+	g_print("err in thread try new %d %s\n",error->code,error->message ? error->message : "??");
+		exit(1);
+	}
+	error=NULL;
 	
+	taski=g_thread_pool_new(j_trans_task, t,-1,FALSE,&error);
+	if(err !=NULL){
+	kore_log(LOG_NOTICE,"err trying to launch the pool task thread %d %s",error->code,error->message ? error->message : "?");
+	exit(1);
+	}
 	
-	
+	kore_task_channel_write(t,"mama\0",5);
+	kore_task_channel_write(t,"mama\0",5);
 	struct dirent *pluginent = NULL;
 	const char *path=NULL;
 	DIR *dir=NULL;
@@ -491,6 +573,8 @@ int rtc_loop(struct kore_task*t){
 	g_main_context_unref(sess_watchdog_ctx);
 	sess_watchdog_ctx=NULL;
 	if(janus_plugin !=NULL) {janus_plugin->destroy();janus_plugin=NULL;}
+	g_thread_pool_free(taski,FALSE,FALSE);
+	g_thread_join(rh);
 	g_print("Bye!\n");
 	//exit(0);
 	kore_task_channel_write(t,"mama\0",5);

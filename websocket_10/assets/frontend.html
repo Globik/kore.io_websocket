@@ -4,11 +4,13 @@
 	<b>your id: </b><span id="yrid"></span><br>
 	<h4>Send a message</h4>
 	<input type="text" id="f" value="your_message"/>
-	<button onclick="send_message();">send message</button>
+	<button onclick="send_message();">send message</button> | <button onclick="go_attach();">attach</button>
+	| <button onclick="go_detach();">detach</button>
+	| <button onclick="go_destroy();">destroy</button><br>
 <h4>output:</h4>
 <output id="mout"></output>
 	<script>
-var socket = null,transaction=null,session_id=null;
+var socket = null,transaction=null,session_id=0,handle_id=0;
 	var usid=0;
 	yrid.textContent=usid;
 		
@@ -22,7 +24,15 @@ try{var m=JSON.parse(msg);}catch(e){mout.innerHTML+="<b>parse err: </b>"+e+"<br>
 	usid=m.id;
 	yrid.textContent=m.id;
 	transaction=m.transaction;
-	session_id=m.vid;
+	session_id=m.session_id;
+	}else if(m.type=="on_attach"){
+transaction=m.transaction;
+handle_id=m.handle_id;
+session_id=m.session_id	
+	}else if(m.type=="on_detach"){
+	
+	}else if(m.type=="on_destroy"){
+	
 	}else{
 	mout.innerHTML+="<b>unknown type: </b>"+m.type+"<br>";
 	}
@@ -44,5 +54,29 @@ socket.onopen = function(evt) { mout.innerHTML+= "<b>websocket opened</b><br>";}
 		if(!socket){mout.innerHTML+="<b>already disconnected!</b><br>";return;}
 			socket.close();
 			socket=null;
+		}
+		function go_attach(){
+		var ob={};
+			ob.type="attach";
+			ob.session_id=session_id;
+			ob.handle_id=handle_id;
+			ob.transaction=transaction;
+		if(socket)socket.send(JSON.stringify(ob));
+		}
+		function go_detach(){
+		var ob={};
+			ob.type="detach";
+			ob.session_id=session_id;
+			ob.handle_id=handle_id;
+			ob.transaction=transaction;
+			if(socket)socket.send(JSON.stringify(ob));
+		}
+		function go_destroy(){
+		var ob={};
+			ob.type="destroy";
+			ob.session_id=session_id;
+			ob.handle_id=handle_id;
+			ob.transaction=transaction;
+			if(socket)socket.send(JSON.stringify(ob));
 		}
 </script></body></html>
