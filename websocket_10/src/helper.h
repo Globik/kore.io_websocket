@@ -115,7 +115,9 @@ json_t *janus_plugin_handle_sdp(janus_plugin_session *plugin_session, janus_plug
 void plug_fucker(GHashTable *,janus_plugin*);
 void load_plugin(const char*);
 
-static janus_callbacks janus_handler_plugin =
+//static 
+	janus_callbacks janus_handler_plugin; //=
+/*
 	{
 		.push_event = janus_plugin_push_event,
 		.relay_rtp = janus_plugin_relay_rtp,
@@ -126,6 +128,7 @@ static janus_callbacks janus_handler_plugin =
 		.events_is_enabled = janus_events_is_enabled,
 		.notify_event = janus_plugin_notify_event,
 	}; 
+	*/
 gchar*select_local_ip(void);
 void conf_max_nack_queue(void);
 void conf_force_bundle_or_and_rtcp_mux(void);
@@ -174,6 +177,7 @@ GHashTable *eventhandlers;
 GHashTable *eventhandlers_so;
 
 char *api_secret, *admin_api_secret;
+void incoming_message(janus_ice_handle*,janus_session *,json_auto_t*,guint64);
 
 
 

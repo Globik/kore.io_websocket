@@ -92,6 +92,22 @@ GHashTable *plugins = NULL;
 gboolean daemonize = FALSE;
 int pipefd[2];
 
+
+janus_callbacks janus_handler_plugin=
+	{
+		.push_event = janus_plugin_push_event,
+		.relay_rtp = janus_plugin_relay_rtp,
+		.relay_rtcp = janus_plugin_relay_rtcp,
+		.relay_data = janus_plugin_relay_data,
+		.close_pc = janus_plugin_close_pc,
+		.end_session = janus_plugin_end_session,
+		.events_is_enabled = janus_events_is_enabled,
+		.notify_event = janus_plugin_notify_event,
+	}; 
+
+
+
+
 char *api_secret = NULL, *admin_api_secret = NULL;
 gchar *local_ip = NULL;
 //static 
@@ -307,6 +323,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		}else if(!strcmp(t_txt,"login")){
 		kore_log(LOG_NOTICE,"type login");
 		}else if(!strcmp(t_txt,"attach")){
+			
 		kore_log(LOG_NOTICE,"type attach.");
 		if(handle !=NULL){kore_log(LOG_INFO,"handle is not null");return;}
 		janus_mutex_lock(&session->mutex);
@@ -331,16 +348,66 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 				return;
 			}else{kore_log(LOG_INFO,"SUCCESS IN ATTACHING PLUGIN");}
 			janus_mutex_unlock(&session->mutex);
-			json_auto_t*reply=json_object();
+			json_t*reply=json_object();
 			json_object_set_new(reply,"session_id",json_integer(session_id));
 			json_object_set_new(reply,"transaction",json_string(transi));
 			json_object_set_new(reply,"handle_id",json_integer(handle_id));
 			json_object_set_new(reply,"type",json_string("on_attach"));
-			size_t size=json_dumpb(reply,NULL,0,0);
+
+
+//janus_plugin *plugin_tl = (janus_plugin *)handle->app;
+char*transi2="fucker";
+janus_plugin_result *result = plugin_t->handle_message(handle->app_handle,g_strdup((char *)transi2),reply, reply);
+
+			
+	if(result == NULL) {
+JANUS_LOG(LOG_WARN,"Something went horribly wrong!");
+//ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_PLUGIN_MESSAGE, "Plugin didn't give a result");
+			return;
+		}
+if(result->type == JANUS_PLUGIN_OK) {
+			JANUS_LOG(LOG_WARN,"The plugin gave a result already (synchronous request/response) ");
+	if(result->content == NULL || !json_is_object(result->content)) {
+				JANUS_LOG(LOG_WARN," Missing content, or not a JSON object ");
+				//ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_PLUGIN_MESSAGE,
+					//result->content == NULL ?
+	JANUS_LOG(LOG_WARN,"Plugin didn't provide any content for this synchronous response ::Plugin returned an invalid JSON response");
+				janus_plugin_result_destroy(result);
+		return;
+				//goto jsondone;
+}
+			/* Reference the content, as destroying the result instance will decref it */
+			//json_incref(result->content);
+			
+		} 
+	else if(result->type == JANUS_PLUGIN_OK_WAIT) {
+			/* The plugin received the request but didn't process it yet, send an ack (asynchronous notifications may follow) */
+	JANUS_LOG(LOG_WARN," Send the success reply JANUS_PLUGIN_OK_WAIT");
+			//ret = janus_process_success(request, reply);
+		} else {
+			/* Something went horribly wrong! */
+			//ret = janus_process_error_string(request, session_id, transaction_text, JANUS_ERROR_PLUGIN_MESSAGE,
+JANUS_LOG(LOG_WARN,"Plugin returned a severe (unknown) error");
+			janus_plugin_result_destroy(result);
+			return;
+		}
+		janus_plugin_result_destroy(result);
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+size_t size=json_dumpb(reply,NULL,0,0);
 	if(size==0){kore_log(LOG_INFO, "json_dumpb Size is null\n");}
 	char*buf=alloca(size);
 	size=json_dumpb(reply,buf,size,0);
-	kore_log(LOG_INFO, "buffer: %s\n", buf);
+	//kore_log(LOG_INFO, "buffer: %s\n", buf);
 	kore_websocket_send(c, 1, buf,size);
 	send_to_clients=1;
 		}else if(!strcmp(t_txt,"detach")){
@@ -384,11 +451,14 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 	char*buf=alloca(size);
 	size=json_dumpb(reply,buf,size,0);
 	kore_websocket_send(c, 1, buf,size);
-			
-		send_to_clients=1;
-		}else{
-		kore_log(LOG_NOTICE,"unknown type");
-		send_to_clients=1;
+	send_to_clients=1;
+	}else if(!strcmp(t_txt,"to_janus_offer")){
+	kore_log(LOG_INFO,"type: 'to_janus_offer'");
+	incoming_message(handle,session,root,session_id);
+	send_to_clients=1;
+	}else{
+	kore_log(LOG_NOTICE,"unknown type");
+	send_to_clients=1;
 		}
 		
 if(send_to_clients==0) kore_websocket_send(c,op,data,len);	

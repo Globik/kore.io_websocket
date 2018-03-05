@@ -1,4 +1,5 @@
 //#include <stdlib.h> //exit
+#include <kore/kore.h>
 #include "helper.h"
 char *config_file = NULL;
 char *configs_folder=NULL;
@@ -266,7 +267,14 @@ void janus_session_notify_event(janus_session *session, json_t *event) {
 		JANUS_LOG(LOG_HUGE, "Sending event to %s (%p)\n", session->source->transport->get_package(), session->source->instance);
 		session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
 	} else {
-		// No transport, free the event 
+		JANUS_LOG(LOG_WARN,"No transport, free the event");
+		size_t size=json_dumpb(event,NULL,0,0);
+	if(size==0){JANUS_LOG(LOG_WARN, "json_dumpb Size is null\n");return;}
+	char*buf=alloca(size);
+	size=json_dumpb(event,buf,size,0);
+
+	//kore_websocket_send(c, 1, buf,size);
+		kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
 		json_decref(event);
 	}
 } 
@@ -388,11 +396,20 @@ int janus_plugin_push_event(janus_plugin_session *plugin_session,
 							json_t *message, 
 							json_t *jsep) {
 	//to browser from plugin
-	if(!plugin || !message)
-		return -1;
-	if(!plugin_session || plugin_session < (janus_plugin_session *)0x1000 ||
-			!janus_plugin_session_is_alive(plugin_session) || plugin_session->stopped)
+	JANUS_LOG(LOG_WARN,"ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = %s",transaction);
+	if(!plugin || !message){JANUS_LOG(LOG_WARN,"no message and no plugin in janus_plugin_push_event");return -1;}
+	 char*foo=json_dumps(message,0);
+	JANUS_LOG(LOG_WARN,"incoming message: %s",foo);
+	free(foo);
+	
+	char*foo2=json_dumps(jsep,0);
+	JANUS_LOG(LOG_WARN,"incoming message: %s",foo2);
+	free(foo2);
+if(!plugin_session || plugin_session < (janus_plugin_session *)0x1000 || !janus_plugin_session_is_alive(plugin_session) 
+   || plugin_session->stopped){
+	JANUS_LOG(LOG_WARN,"janus_plugin_session is not alive in push_event");
 		return -2;
+}
 	janus_ice_handle *ice_handle = (janus_ice_handle *)plugin_session->gateway_handle;
 	if(!ice_handle || janus_flags_is_set(&ice_handle->webrtc_flags, JANUS_ICE_HANDLE_WEBRTC_STOP))
 		return JANUS_ERROR_SESSION_NOT_FOUND;
@@ -428,20 +445,18 @@ int janus_plugin_push_event(janus_plugin_session *plugin_session,
 	json_object_set_new(event, "janus", json_string("event"));
 	json_object_set_new(event, "session_id", json_integer(session->session_id));
 	json_object_set_new(event, "sender", json_integer(ice_handle->handle_id));
-	if(transaction != NULL)
-		json_object_set_new(event, "transaction", json_string(transaction));
+	if(transaction != NULL)json_object_set_new(event, "transaction", json_string(transaction));
 	json_t *plugin_data = json_object();
 	json_object_set_new(plugin_data, "plugin", json_string(plugin->get_package()));
 	json_object_set_new(plugin_data, "data", message);
 	json_object_set_new(event, "plugindata", plugin_data);
-	if(merged_jsep != NULL)
-		json_object_set_new(event, "jsep", merged_jsep);
+	if(merged_jsep != NULL) json_object_set_new(event, "jsep", merged_jsep);
 	// Send the event 
 	JANUS_LOG(LOG_VERB, "[%"SCNu64"] Sending event to transport...\n", ice_handle->handle_id);
 	janus_session_notify_event(session, event);
 
 	if(jsep != NULL && janus_events_is_enabled()) {
-		// Notify event handlers as well 
+		JANUS_LOG(LOG_WARN," Notify event handlers as well."); 
 		janus_events_notify_handlers(JANUS_EVENT_TYPE_JSEP,
 			session->session_id, ice_handle->handle_id, "local", sdp_type, sdp);
 	}
