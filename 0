@@ -1,0 +1,585 @@
+    ./configure --disable-plugin-sip  --disable-plugin-sipre  --disable-plugin-nosip  --disable-plugin-recordplay  --disable-plugin-streaming --enable-boringssl --enable-dtls-settimeout
+
+-disable-rabbitmq-event-handler
+                          Disable RabbitMQ event handler
+  --disable-plugin-audiobridge
+                          Disable audiobridge plugin
+  --disable-plugin-echotest
+                          Disable echotest plugin
+  --disable-plugin-recordplay
+                          Disable record&play plugin
+  --disable-plugin-sip    Disable sip plugin
+  --disable-plugin-sipre  Disable sipre plugin
+  --disable-plugin-nosip  Disable nosip plugin
+  --disable-plugin-streaming
+                          Disable streaming plugin
+  --disable-plugin-textroom
+                          Disable textroom plugin
+  --disable-plugin-videocall
+                          Disable videocall plugin
+  --disable-plugin-videoroom
+                          Disable videoroom plugin
+  --disable-plugin-voicemail
+                          Disable voicemail plugin
+  --enable-javascript-es-module
+                          Generate an ECMAScript style module from janus.js
+  --enable-javascript-umd-module
+                          Generate an UMD style module from janus.js
+  --enable-javascript-iife-module
+                          Generate an IIFE style wrapper around janus.js
+  --enable-javascript-common-js-module
+                          Generate an CommonJS style module from janus.js
+  --enable-post-processing
+                          Enable building post-processing utility
+
+
+
+{
+    "session_id": 7158989234748118,
+    "session_last_activity": 12536521908,
+    "session_transport": "janus.transport.http",
+    "handle_id": 6596701002448083,
+    "opaque_id": "echotest-L4G8wPYeEnAw",
+    "created": 12382124964,
+    "send_thread_created": true,
+    "current_time": 12552169740,
+    "plugin": "janus.plugin.echotest",
+    "plugin_specific": {
+        "audio_active": true,
+        "video_active": true,
+        "audio_codec": "opus",
+        "video_codec": "vp8",
+        "bitrate": 0,
+        "peer-bitrate": 699924,
+        "slowlink_count": 0,
+        "destroyed": 0
+    },
+    "flags": {
+        "got-offer": true,
+        "got-answer": true,
+        "processing-offer": false,
+        "starting": true,
+        "ice-restart": false,
+        "ready": true,
+        "stopped": false,
+        "alert": false,
+        "trickle": true,
+        "all-trickles": true,
+        "resend-trickles": false,
+        "trickle-synced": false
+
+ "data-channels": true,
+        "has-audio": true,
+        "has-video": true,
+        "rfc4588-rtx": false,
+        "cleaning": false
+    },
+    "agent-created": 12383453988,
+    "ice-mode": "full",
+    "ice-role": "controlled",
+    "sdps": {
+        "profile": "UDP/TLS/RTP/SAVPF",
+        "local": "v=0\r\no=- 9035257930447295963 2 IN IP4 10.34.87.137\r\ns=-\r\nt=0 0\r\na=group:BUNDLE audio video data\r\na=msid-semantic: WMS janus\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 10.34.87.137\r\na=sendrecv\r\na=mid:audio\r\na=rtcp-mux\r\na=ice-ufrag:bzK/\r\na=ice-pwd:GQOBoJqV9c7LezMONnoI+q\r\na=ice-options:trickle\r\na=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38\r\na=setup:active\r\na=rtpmap:111 opus/48000/2\r\na=ssrc:924820343 cname:janusaudio\r\na=ssrc:924820343 msid:janus janusa0\r\na=ssrc:924820343 mslabel:janus\r\na=ssrc:924820343 label:janusa0\r\na=candidate:1 1 udp 2013266431 10.34.87.137 49992 typ host\r\na=end-of-candidates\r\nm=video 9 UDP/TLS/RTP/SAVPF 96\r\nc=IN IP4 10.34.87.137\r\na=sendrecv\r\na=mid:video\r\na=rtcp-mux\r\na=ice-ufrag:bzK/\r\na=ice-pwd:GQOBoJqV9c7LezMONnoI+q\r\na=ice-options:trickle\r\na=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38\r\na=setup:active\r\na=rtpmap:96 VP8/90000\r\na=rtcp-fb:96 ccm fir\r\na=rtcp-fb:96 nack\r\na=rtcp-fb:96 nack pli\r\na=rtcp-fb:96 goog-remb\r\na=rtcp-fb:96 transport-cc\r\na=ssrc:118589591 cname:janusvideo\r\na=ssrc:118589591 msid:janus janusv0\r\na=ssrc:118589591 mslabel:janus\r\na=ssrc:118589591 label:janusv0\r\na=candidate:1 1 udp 2013266431 10.34.87.137 49992 typ host\r\na=end-of-candidates\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 10.34.87.137\r\na=sendrecv\r\na=sctpmap:5000 webrtc-datachannel 16\r\na=mid:data\r\na=ice-ufrag:bzK/\r\na=ice-pwd:GQOBoJqV9c7LezMONnoI+q\r\na=ice-options:trickle\r\na=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38\r\na=setup:active\r\na=candidate:1 1 udp 2013266431 10.34.87.137 49992 typ host\r\na=end-of-candidates\r\n",
+        "remote": "v=0\r\no=- 9035257930447295963 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE audio video data\r\na=msid-semantic: WMS TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111 103 104 9 0 8 106 105 13 110 112 113 126\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=ice-ufrag:fdGW\r\na=ice-pwd:l49MC9urZCzW8tjhQ7NolfCp\r\na=ice-options:trickle\r\na=fingerprint:sha-256 F0:85:65:4A:AE:99:B6:4E:B3:29:35:6C:A9:62:F7:57:04:2B:65:92:32:6E:72:83:10:1F:C4:8D:BC:52:91:2B\r\na=setup:actpass\r\na=mid:audio\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=sendrecv\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\na=rtcp-fb:111 transport-cc\r\na=fmtp:111 minptime=10;useinbandfec=1\r\na=rtpmap:103 ISAC/16000\r\na=rtpmap:104 ISAC/32000\r\na=rtpmap:9 G722/8000\r\na=rtpmap:0 PCMU/8000\r\na=rtpmap:8 PCMA/8000\r\na=rtpmap:106 CN/32000\r\na=rtpmap:105 CN/16000\r\na=rtpmap:13 CN/8000\r\na=rtpmap:110 telephone-event/48000\r\na=rtpmap:112 telephone-event/32000\r\na=rtpmap:113 telephone-event/16000\r\na=rtpmap:126 telephone-event/8000\r\na=ssrc:2684448135 cname:CLEhVXt+TA2W3Qba\r\na=ssrc:2684448135 msid:TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d dfdea7c3-2a35-4855-b921-00f4c099da66\r\na=ssrc:2684448135 mslabel:TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d\r\na=ssrc:2684448135 label:dfdea7c3-2a35-4855-b921-00f4c099da66\r\nm=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100 101 102 125 127\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=ice-ufrag:fdGW\r\na=ice-pwd:l49MC9urZCzW8tjhQ7NolfCp\r\na=ice-options:trickle\r\na=fingerprint:sha-256 F0:85:65:4A:AE:99:B6:4E:B3:29:35:6C:A9:62:F7:57:04:2B:65:92:32:6E:72:83:10:1F:C4:8D:BC:52:91:2B\r\na=setup:actpass\r\na=mid:video\r\na=extmap:2 urn:ietf:params:rtp-hdrext:toffset\r\na=extmap:3 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=extmap:4 urn:3gpp:video-orientation\r\na=extmap:5 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01\r\na=extmap:6 http://www.webrtc.org/experiments/rtp-hdrext/playout-delay\r\na=extmap:7 http://www.webrtc.org/experiments/rtp-hdrext/video-content-type\r\na=extmap:8 http://www.webrtc.org/experiments/rtp-hdrext/video-timing\r\na=sendrecv\r\na=rtcp-mux\r\na=rtcp-rsize\r\na=rtpmap:96 VP8/90000\r\na=rtcp-fb:96 ccm fir\r\na=rtcp-fb:96 nack\r\na=rtcp-fb:96 nack pli\r\na=rtcp-fb:96 goog-remb\r\na=rtcp-fb:96 transport-cc\r\na=rtpmap:97 rtx/90000\r\na=fmtp:97 apt=96\r\na=rtpmap:98 VP9/90000\r\na=rtcp-fb:98 ccm fir\r\na=rtcp-fb:98 nack\r\na=rtcp-fb:98 nack pli\r\na=rtcp-fb:98 goog-remb\r\na=rtcp-fb:98 transport-cc\r\na=rtpmap:99 rtx/90000\r\na=fmtp:99 apt=98\r\na=rtpmap:100 H264/90000\r\na=rtcp-fb:100 ccm fir\r\na=rtcp-fb:100 nack\r\na=rtcp-fb:100 nack pli\r\na=rtcp-fb:100 goog-remb\r\na=rtcp-fb:100 transport-cc\r\na=fmtp:100 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f\r\na=rtpmap:101 rtx/90000\r\na=fmtp:101 apt=100\r\na=rtpmap:102 red/90000\r\na=rtpmap:125 rtx/90000\r\na=fmtp:125 apt=102\r\na=rtpmap:127 ulpfec/90000\r\na=ssrc-group:FID 4093096293 2697077589\r\na=ssrc:4093096293 cname:CLEhVXt+TA2W3Qba\r\na=ssrc:4093096293 msid:TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d 5563bf19-2606-463d-8258-814090c1cfb4\r\na=ssrc:4093096293 mslabel:TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d\r\na=ssrc:4093096293 label:5563bf19-2606-463d-8258-814090c1cfb4\r\na=ssrc:2697077589 cname:CLEhVXt+TA2W3Qba\r\na=ssrc:2697077589 msid:TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d 5563bf19-2606-463d-8258-814090c1cfb4\r\na=ssrc:2697077589 mslabel:TdaPZO9y8wunsjPvfTOkux7lQLz1y05ikC7d\r\na=ssrc:2697077589 label:5563bf19-2606-463d-8258-814090c1cfb4\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:fdGW\r\na=ice-pwd:l49MC9urZCzW8tjhQ7NolfCp\r\na=ice-options:trickle\r\na=fingerprint:sha-256 F0:85:65:4A:AE:99:B6:4E:B3:29:35:6C:A9:62:F7:57:04:2B:65:92:32:6E:72:83:10:1F:C4:8D:BC:52:91:2B\r\na=setup:actpass\r\na=mid:data\r\na=sctpmap:5000 webrtc-datachannel 1024\r\n"
+    },
+    "queued-packets": -1,
+    "streams": [
+        {
+            "id": 1,
+            "ready": -1,
+            "ssrc": {
+                "audio": 924820343,
+                "video": 118589591,
+                "audio-peer": 2684448135,
+                "video-peer": 4093096293,
+                "video-peer-rtx": 2697077589
+            },
+            "direction": {
+                "audio-send": true,
+                "audio-recv": true,
+                "video-send": true,
+                "video-recv": true
+            },
+
+            "codecs": {
+                "audio-pt": 111,
+   "audio-codec": "opus",
+                "video-pt": 96,
+                "video-codec": "vp8"
+            },
+            "rtcp_stats": {
+                "audio": {
+                    "base": 48000,
+                    "rtt": 574,
+                    "lost": 0,
+                    "lost-by-remote": 0,
+                    "jitter-local": 4,
+                    "jitter-remote": 2,
+                    "in-link-quality": 100,
+                    "in-media-link-quality": 100,
+                    "out-link-quality": 100,
+                    "out-media-link-quality": 100
+                },
+                "video": {
+                    "base": 90000,
+                    "rtt": 555,
+                    "lost": 0,
+                    "lost-by-remote": 0,
+                    "jitter-local": 7,
+                    "jitter-remote": 42,
+                    "in-link-quality": 100,
+                    "in-media-link-quality": 100,
+                    "out-link-quality": 100,
+                    "out-media-link-quality": 100
+                }
+            },
+            "components": [
+                {
+                    "id": 1,
+                    "state": "ready",
+                    "connected": 12383726552,
+  "local-candidates": [
+                        "1 1 udp 2013266431 10.34.87.137 49992 typ host"
+                    ],
+                    "remote-candidates": [
+                        "1133363829 1 udp 2122260223 10.34.87.137 58443 typ host generation 0 ufrag fdGW network-id 1 network-cost 50"
+                    ],
+                    "selected-pair": "10.34.87.137:49992 [host,udp] <-> 10.34.87.137:58443 [host,udp]",
+                    "dtls": {
+                        "fingerprint": "D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38",
+                        "remote-fingerprint": "F0:85:65:4A:AE:99:B6:4E:B3:29:35:6C:A9:62:F7:57:04:2B:65:92:32:6E:72:83:10:1F:C4:8D:BC:52:91:2B",
+                        "remote-fingerprint-hash": "sha-256",
+                        "dtls-role": "active",
+                        "dtls-state": "connected",
+                        "retransmissions": 0,
+                        "valid": true,
+                        "ready": true,
+                        "handshake-started": 12383726563,
+                        "connected": 12383982850,
+                        "sctp-association": true
+                    },
+                    "in_stats": {
+                        "audio_packets": 8405,
+                        "audio_bytes": 768024,
+                        "audio_bytes_lastsec": 4795,
+                        "do_audio_nacks": false,
+                        "video_packets": 10288,
+                        "video_bytes": 11541681,
+                        "video_bytes_lastsec": 80412,
+                        "do_video_nacks": true,
+                        "video_nacks": 0,
+                        "data_packets": 18,
+                        "data_bytes": 4197
+                    },
+                    "out_stats": {
+  "audio_packets": 8405,
+                        "audio_bytes": 768024,
+                        "audio_bytes_lastsec": 4743,
+                        "audio_nacks": 0,
+                        "video_packets": 10287,
+                        "video_bytes": 11540500,
+                        "video_bytes_lastsec": 77443,
+                        "video_nacks": 0,
+                        "data_packets": 17,
+                        "data_bytes": 3114
+                    }
+                }
+            ]
+        }
+    ]
+}
+******************************************
+
+******************************************
+Initializing library
+janus.js:314 Library initialized: true
+janus.js:341 Using REST API to contact Janus: http://localhost:8088/janus
+janus.js:740 Created session: 7158989234748118
+janus.js:990 Created handle: 6596701002448083
+echotest.js:97 Plugin attached! (janus.plugin.echotest, id=6596701002448083)
+janus.js:1409 Creating PeerConnection
+janus.js:1417 Preparing local SDP and gathering candidates (trickle=true)
+janus.js:1468 Adding local stream
+janus.js:1473 Creating data channel
+janus.js:2091 Creating offer (iceDone=false)
+janus.js:2123 Setting local description
+janus.js:2141 Offer ready
+janus.js:2052 Remote description accepted!
+echotest.js:152 ICE state changed to checking
+janus.js:1449 Handling Remote Track
+janus.js:1456 Adding onended callback to track: MediaStreamTrack {kind: "audio", id: "janusa0", label: "janusa0", enabled: true, muted: false, …}
+janus.js:1449 Handling Remote Track
+janus.js:1456 Adding onended callback to track: MediaStreamTrack {kind: "video", id: "janusv0", label: "janusv0", enabled: true, muted: false, …}
+janus.js:1425 End of candidates.
+echotest.js:152 ICE state changed to connected
+echotest.js:152 ICE state changed to completed
+echotest.js:158 Janus says our WebRTC PeerConnection is up now
+janus.js:1480 State change on data channel: open
+echotest.js:345 The DataChannel is available!
+echotest.js:155 Janus started receiving our audio
+echotest.js:155 Janus started receiving our video
+janus.js:2387 Starting bitrate timer (via getStats)
+janus.js:1217 Sending string on data channel: kuki
+janus.js:1475 Received message on datachannel bla bla bla
+
+************************************************8
+
+******************************************************
+There's a message for JANUS EchoTest plugin
+Setting audio property: true
+Setting video property: true
+[2151900764686230] Sending event to transport...
+  >> 0 (Success)
+Got a Janus API request from janus.transport.http (0x8af7380)
+Transport task pool, serving request
+[2151900764686230] There's a message for JANUS EchoTest plugin
+[2151900764686230] Remote SDP:
+v=0
+o=- 6335930584395004838 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE audio video data
+a=msid-semantic: WMS VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP
+m=audio 9 UDP/TLS/RTP/SAVPF 111 103 104 9 0 8 106 105 13 110 112 113 126
+c=IN IP4 0.0.0.0
+a=rtcp:9 IN IP4 0.0.0.0
+a=ice-ufrag:0CV7
+a=ice-pwd:VND384PLOgTFXVRMWciQ6yxL
+a=ice-options:trickle
+a=fingerprint:sha-256 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+a=setup:actpass
+a=mid:audio
+a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level
+a=sendrecv
+a=rtcp-mux
+a=rtpmap:111 opus/48000/2
+a=rtcp-fb:111 transport-cc
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtpmap:103 ISAC/16000
+a=rtpmap:104 ISAC/32000
+a=rtpmap:9 G722/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:106 CN/32000
+a=rtpmap:105 CN/16000
+a=rtpmap:13 CN/8000
+a=rtpmap:110 telephone-event/48000
+a=rtpmap:112 telephone-event/32000
+a=rtpmap:113 telephone-event/16000
+a=rtpmap:126 telephone-event/8000
+a=ssrc:3268010100 cname:ZWXdVX0qxz8Dah5K
+a=ssrc:3268010100 msid:VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP aa57c736-1f0e-4a35-abe0-201b8da2bd1a
+a=ssrc:3268010100 mslabel:VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP
+a=ssrc:3268010100 label:aa57c736-1f0e-4a35-abe0-201b8da2bd1a
+m=video 9 UDP/TLS/RTP/SAVPF 96 97 98 99 100 101 102 125 127
+c=IN IP4 0.0.0.0
+a=rtcp:9 IN IP4 0.0.0.0
+a=ice-ufrag:0CV7
+a=ice-pwd:VND384PLOgTFXVRMWciQ6yxL
+a=ice-options:trickle
+a=fingerprint:sha-256 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+a=setup:actpass
+a=mid:video
+a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
+a=extmap:3 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time
+a=extmap:4 urn:3gpp:video-orientation
+a=extmap:5 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01
+a=extmap:6 http://www.webrtc.org/experiments/rtp-hdrext/playout-delay
+a=extmap:7 http://www.webrtc.org/experiments/rtp-hdrext/video-content-type
+a=extmap:8 http://www.webrtc.org/experiments/rtp-hdrext/video-timing
+a=sendrecv
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack
+a=rtcp-fb:96 nack pli
+a=rtcp-fb:96 goog-remb
+a=rtcp-fb:96 transport-cc
+a=rtpmap:97 rtx/90000
+a=fmtp:97 apt=96
+a=rtpmap:98 VP9/90000
+a=rtcp-fb:98 ccm fir
+a=rtcp-fb:98 nack
+a=rtcp-fb:98 nack pli
+a=rtcp-fb:98 goog-remb
+a=rtcp-fb:98 transport-cc
+a=rtpmap:99 rtx/90000
+a=fmtp:99 apt=98
+a=rtpmap:100 H264/90000
+a=rtcp-fb:100 ccm fir
+a=rtcp-fb:100 nack
+a=rtcp-fb:100 nack pli
+a=rtcp-fb:100 goog-remb
+a=rtcp-fb:100 transport-cc
+a=fmtp:100 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f
+a=rtpmap:101 rtx/90000
+a=fmtp:101 apt=100
+a=rtpmap:102 red/90000
+a=rtpmap:125 rtx/90000
+a=fmtp:125 apt=102
+a=rtpmap:127 ulpfec/90000
+a=ssrc-group:FID 104600774 1633371589
+a=ssrc:104600774 cname:ZWXdVX0qxz8Dah5K
+a=ssrc:104600774 msid:VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP a7aad49f-f88f-4fcc-9447-41cbe687c2e9
+a=ssrc:104600774 mslabel:VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP
+a=ssrc:104600774 label:a7aad49f-f88f-4fcc-9447-41cbe687c2e9
+a=ssrc:1633371589 cname:ZWXdVX0qxz8Dah5K
+a=ssrc:1633371589 msid:VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP a7aad49f-f88f-4fcc-9447-41cbe687c2e9
+a=ssrc:1633371589 mslabel:VsOpCIqUrlUlO9wgsPjwvTpvU3wB5tZKSQyP
+a=ssrc:1633371589 label:a7aad49f-f88f-4fcc-9447-41cbe687c2e9
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:0CV7
+a=ice-pwd:VND384PLOgTFXVRMWciQ6yxL
+a=ice-options:trickle
+a=fingerprint:sha-256 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[2151900764686230] Audio has been negotiated, Video has been negotiated, SCTP/DataChannels have been negotiated
+[2151900764686230] Setting ICE locally: got OFFER (1 audios, 1 videos)
+[2151900764686230] Creating ICE agent (ICE Full mode, controlled)
+[2151900764686230] Adding 10.34.87.137 to the addresses to gather candidates for
+[2151900764686230] Gathering done for stream 1
+[2151900764686230]   Setting DTLS initial timeout: 100
+[2151900764686230] Parsing audio candidates (stream=1)...
+[2151900764686230] ICE ufrag (local):   0CV7
+[2151900764686230] ICE pwd (local):     VND384PLOgTFXVRMWciQ6yxL
+[2151900764686230] Fingerprint (local) : sha-256 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+[2151900764686230] DTLS setup (local):  actpass
+[2151900764686230] Setting connect state (DTLS client)
+[2151900764686230] Audio mid: audio
+[2151900764686230] Peer audio SSRC: 3268010100
+[2151900764686230] Parsing video candidates (stream=1)...
+[2151900764686230] ICE ufrag (local):   0CV7
+[2151900764686230] ICE pwd (local):     VND384PLOgTFXVRMWciQ6yxL
+[2151900764686230] Fingerprint (local) : sha-256 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+[2151900764686230] DTLS setup (local):  actpass
+[2151900764686230] Setting connect state (DTLS client)
+[2151900764686230] Video mid: video
+[2151900764686230] Peer video SSRC: 104600774
+[2151900764686230] Peer video SSRC (rtx): 1633371589
+[2151900764686230] Parsing SCTP candidates (stream=1)...
+[2151900764686230] ICE ufrag (local):   0CV7
+[2151900764686230] ICE pwd (local):     VND384PLOgTFXVRMWciQ6yxL
+[2151900764686230] Fingerprint (local) : sha-256 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+[2151900764686230] DTLS setup (local):  actpass
+[2151900764686230] Setting connect state (DTLS client)
+[2151900764686230] Data Channel mid: data
+Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+Will remove payload type 97 (97 rtx/90000)
+Will remove payload type 99 (99 rtx/90000)
+Will remove payload type 101 (101 rtx/90000)
+Will remove payload type 102 (102 red/90000)
+Will remove payload type 125 (125 rtx/90000)
+Will remove payload type 127 (127 ulpfec/90000)
+ -------------------------------------------
+  >> Anonymized
+ -------------------------------------------
+Setting audio property: true
+Setting video property: true
+This is involving a negotiation (offer) as well:
+v=0
+o=- 6335930584395004838 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=audio 9 UDP/TLS/RTP/SAVPF 111 103 104 9 0 8 106 105 13 110 112 113 126
+c=IN IP4 1.1.1.1
+a=sendrecv
+a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level
+a=rtpmap:111 opus/48000/2
+a=rtcp-fb:111 transport-cc
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtpmap:103 ISAC/16000
+a=rtpmap:104 ISAC/32000
+a=rtpmap:9 G722/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:106 CN/32000
+a=rtpmap:105 CN/16000
+a=rtpmap:13 CN/8000
+a=rtpmap:110 telephone-event/48000
+a=rtpmap:112 telephone-event/32000
+a=rtpmap:113 telephone-event/16000
+a=rtpmap:126 telephone-event/8000
+m=video 9 UDP/TLS/RTP/SAVPF 96 98 100
+c=IN IP4 1.1.1.1
+a=sendrecv
+a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
+a=extmap:3 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time
+a=extmap:4 urn:3gpp:video-orientation
+a=extmap:5 http://www.ietf.org/id/draft-holmer-rmcat-transport-wide-cc-extensions-01
+a=extmap:6 http://www.webrtc.org/experiments/rtp-hdrext/playout-delay
+a=extmap:7 http://www.webrtc.org/experiments/rtp-hdrext/video-content-type
+a=extmap:8 http://www.webrtc.org/experiments/rtp-hdrext/video-timing
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack
+a=rtcp-fb:96 nack pli
+a=rtcp-fb:96 goog-remb
+a=rtcp-fb:96 transport-cc
+a=rtpmap:98 VP9/90000
+a=rtcp-fb:98 ccm fir
+a=rtcp-fb:98 nack
+a=rtcp-fb:98 nack pli
+a=rtcp-fb:98 goog-remb
+a=rtcp-fb:98 transport-cc
+a=rtpmap:100 H264/90000
+a=rtcp-fb:100 ccm fir
+a=rtcp-fb:100 nack
+a=rtcp-fb:100 nack pli
+a=rtcp-fb:100 goog-remb
+a=rtcp-fb:100 transport-cc
+a=fmtp:100 level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+ -------------------------------------------
+  >> Anonymized
+ -------------------------------------------
+[2151900764686230] We have 1 candidates for Stream #1, Component #1
+[2151900764686230]   Address:    10.34.87.137:42613
+[2151900764686230]   Priority:   2013266431
+[2151900764686230]   Foundation: 1
+[2151900764686230]     1 1 udp 2013266431 10.34.87.137 42613 typ host
+[2151900764686230] We have 1 candidates for Stream #1, Component #1
+[2151900764686230]   Address:    10.34.87.137:42613
+[2151900764686230]   Priority:   2013266431
+[2151900764686230]   Foundation: 1
+[2151900764686230]     1 1 udp 2013266431 10.34.87.137 42613 typ host
+[2151900764686230] We have 1 candidates for Stream #1, Component #1
+[2151900764686230]   Address:    10.34.87.137:42613
+[2151900764686230]   Priority:   2013266431
+[2151900764686230]   Foundation: 1
+[2151900764686230]     1 1 udp 2013266431 10.34.87.137 42613 typ host
+ -------------------------------------------
+  >> Merged (1733 bytes)
+ -------------------------------------------
+v=0
+o=- 6335930584395004838 2 IN IP4 10.34.87.137
+s=-
+t=0 0
+a=group:BUNDLE audio video data
+a=msid-semantic: WMS janus
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 10.34.87.137
+a=sendrecv
+a=mid:audio
+a=rtcp-mux
+a=ice-ufrag:Cqmm
+a=ice-pwd:zwuhNy05cgb26MFJKJBQ2q
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=rtpmap:111 opus/48000/2
+a=ssrc:1384044 cname:janusaudio
+a=ssrc:1384044 msid:janus janusa0
+a=ssrc:1384044 mslabel:janus
+a=ssrc:1384044 label:janusa0
+a=candidate:1 1 udp 2013266431 10.34.87.137 42613 typ host
+a=end-of-candidates
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 10.34.87.137
+a=sendrecv
+a=mid:video
+a=rtcp-mux
+a=ice-ufrag:Cqmm
+a=ice-pwd:zwuhNy05cgb26MFJKJBQ2q
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack
+a=rtcp-fb:96 nack pli
+a=rtcp-fb:96 goog-remb
+a=rtcp-fb:96 transport-cc
+a=ssrc:2349996609 cname:janusvideo
+a=ssrc:2349996609 msid:janus janusv0
+a=ssrc:2349996609 mslabel:janus
+a=ssrc:2349996609 label:janusv0
+a=candidate:1 1 udp 2013266431 10.34.87.137 42613 typ host
+a=end-of-candidates
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.87.137
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:Cqmm
+a=ice-pwd:zwuhNy05cgb26MFJKJBQ2q
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.87.137 42613 typ host
+a=end-of-candidates
+
+[2151900764686230] Done! Ready to setup remote candidates and send connectivity checks...
+[2151900764686230]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[2151900764686230] Sending event to transport...
+  >> Pushing event: 0 (took 1130 us)
+[2151900764686230] ICE thread started
+Got a Janus API request from janus.transport.http (0x8af7380)
+Got a keep-alive on session 1441359319828202
+Session 1441359319828202 found... returning up to 1 messages
+Got a Janus API request from janus.transport.http (0x8afe838)
+[2151900764686230] Trickle candidate (audio): candidate:1133363829 1 udp 2122260223 10.34.87.137 48989 typ host generation 0 ufrag 0CV7 network-id 1 network-cost 50
+[2151900764686230]  Adding remote candidate component:1 stream:1 type:host 10.34.87.137:48989
+[2151900764686230]  Transport: UDP
+[2151900764686230] ICE already started for this component, setting candidates we have up to now
+[2151900764686230] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[2151900764686230] >> Remote Stream #1, Component #1
+[2151900764686230]   Address:    10.34.87.137:48989
+[2151900764686230]   Priority:   2122260223
+[2151900764686230]   Foundation: 1133363829
+[2151900764686230]   Username:   0CV7
+[2151900764686230]   Password:   VND384PLOgTFXVRMWciQ6yxL
+[2151900764686230]  Setting remote credentials...
+[2151900764686230] Component state changed for component 1 in stream 1: 2 (connecting)
+[2151900764686230] Remote candidates set!
+[2151900764686230] New selected pair for component 1 in stream 1: 1 <-> 1133363829
+[2151900764686230]   Component is ready enough, starting DTLS handshake...
+[2151900764686230] Creating retransmission timer with ID 4
+[2151900764686230] Component state changed for component 1 in stream 1: 3 (connected)
+[2151900764686230] Component state changed for component 1 in stream 1: 4 (ready)
+[2151900764686230] ICE send thread started...
+Got a Janus API request from janus.transport.http (0x8afe838)
+[2151900764686230] Trickle candidate (video): candidate:1133363829 1 udp 2122260223 10.34.87.137 48747 typ host generation 0 ufrag 0CV7 network-id 1 network-cost 50
+[2151900764686230] Got a video candidate (index 1) but we're bundling, ignoring...
+Got a Janus API request from janus.transport.http (0x8afe838)
+[2151900764686230] Trickle candidate (data): candidate:1133363829 1 udp 2122260223 10.34.87.137 54103 typ host generation 0 ufrag 0CV7 network-id 1 network-cost 50
+[2151900764686230] Got a data candidate (index 2) but we're bundling, ignoring...
+Got a Janus API request from janus.transport.http (0x8afe838)
+Got a keep-alive on session 1441359319828202
+Session 1441359319828202 found... returning up to 1 messages
+[2151900764686230] DTLS established, yay!
+[2151900764686230] Computing sha-256 fingerprint of remote certificate...
+[2151900764686230] Remote fingerprint (sha-256) of the client is 76:0B:35:E4:9F:E8:7E:5A:FC:79:F6:D4:20:35:8D:68:B2:3C:AF:D6:92:1A:3F:0F:C2:BF:44:A8:E7:4D:45:D9
+[2151900764686230]  Fingerprint is a match!
+[2151900764686230] SRTP_AES128_CM_SHA1_32
+[2151900764686230] Key/Salt/Master: 30/16/14
+[2151900764686230] Created inbound SRTP session for component 1 in stream 1
+[2151900764686230] Created outbound SRTP session for component 1 in stream 1
+[2151900764686230] The DTLS handshake for the component 1 in stream 1 has been completed
+[2151900764686230] The DTLS handshake has been completed
+[2151900764686230] Telling the plugin about it (JANUS EchoTest plugin)
+WebRTC media is now available
+[2151900764686230] Starting thread for SCTP association
+[2151900764686230] Sending event to transport...
+[2151900764686230] Started thread: setup of the SCTP association
+[2151900764686230] Connecting the SCTP association
+Association change SCTP_COMM_UP, streams (in/out) = (1024/16), supports PR AUTH ASCONF MULTIBUF RE-CONFIG.
+[2151900764686230] Opened channel 'JanusDataChannel' (id=1) (1/0/0)
+[2151900764686230] Connected to the DataChannel peer
+Audio SSRC changed, 0 --> 3268010100
+[2151900764686230] Notifying that we are receiving audio
+[2151900764686230] Sending event to transport...
+[2151900764686230] DTLS already set up, disabling retransmission timer!
+Got a Janus API request from janus.transport.http (0x8afe838)
+No more remote candidates for handle 2151900764686230!
+Video SSRC changed, 0 --> 104600774
+[2151900764686230] Notifying that we are receiving video
+[2151900764686230] Sending event to transport...
+
+
