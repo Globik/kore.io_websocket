@@ -161,7 +161,7 @@ int inc_req(json_t);
 
 
 int init(state){
-	printf("Entering init.\n");
+printf("Entering init.\n");
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	//if(worker->id !=1) return (KORE_RESULT_OK);
 	printf("after state.\n");
@@ -290,7 +290,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 	
 	
 	
-	json_auto_t *root = load_json((const char*)data, len);
+	json_t *root = load_json((const char*)data, len);
 	if(root){
 	 char*foo=json_dumps(root,0);
 	kore_log(LOG_NOTICE,"incoming message: %s",foo);
@@ -304,7 +304,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		
 		janus_session *session=janus_session_find(session_id);
 		if(!session){
-		kore_log(LOG_NOTICE,"The session not found. Returning");return;
+		kore_log(LOG_NOTICE,"The session not found. Returning");json_decref(root);return;
 		}
 		session->last_activity=janus_get_monotonic_time();
 		janus_ice_handle *handle=NULL;
@@ -325,18 +325,20 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		}else if(!strcmp(t_txt,"attach")){
 			
 		kore_log(LOG_NOTICE,"type attach.");
-		if(handle !=NULL){kore_log(LOG_INFO,"handle is not null");return;}
+		if(handle !=NULL){kore_log(LOG_INFO,"handle is not null");json_decref(root);return;}
 		janus_mutex_lock(&session->mutex);
 		handle=janus_ice_handle_create(session,NULL);
 		if(handle==NULL){
 		kore_log(LOG_INFO,"Failed to create ice handle.");
 		janus_mutex_unlock(&session->mutex);
+			json_decref(root);
 		return;
 			}
 			handle_id=handle->handle_id;
 			janus_plugin *plugin_t=janus_plugin_find("janus.plugin.echotest");
 			if(plugin_t==NULL){
 			kore_log(LOG_INFO,"plugin_t is NULL");
+				json_decref(root);
 			return;
 			}else{kore_log(LOG_INFO,"plugin_t is NOT NULL");}
 			int error=0;
@@ -345,6 +347,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 				g_hash_table_remove(session->ice_handles,&handle_id);
 				janus_mutex_unlock(&session->mutex);
 				kore_log(LOG_INFO,"Err attach plugin.");
+				json_decref(root);
 				return;
 			}else{kore_log(LOG_INFO,"SUCCESS IN ATTACHING PLUGIN");}
 			janus_mutex_unlock(&session->mutex);
@@ -354,7 +357,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 			json_object_set_new(reply,"handle_id",json_integer(handle_id));
 			json_object_set_new(reply,"type",json_string("on_attach"));
 
-
+/*
 //janus_plugin *plugin_tl = (janus_plugin *)handle->app;
 char*transi2="fucker";
 janus_plugin_result *result = plugin_t->handle_message(handle->app_handle,g_strdup((char *)transi2),reply, reply);
@@ -376,16 +379,16 @@ if(result->type == JANUS_PLUGIN_OK) {
 		return;
 				//goto jsondone;
 }
-			/* Reference the content, as destroying the result instance will decref it */
+			//Reference the content, as destroying the result instance will decref it 
 			//json_incref(result->content);
 			
 		} 
 	else if(result->type == JANUS_PLUGIN_OK_WAIT) {
-			/* The plugin received the request but didn't process it yet, send an ack (asynchronous notifications may follow) */
+			// The plugin received the request but didn't process it yet, send an ack (asynchronous notifications may follow) 
 	JANUS_LOG(LOG_WARN," Send the success reply JANUS_PLUGIN_OK_WAIT");
 			//ret = janus_process_success(request, reply);
 		} else {
-			/* Something went horribly wrong! */
+			// Something went horribly wrong! 
 			//ret = janus_process_error_string(request, session_id, transaction_text, JANUS_ERROR_PLUGIN_MESSAGE,
 JANUS_LOG(LOG_WARN,"Plugin returned a severe (unknown) error");
 			janus_plugin_result_destroy(result);
@@ -393,7 +396,7 @@ JANUS_LOG(LOG_WARN,"Plugin returned a severe (unknown) error");
 		}
 		janus_plugin_result_destroy(result);
 			
-			
+*/			
 			
 			
 			
@@ -407,7 +410,7 @@ size_t size=json_dumpb(reply,NULL,0,0);
 	if(size==0){kore_log(LOG_INFO, "json_dumpb Size is null\n");}
 	char*buf=alloca(size);
 	size=json_dumpb(reply,buf,size,0);
-	//kore_log(LOG_INFO, "buffer: %s\n", buf);
+	//kore_log(LOG_INFO, "buffer: %s\n", buf);swweeddddds
 	kore_websocket_send(c, 1, buf,size);
 	send_to_clients=1;
 		}else if(!strcmp(t_txt,"detach")){
@@ -438,9 +441,10 @@ size_t size=json_dumpb(reply,NULL,0,0);
 	size=json_dumpb(reply,buf,size,0);
 	kore_websocket_send(c, 1, buf,size);
     send_to_clients=1;
-		}else if(!strcmp(t_txt,"destroy")){
+		}
+		else if(!strcmp(t_txt,"destroy")){
 		kore_log(LOG_NOTICE,"type destroy");
-			if(handle !=NULL){kore_log(LOG_INFO,"handle is not null. skiping.");return;}
+			if(handle !=NULL){kore_log(LOG_INFO,"handle is not null. skiping.");json_decref(root);return;}
 			janus_session_schedule_destruction(session,TRUE,TRUE,TRUE);
 			json_auto_t *reply=json_object();
 			json_object_set_new(reply,"type",json_string("on_destroy"));
@@ -452,10 +456,19 @@ size_t size=json_dumpb(reply,NULL,0,0);
 	size=json_dumpb(reply,buf,size,0);
 	kore_websocket_send(c, 1, buf,size);
 	send_to_clients=1;
-	}else if(!strcmp(t_txt,"to_janus_offer")){
-	kore_log(LOG_INFO,"type: 'to_janus_offer'");
-	incoming_message(handle,session,root,session_id);
+	}
+		//offer? answer?
+		else if(!strcmp(t_txt,"janus")){
+	kore_log(LOG_INFO,"type: janus");
+	incoming_message(handle,session,root,session_id,c);
 	send_to_clients=1;
+			
+	}
+	// on ice candidate ???	
+	else if(!strcmp(t_txt,"trickle")){
+	kore_log(LOG_INFO,"Type trickle");
+	do_trickle(handle,session,root,session_id,c);
+send_to_clients=1;		
 	}else{
 	kore_log(LOG_NOTICE,"unknown type");
 	send_to_clients=1;
@@ -465,7 +478,7 @@ if(send_to_clients==0) kore_websocket_send(c,op,data,len);
 free(foo);
 	}else{}
 
-	//json_decref(root);
+	json_decref(root);
 	
 }
 

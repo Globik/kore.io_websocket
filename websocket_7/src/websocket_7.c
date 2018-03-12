@@ -22,12 +22,13 @@
 #include <kore/http.h>
 #include <kore/tasks.h>
 #include <limits.h>
-//include <glib.h>
+//include <glib.h>sss
 #include <pthread.h>
 #include <jansson.h>
 #include "assets.h"
 #include "plugin.h"
 #include "helper.h"
+#include "openssl/bio.h"
 //#define WEBSOCKET_PAYLOAD_SINGLE	125
 //#define WEBSOCKET_PAYLOAD_EXTEND_1	126
 //#define WEBSOCKET_PAYLOAD_EXTEND_2	127

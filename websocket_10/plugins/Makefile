@@ -2,7 +2,7 @@
 INCLS=-I/home/globik/janus-gateway -I/home/globik/janus-gateway/transports \
 -I/home/globik/janus-gateway/plugins -I/home/globik/janus-gateway/events -I/home/globik/webrtc
 OBJ=/home/globik/janus-gateway/*.o /home/globik/janus-gateway/plugins/janus-plugin.o 
-DEFS=-DINET -DINET6 -DDEBUG_SCTP -DHAVE_LIBCURL -DHAVE_SCTP -DEBUG -D_GNU_SOURCE -DHAVE_SRTP_2 -DDEBUG_LEVEL=7 
+DEFS=-DINET -DINET6 -DDEBUG_SCTP -DHAVE_LIBCURL -DHAVE_SCTP -DEBUG -D_GNU_SOURCE -DH_SRTP_2 -DDEBUG_LEVEL=7 
 CFLAGS=-g -O2 -std=c99  $(DEFS) -fPIC -Wno-deprecated `pkg-config --cflags openssl nice`
 SUKA=-pthread -lgobject-2.0 -lusrsctp -lcurl -lsrtp2 -ldl -ljansson
 PAA=/home/globik/janus-gateway

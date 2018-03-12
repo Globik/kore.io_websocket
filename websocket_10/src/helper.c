@@ -1,8 +1,9 @@
 //#include <stdlib.h> //exit
-#include <kore/kore.h>
+//#include <kore/kore.h>
 #include "helper.h"
 char *config_file = NULL;
 char *configs_folder=NULL;
+gboolean full_trickle;
 
 //static 
 	void janus_handle_signal(int signum) {
@@ -424,9 +425,10 @@ if(!plugin_session || plugin_session < (janus_plugin_session *)0x1000 || !janus_
 	// Attach JSEP if possible? */
 	const char *sdp_type = json_string_value(json_object_get(jsep, "type"));
 	const char *sdp = json_string_value(json_object_get(jsep, "sdp"));
+	gboolean restart=json_object_get(jsep,"sdp") ? json_is_true(json_object_get(jsep,"restart")) : FALSE;
 	json_t *merged_jsep = NULL;
 	if(sdp_type != NULL && sdp != NULL) {
-		merged_jsep = janus_plugin_handle_sdp(plugin_session, plugin, sdp_type, sdp);
+		merged_jsep = janus_plugin_handle_sdp(plugin_session, plugin, sdp_type, sdp,restart);
 		if(merged_jsep == NULL) {
 			if(ice_handle == NULL || janus_flags_is_set(&ice_handle->webrtc_flags, JANUS_ICE_HANDLE_WEBRTC_STOP)
 					|| janus_flags_is_set(&ice_handle->webrtc_flags, JANUS_ICE_HANDLE_WEBRTC_ALERT)) {
@@ -508,12 +510,14 @@ g_print("leaving out conf_max\n");
 }
 
 void conf_force_bundle_or_and_rtcp_mux(){
+	/*
 item = janus_config_get_item_drilldown(config, "media", "force-bundle");
 	force_bundle = (item && item->value) ? janus_is_true(item->value) : FALSE;
 	janus_ice_force_bundle(force_bundle);
 	item = janus_config_get_item_drilldown(config, "media", "force-rtcp-mux");
 	force_rtcpmux = (item && item->value) ? janus_is_true(item->value) : FALSE;
 	janus_ice_force_rtcpmux(force_rtcpmux);
+	*/
 }
 void conf_no_media_timer(){
 	JANUS_LOG(LOG_WARN, "entering no_media_timer\n");
@@ -530,15 +534,16 @@ item = janus_config_get_item_drilldown(config, "media", "no_media_timer");
 }
 
 const char*conf_cert_pem(){
-	const char*cert_pem;
+const char*cert_pem;
 item = janus_config_get_item_drilldown(config, "certificates", "cert_pem");
 	if(!item || !item->value) {
-		//server_pem = NULL;
+		g_print("\nserver_pem = NULL;\n");
 		cert_pem=NULL;
 		return cert_pem;
 	} else {
-		//server_pem = item->value;
+		g_print("server_pem = item->value;\n");
 		cert_pem=item->value;
+		g_print("cert_pem %s\n",cert_pem);
 		return cert_pem;
 	}
 }
@@ -551,8 +556,9 @@ item = janus_config_get_item_drilldown(config, "certificates", "cert_key");
 		cert_key=NULL;
 		return cert_key;
 	} else {
-		//server_key = item->value;
+		g_print("server_key = item->value;\n");
 		cert_key=item->value;
+		g_print("cert_key %s\n",cert_key);
 		return cert_key;
 	}
 }
@@ -608,6 +614,7 @@ janus_ice_debugging_enable();
 
 
 void conf_turn(){
+//item=janus_config_get_item_drilldown(config,"media","ipv6");
 item = janus_config_get_item_drilldown(config, "media", "rtp_port_range");
 if(item && item->value) {
 // Split in min and max port 
@@ -632,7 +639,7 @@ if(item && item->value) {
 	
 	
 	
-	g_printf(" Check if we need to enable the ICE Lite mode \n");
+	JANUS_LOG(LOG_WARN," Check if we need to enable the ICE Lite mode \n");
 	item = janus_config_get_item_drilldown(config, "nat", "ice_lite");
 	ice_lite =(item && item->value) ? janus_is_true(item->value) : FALSE;
 	//Check if we need to enable ICE-TCP support (warning: still broken, for debugging only) 
@@ -698,13 +705,13 @@ item = janus_config_get_item_drilldown(config, "nat", "ice_tcp");
 	g_print("ice_tcp: %d\n",ice_tcp);
 	g_print("ice_lite %d\n",ice_lite);
 	g_print("ipv6 %d\n",ipv6);
-	janus_ice_init(ice_lite, ice_tcp, ipv6, rtp_min_port, rtp_max_port);
+	janus_ice_init(ice_lite, ice_tcp,full_trickle, ipv6, rtp_min_port, rtp_max_port);
 	if(janus_ice_set_stun_server(stun_server, stun_port) < 0) {
-		g_print("Invalid STUN address %s:%u\n", stun_server, stun_port);
+	JANUS_LOG(LOG_FATAL,"Invalid STUN address %s:%u\n", stun_server, stun_port);
 		exit(1);
 	}
 	if(janus_ice_set_turn_server(turn_server, turn_port, turn_type, turn_user, turn_pwd) < 0) {
-		g_print("Invalid TURN address %s:%u\n", turn_server, turn_port);
+		JANUS_LOG(LOG_FATAL,"Invalid TURN address %s:%u\n", turn_server, turn_port);
 		exit(1);
 	}
 #ifndef HAVE_LIBCURL
@@ -835,7 +842,7 @@ if(config_file == NULL) {
 		g_print("Error reading/parsing the configuration file, going on with the defaults and the command line arguments\n");
 		config = janus_config_create("janus.cfg");
 		if(config == NULL) {
-			//If we can't even create an empty configuration, something's definitely wrong 
+			g_print("If we can't even create an empty configuration, something's definitely wrong \n");
 			exit(1);
 		}
 	}else{g_print("CONFIG FOLDER!!!!!!!!!!!!!!\n");}
@@ -895,7 +902,7 @@ g_print("Using %s as local IP...\n", local_ip);
 #endif
 const char *nat_1_1_mapping = NULL;
 uint16_t rtp_min_port = 0, rtp_max_port = 0;
-gboolean ice_lite = FALSE, ice_tcp = FALSE, ipv6 = FALSE;
+gboolean ice_lite = FALSE,full_trickle=FALSE, ice_tcp = FALSE, ipv6 = FALSE;
 item = janus_config_get_item_drilldown(config, "media", "ipv6");
 ipv6 = (item && item->value) ? janus_is_true(item->value) : FALSE;
 conf_turn();
@@ -908,18 +915,34 @@ conf_force_bundle_or_and_rtcp_mux();
 conf_max_nack_queue();
 //no-media timer 
 conf_no_media_timer();
+		/* RFC4588 support */
+	item = janus_config_get_item_drilldown(config, "media", "rfc_4588");
+	if(item && item->value) {
+		janus_set_rfc4588_enabled(janus_is_true(item->value));
+	}
 g_print("Setup OpenSSL stuff\n");
 const char* server_pem=conf_cert_pem();
+		//g_print
 const char* server_key=conf_cert_key();
-JANUS_LOG(LOG_VERB, "Using certificates:\n\t%s\n\t%s\n", server_pem, server_key);
+g_print("Using certificates:\n\t%s\n\t%s\n", server_pem, server_key);
 SSL_library_init();
 SSL_load_error_strings();
 OpenSSL_add_all_algorithms();
-	// ... and DTLS-SRTP in particular 
-if(janus_dtls_srtp_init(server_pem, server_key) < 0) {
-exit(1);
+// ... and DTLS-SRTP in particular 
+// janus_use_openssl_pre_1_1_api	
+		
+//guint a=0;		
+guint a=janus_dtls_srtp_init(server_pem, server_key);
+g_print("aaa %d\n",a);
+if(a < 0) {
+g_print("SRTP_INIT IS NOT OK!!!!! EXIT!\n");
+//exit(1);
+}else{
+g_print("SRTP INIT OK!\n");
 }
-	// Check if there's any custom value for the starting MTU to use in the BIO filter 
+
+
+	g_print("Check if there's any custom value for the starting MTU to use in the BIO filter\n"); 
 conf_dtls_mtu();
 
 #ifdef HAVE_SCTP
@@ -943,10 +966,12 @@ conf_dtls_mtu();
 	}
 
 gchar **disabled_plugins = NULL;
-struct dirent *pluginent = NULL;
+//struct dirent *
+	pluginent = NULL;
 disabled_plugins = NULL;
 const char *path=NULL;
-DIR *dir=NULL;
+//DIR *
+	dir=NULL;
 // Load plugins 
 //	path = PLUGINDIR;
 //path="/usr/local/lib/janus/plugins";

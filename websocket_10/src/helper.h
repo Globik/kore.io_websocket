@@ -1,13 +1,16 @@
 //#include <limits.h>
 #include <stdlib.h> //exit
 //#include <net/if.h>
-//#include <netdb.h>
+//#include <netdb.h>ijiji
 #include <dlfcn.h>
 #include <dirent.h>
 #include <unistd.h> //write
 //#include <poll.h>
 #include <errno.h> //eintr, errno
 #include <glib.h>
+
+#include <kore/kore.h>
+
 #include "debug.h" //janus_print
 #include "utils.h" //janus_pidfile_remove
 #include "config.h"
@@ -33,7 +36,7 @@
 #define DEFAULT_SESSION_TIMEOUT		3000
 
 #define CONFDIR "/home/globik/kore.io_websocket/websocket_10/configs"
-
+//#define CONFDIR "/usr/local/etc/janus"
 
 //#include "log.h"
 extern const char* janus_get_api_error(int);
@@ -76,7 +79,9 @@ gchar **disabled_plugins;
 //static 
 	//char *configs_folder;
 //static janus_callbacks janus_handler_plugin;
-
+struct dirent *pluginent;
+char *configs_folder;
+DIR *dir;
 int janus_log_level;
 gboolean janus_log_timestamps;
 gboolean janus_log_colors;
@@ -111,7 +116,7 @@ void janus_plugin_relay_data(janus_plugin_session *, char *, int);
 void janus_plugin_relay_rtp(janus_plugin_session *, int, char *, int);
 void janus_plugin_relay_rtcp(janus_plugin_session *, int, char *, int);
 int janus_plugin_push_event(janus_plugin_session *,janus_plugin *,const char *,json_t *, json_t *); 
-json_t *janus_plugin_handle_sdp(janus_plugin_session *plugin_session, janus_plugin *plugin, const char *sdp_type, const char *sdp);
+json_t *janus_plugin_handle_sdp(janus_plugin_session *plugin_session, janus_plugin *plugin, const char *sdp_type, const char *sdp,gboolean);
 void plug_fucker(GHashTable *,janus_plugin*);
 void load_plugin(const char*);
 
@@ -177,7 +182,8 @@ GHashTable *eventhandlers;
 GHashTable *eventhandlers_so;
 
 char *api_secret, *admin_api_secret;
-void incoming_message(janus_ice_handle*,janus_session *,json_auto_t*,guint64);
+void incoming_message(janus_ice_handle*,janus_session *,json_t*,guint64,struct connection*);
+void do_trickle(janus_ice_handle*,janus_session*,json_t*,guint64,struct connection*);
 
 
 

@@ -80,47 +80,43 @@ limitations under the License.
             }
         }
 
-        function onIceCandidate(e) {
-            if (e.candidate == null) {
-                if (sdp == "") {
+function onIceCandidate(e) {
+if (e.candidate == null) {
+ if (sdp == "") {
                     msg("SDP ERROR!");
                     return;
                 }
-				
-                msg('Posting WebRTC offer...');
-				msg(e.candidate);
+msg('Posting WebRTC offer...');
+msg(e.candidate);
 console.warn("e.candidate: ",e.candidate);
-         // wsocket = new WebSocket((window.location.protocol == "http:" ? "ws" : "wss" ) + "://" + window.location.host + "/websocketInit");
-          wsocket=new WebSocket("ws://127.0.0.1:8888/connect");
-				wsocket.onopen = function (evt) { msg("WebSocket connected");
-										   console.log('websocket connected');
-										   msg("ev.candidate: "+e.candidate);
-										   msg(sdp);
-										   wsocket.send(sdp);}
-          wsocket.onmessage = function (evt)
-                {
+// wsocket = new WebSocket((window.location.protocol == "http:" ? "ws" : "wss" ) + "://" + window.location.host + "/websocketInit");
+wsocket=new WebSocket("ws://127.0.0.1:8888/connect");
+wsocket.onopen = function (evt) { msg("WebSocket connected");
+console.log('websocket connected');
+msg("ev.candidate: "+e.candidate);
+msg(sdp);
+wsocket.send(sdp);}
+wsocket.onmessage = function (evt){
 msg('Got answer, connecting...');
 console.log("evt.data: ",evt.data);
 var ax;
 if (typeof mozRTCSessionDescription !== 'undefined') { 
 ax = new mozRTCSessionDescription({ type: "answer", sdp: evt.data }) 
 } else { ax = new RTCSessionDescription({ type: "answer", sdp: evt.data }) }
-			  console.log("AXXXX: ",ax);
+console.log("AXXXX: ",ax);
  connection.setRemoteDescription(ax, onSetRemoteDescriptionDone, onError);
 }
-                msg("RETURNS HERE>>>");
-                return;
-            }
-			msg("<b>CANDIDATE:</b> "+e.candidate.candidate);
-			// ./webrtc_sample_linux
-			//msg(e.candidate.candidate);
-            currentoffer.sdp += ("a=" + e.candidate.candidate + "\r\n");
-            sdp = currentoffer.sdp;
-        }
+msg("RETURNS HERE>>>");
+return;
+ }
+msg("<b>CANDIDATE:</b> "+e.candidate.candidate);
+currentoffer.sdp += ("a=" + e.candidate.candidate + "\r\n");
+sdp = currentoffer.sdp;
+ }
 
-        function onCandidateAdded(e) { debug('onCandidateAdded: ' + e);alert(e); }
+function onCandidateAdded(e) { debug('onCandidateAdded: ' + e);alert(e); }
 
-        function onOfferDone(offer)
+function onOfferDone(offer)
         {
 			msg("ON OFFER DONE");
             // debug(offer.sdp);
