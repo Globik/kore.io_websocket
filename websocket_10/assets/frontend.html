@@ -37,7 +37,7 @@ usid=m.id;
 yrid.textContent=m.id;
 transaction=m.transaction;
 session_id=m.session_id;
-}else if(m.type=="on_attach"){
+}else if(m.type=="message"){}else if(m.type=="on_attach"){
 transaction=m.transaction;
 handle_id=m.handle_id;
 session_id=m.session_id	
@@ -72,7 +72,14 @@ socket.onerror = function(evt) { mout.innerHTML+="<b>onerror:</b>"+evt+"<br>"; }
 }
 function send_message(){
 if(!f.value)return;
-if(socket)socket.send(f.value);
+var ob={};
+	ob.msg=f.value;
+	ob.type="message";
+	ob.session_id=session_id;
+ob.handle_id=handle_id;
+ob.transaction=transaction;
+	
+if(socket)socket.send(JSON.stringify(ob));
 }
 function disconnect(){
 if(!socket){mout.innerHTML+="<b>already disconnected!</b><br>";return;}

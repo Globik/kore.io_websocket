@@ -4018,3 +4018,940 @@ In a hurry? I'm trying to free resources cleanly, here!
 [Mon Mar 12 15:42:56 2018] Closing plugins: PLUGINS_SO IS NULL
 [Mon Mar 12 15:42:56 2018] Closing event handlers:
 Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Tue Mar 13 18:35:36 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Tue Mar 13 18:35:36 2018] TURN REST API backend: (disabled)
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.80.168) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Tue Mar 13 18:35:36 2018] Setting max NACK queue to 300ms
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m entering no_media_timer
+[Tue Mar 13 18:35:36 2018] Crypto: OpenSSL pre-1.1.0
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Tue Mar 13 18:35:36 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Tue Mar 13 18:35:36 2018] ICE handles watchdog started
+[Tue Mar 13 18:35:36 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Tue Mar 13 18:35:36 2018] Loading plugin 'libjanus_echotest.so'...
+[Tue Mar 13 18:35:36 2018] Sessions watchdog started
+[Tue Mar 13 18:35:36 2018] JANUS EchoTest plugin created!
+[Tue Mar 13 18:35:36 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Tue Mar 13 18:35:36 2018] [janus.plugin.echotest.cfg]
+[Tue Mar 13 18:35:36 2018]     [general]
+[Tue Mar 13 18:35:36 2018] JANUS EchoTest plugin initialized!
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Tue Mar 13 18:35:36 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Tue Mar 13 18:35:36 2018] Joining EchoTest handler thread
+[Tue Mar 13 18:35:36 2018] EchoTest watchdog started
+[Tue Mar 13 18:36:14 2018] Creating new session: 8123385400495426
+[Tue Mar 13 18:36:18 2018] Creating new handle in session 8123385400495426: 4059002517050091
+[Tue Mar 13 18:36:24 2018] [4059002517050091] There's a message for JANUS EchoTest plugin
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Remote SDP:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 3923674774341511831 0 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 C9:04:B4:EF:2F:25:B0:18:0F:98:01:FA:14:5D:17:28:F4:63:93:24:81:DA:CC:F6:06:62:AC:EA:17:78:1D:18
+a=group:BUNDLE sdparta_0
+a=ice-options:trickle
+a=msid-semantic:WMS *
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=sendrecv
+a=ice-pwd:6f128e8f0dcc931cb8a935fa06cc9459
+a=ice-ufrag:c68b990a
+a=mid:sdparta_0
+a=sctpmap:5000 webrtc-datachannel 256
+a=setup:actpass
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Creating ICE agent (ICE Full mode, controlled)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Adding 10.34.80.168 to the addresses to gather candidates for
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Gathering done for stream 1
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_ctrl: 6
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Fingerprint (global) : sha-256 C9:04:B4:EF:2F:25:B0:18:0F:98:01:FA:14:5D:17:28:F4:63:93:24:81:DA:CC:F6:06:62:AC:EA:17:78:1D:18
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Parsing SCTP candidates (stream=1)...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] ICE pwd (local):     6f128e8f0dcc931cb8a935fa06cc9459
+[Tue Mar 13 18:36:24 2018] [4059002517050091] ICE ufrag (local):   c68b990a
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data Channel mid: sdparta_0
+[Tue Mar 13 18:36:24 2018] [4059002517050091] DTLS setup (local):  actpass
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Setting connect state (DTLS client)
+[Tue Mar 13 18:36:24 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 256
+[Tue Mar 13 18:36:24 2018]  -------------------------------------------
+[Tue Mar 13 18:36:24 2018]   >> Anonymized
+[Tue Mar 13 18:36:24 2018]  -------------------------------------------
+[Tue Mar 13 18:36:24 2018] This is involving a negotiation (offer) as well:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 3923674774341511831 0 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Tue Mar 13 18:36:24 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Tue Mar 13 18:36:24 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Tue Mar 13 18:36:24 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=mozilla...THIS_IS_SDPARTA-56.0 3923674774341511831 0 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Tue Mar 13 18:36:24 2018]  -------------------------------------------
+[Tue Mar 13 18:36:24 2018]   >> Anonymized
+[Tue Mar 13 18:36:24 2018]  -------------------------------------------
+[Tue Mar 13 18:36:24 2018] [4059002517050091] We have 1 candidates for Stream #1, Component #1
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Address:    10.34.80.168:47511
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Priority:   2013266431
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Foundation: 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     1 1 udp 2013266431 10.34.80.168 47511 typ host
+[Tue Mar 13 18:36:24 2018]  -------------------------------------------
+[Tue Mar 13 18:36:24 2018]   >> Merged (557 bytes)
+[Tue Mar 13 18:36:24 2018]  -------------------------------------------
+[Tue Mar 13 18:36:24 2018] v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 1520980584206684 1 IN IP4 10.34.80.168
+s=-
+t=0 0
+a=group:BUNDLE sdparta_0
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.80.168
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:sdparta_0
+a=ice-ufrag:WI36
+a=ice-pwd:3eW+PjT0uD3N8/+BKeY2nG
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.80.168 47511 typ host
+a=end-of-candidates
+
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Done! Ready to setup remote candidates and send connectivity checks...
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Sending event to transport...
+[Tue Mar 13 18:36:24 2018] [33m[WARN][0m No transport, free the event[Tue Mar 13 18:36:24 2018]   >> Pushing event: 0 (took 1011 us)
+[Tue Mar 13 18:36:24 2018] Creating plugin result...
+[Tue Mar 13 18:36:24 2018] Destroying plugin result...
+[Tue Mar 13 18:36:24 2018] [33m[WARN][0m jsondone occured.[Tue Mar 13 18:36:24 2018] [4059002517050091] ICE thread started
+[Tue Mar 13 18:36:24 2018] [ice.c:janus_ice_thread:2663] [4059002517050091] Looping (ICE)...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Trickle candidate (sdparta_0): candidate:0 1 UDP 2122252543 10.34.80.168 42308 typ host
+[Tue Mar 13 18:36:24 2018] [4059002517050091]  Adding remote candidate component:1 stream:1 type:host 10.34.80.168:42308
+[Tue Mar 13 18:36:24 2018] [4059002517050091]  Transport: UDP
+[Tue Mar 13 18:36:24 2018] [4059002517050091]    Candidate added to the list! (1 elements for 1/1)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] ICE already started for this component, setting candidates we have up to now
+[Tue Mar 13 18:36:24 2018] [4059002517050091] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Remote Stream #1, Component #1
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Address:    10.34.80.168:42308
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Priority:   2122252543
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Foundation: 0
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Username:   c68b990a
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Password:   6f128e8f0dcc931cb8a935fa06cc9459
+[Tue Mar 13 18:36:24 2018] [4059002517050091]  Setting remote credentials...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Component state changed for component 1 in stream 1: 2 (connecting)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Remote candidates set!
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Trickle candidate (sdparta_0): candidate:1 1 TCP 2105524479 10.34.80.168 9 typ host tcptype active
+[Tue Mar 13 18:36:24 2018] [4059002517050091]  Adding remote candidate component:1 stream:1 type:host 10.34.80.168:9
+[Tue Mar 13 18:36:24 2018] [4059002517050091]    Skipping unsupported transport 'TCP' for media
+[Tue Mar 13 18:36:24 2018] [4059002517050091] New selected pair for component 1 in stream 1: 1 <-> 0
+[Tue Mar 13 18:36:24 2018] [4059002517050091]   Component is ready enough, starting DTLS handshake...
+[Tue Mar 13 18:36:24 2018] Advertizing MTU: 1440
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_write: 0x944bab8, 199
+[Tue Mar 13 18:36:24 2018]   -- 199
+[Tue Mar 13 18:36:24 2018] New list length: 1
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_ctrl: 6
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Going to send DTLS data: 199 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> Read 199 bytes from the write_BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> ... and sent 199 of those bytes on the socket
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Creating retransmission timer with ID 4
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Component state changed for component 1 in stream 1: 3 (connected)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Component state changed for component 1 in stream 1: 4 (ready)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] ICE send thread started...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     Written 695 bytes on the read BIO...
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_write: 0x9450f88, 1082
+[Tue Mar 13 18:36:24 2018]   -- 1082
+[Tue Mar 13 18:36:24 2018] New list length: 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     ... and read -1 of them from SSL...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Going to send DTLS data: 1082 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> Read 1082 bytes from the write_BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> ... and sent 1082 of those bytes on the socket
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Initialization not finished yet...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] DTLSv1_get_timeout: 991
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     Written 91 bytes on the read BIO...
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_ctrl: 7
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     ... and read -1 of them from SSL...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] DTLS established, yay!
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Computing sha-256 fingerprint of remote certificate...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Remote fingerprint (sha-256) of the client is C9:04:B4:EF:2F:25:B0:18:0F:98:01:FA:14:5D:17:28:F4:63:93:24:81:DA:CC:F6:06:62:AC:EA:17:78:1D:18
+[Tue Mar 13 18:36:24 2018] [4059002517050091]  Fingerprint is a match!
+[Tue Mar 13 18:36:24 2018] [4059002517050091] SRTP_AES128_CM_SHA1_80
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Key/Salt/Master: 30/16/14
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Created inbound SRTP session for component 1 in stream 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Created outbound SRTP session for component 1 in stream 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091] The DTLS handshake for the component 1 in stream 1 has been completed
+[Tue Mar 13 18:36:24 2018] [4059002517050091] The DTLS handshake has been completed
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Telling the plugin about it (JANUS EchoTest plugin)
+[Tue Mar 13 18:36:24 2018] WebRTC media is now available
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Sending event to transport...
+[Tue Mar 13 18:36:24 2018] [33m[WARN][0m No transport, free the event[Tue Mar 13 18:36:24 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     Written 157 bytes on the read BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     ... and read 100 of them from SSL...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Sending data (100 bytes) to the SCTP stack...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from DTLS to SCTP stack: 100 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Started thread: setup of the SCTP association
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Connecting the SCTP association
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from SCTP to DTLS stack: 100 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Starting thread for SCTP association
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_write: 0x944bab8, 157
+[Tue Mar 13 18:36:24 2018]   -- 157
+[Tue Mar 13 18:36:24 2018] New list length: 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Going to send DTLS data: 157 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> Read 157 bytes from the write_BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> ... and sent 157 of those bytes on the socket
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     Written 461 bytes on the read BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     ... and read 404 of them from SSL...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Sending data (404 bytes) to the SCTP stack...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from DTLS to SCTP stack: 404 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from SCTP to DTLS stack: 316 bytes
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_write: 0x944bab8, 381
+[Tue Mar 13 18:36:24 2018]   -- 381
+[Tue Mar 13 18:36:24 2018] New list length: 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Going to send DTLS data: 381 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> Read 381 bytes from the write_BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> ... and sent 381 of those bytes on the socket
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     Written 125 bytes on the read BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     ... and read 60 of them from SSL...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Sending data (60 bytes) to the SCTP stack...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from DTLS to SCTP stack: 60 bytes
+[Tue Mar 13 18:36:24 2018] Association change [Tue Mar 13 18:36:24 2018] SCTP_COMM_UP[Tue Mar 13 18:36:24 2018] , streams (in/out) = (256/16)[Tue Mar 13 18:36:24 2018] , supports[Tue Mar 13 18:36:24 2018]  PR[Tue Mar 13 18:36:24 2018]  AUTH[Tue Mar 13 18:36:24 2018]  ASCONF[Tue Mar 13 18:36:24 2018]  MULTIBUF[Tue Mar 13 18:36:24 2018]  RE-CONFIG[Tue Mar 13 18:36:24 2018] .
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Connected to the DataChannel peer
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from SCTP to DTLS stack: 32 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Opened channel 'JanusDataChannel' (id=1) (0/0/0)
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from SCTP to DTLS stack: 28 bytes
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_write: 0x944bab8, 93
+[Tue Mar 13 18:36:24 2018]   -- 93
+[Tue Mar 13 18:36:24 2018] New list length: 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Going to send DTLS data: 93 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> Read 93 bytes from the write_BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> ... and sent 93 of those bytes on the socket
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091]     ... and read 28 of them from SSL...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Sending data (28 bytes) to the SCTP stack...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] Data from DTLS to SCTP stack: 28 bytes
+[Tue Mar 13 18:36:24 2018] janus_dtls_bio_filter_write: 0x944bab8, 93
+[Tue Mar 13 18:36:24 2018]   -- 93
+[Tue Mar 13 18:36:24 2018] New list length: 1
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> Going to send DTLS data: 93 bytes
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> Read 93 bytes from the write_BIO...
+[Tue Mar 13 18:36:24 2018] [4059002517050091] >> >> ... and sent 93 of those bytes on the socket
+[Tue Mar 13 18:36:24 2018] [4059002517050091] DTLS already set up, disabling retransmission timer!
+[Tue Mar 13 18:36:55 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:36:55 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:36:55 2018]   -- 109
+[Tue Mar 13 18:36:55 2018] New list length: 1
+[Tue Mar 13 18:36:55 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:36:55 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:36:55 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:36:55 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:55 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:36:55 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:36:55 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:36:55 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:36:55 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:36:58 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:36:58 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:36:58 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:36:58 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:36:58 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:36:58 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:36:58 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:36:58 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:36:58 2018]   -- 109
+[Tue Mar 13 18:36:58 2018] New list length: 1
+[Tue Mar 13 18:36:58 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:36:58 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:36:58 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:37:27 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:37:27 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:37:27 2018]   -- 109
+[Tue Mar 13 18:37:27 2018] New list length: 1
+[Tue Mar 13 18:37:27 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:37:27 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:37:27 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:37:27 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:37:27 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:37:27 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:37:27 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:37:27 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:37:27 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:37:29 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:37:29 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:37:29 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:37:29 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:37:29 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:37:29 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:37:29 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:37:29 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:37:29 2018]   -- 109
+[Tue Mar 13 18:37:29 2018] New list length: 1
+[Tue Mar 13 18:37:29 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:37:29 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:37:29 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:37:58 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:37:58 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:37:58 2018]   -- 109
+[Tue Mar 13 18:37:58 2018] New list length: 1
+[Tue Mar 13 18:37:58 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:37:58 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:37:58 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:37:58 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:37:58 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:37:58 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:37:58 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:37:58 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:37:58 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:38:01 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:38:01 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:38:01 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:38:01 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:38:01 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:38:01 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:38:01 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:38:01 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:38:01 2018]   -- 109
+[Tue Mar 13 18:38:01 2018] New list length: 1
+[Tue Mar 13 18:38:01 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:38:01 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:38:01 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:38:29 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:38:29 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:38:29 2018]   -- 109
+[Tue Mar 13 18:38:29 2018] New list length: 1
+[Tue Mar 13 18:38:29 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:38:29 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:38:29 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:38:29 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:38:29 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:38:29 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:38:29 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:38:29 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:38:29 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:38:33 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:38:33 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:38:33 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:38:33 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:38:33 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:38:33 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:38:33 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:38:33 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:38:33 2018]   -- 109
+[Tue Mar 13 18:38:33 2018] New list length: 1
+[Tue Mar 13 18:38:33 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:38:33 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:38:33 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:39:00 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:39:00 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:39:00 2018]   -- 109
+[Tue Mar 13 18:39:00 2018] New list length: 1
+[Tue Mar 13 18:39:00 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:39:00 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:39:00 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:39:00 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:39:00 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:39:00 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:39:00 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:39:00 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:39:00 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:39:04 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:39:04 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:39:04 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:39:04 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:39:04 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:39:04 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:39:04 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:39:04 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:39:04 2018]   -- 109
+[Tue Mar 13 18:39:04 2018] New list length: 1
+[Tue Mar 13 18:39:04 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:39:04 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:39:04 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:39:32 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:39:32 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:39:32 2018]   -- 109
+[Tue Mar 13 18:39:32 2018] New list length: 1
+[Tue Mar 13 18:39:32 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:39:32 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:39:32 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:39:32 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:39:32 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:39:32 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:39:32 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:39:32 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:39:32 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:39:36 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:39:36 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:39:36 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:39:36 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:39:36 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:39:36 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:39:36 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:39:36 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:39:36 2018]   -- 109
+[Tue Mar 13 18:39:36 2018] New list length: 1
+[Tue Mar 13 18:39:36 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:39:36 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:39:36 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:39:58 2018] [4059002517050091]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:39:58 2018] [4059002517050091]     ... and read 40 of them from SSL...
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Sending data (40 bytes) to the SCTP stack...
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Data from DTLS to SCTP stack: 40 bytes
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Message received of length 9 on channel with id 0: kokokokok
+[Tue Mar 13 18:39:58 2018] Got a DataChannel message (9 bytes) to bounce back: kokokokok
+[Tue Mar 13 18:39:58 2018] [4059002517050091] SCTP data to send (41 bytes) coming from a plugin: Janus EchoTest here! You wrote: kokokokok
+[Tue Mar 13 18:39:58 2018] [4059002517050091]   -- Using open channel 0
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Data from SCTP to DTLS stack: 88 bytes
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Message sent on channel 0
+[Tue Mar 13 18:39:58 2018] janus_dtls_bio_filter_write: 0x944bab8, 141
+[Tue Mar 13 18:39:58 2018]   -- 141
+[Tue Mar 13 18:39:58 2018] New list length: 1
+[Tue Mar 13 18:39:58 2018] [4059002517050091] >> Going to send DTLS data: 141 bytes
+[Tue Mar 13 18:39:58 2018] [4059002517050091] >> >> Read 141 bytes from the write_BIO...
+[Tue Mar 13 18:39:58 2018] [4059002517050091] >> >> ... and sent 141 of those bytes on the socket
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:39:58 2018] [4059002517050091]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:39:58 2018] [4059002517050091]     ... and read 28 of them from SSL...
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Sending data (28 bytes) to the SCTP stack...
+[Tue Mar 13 18:39:58 2018] [4059002517050091] Data from DTLS to SCTP stack: 28 bytes
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:40:30 2018] [4059002517050091]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:40:30 2018] [4059002517050091]     ... and read 36 of them from SSL...
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Sending data (36 bytes) to the SCTP stack...
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Data from DTLS to SCTP stack: 36 bytes
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Message received of length 5 on channel with id 0: 
+suka
+[Tue Mar 13 18:40:30 2018] Got a DataChannel message (5 bytes) to bounce back: 
+suka
+[Tue Mar 13 18:40:30 2018] [4059002517050091] SCTP data to send (37 bytes) coming from a plugin: Janus EchoTest here! You wrote: 
+suka
+[Tue Mar 13 18:40:30 2018] [4059002517050091]   -- Using open channel 0
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Data from SCTP to DTLS stack: 84 bytes
+[Tue Mar 13 18:40:30 2018] [4059002517050091] Message sent on channel 0
+[Tue Mar 13 18:40:30 2018] janus_dtls_bio_filter_write: 0x944bab8, 141
+[Tue Mar 13 18:40:30 2018]   -- 141
+[Tue Mar 13 18:40:30 2018] New list length: 1
+[Tue Mar 13 18:40:30 2018] [4059002517050091] >> Going to send DTLS data: 141 bytes
+[Tue Mar 13 18:40:30 2018] [4059002517050091] >> >> Read 141 bytes from the write_BIO...
+[Tue Mar 13 18:40:30 2018] [4059002517050091] >> >> ... and sent 141 of those bytes on the socket
+[Tue Mar 13 18:40:31 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:40:31 2018] [4059002517050091]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:40:31 2018] [4059002517050091]     ... and read 28 of them from SSL...
+[Tue Mar 13 18:40:31 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:40:31 2018] [4059002517050091] Sending data (28 bytes) to the SCTP stack...
+[Tue Mar 13 18:40:31 2018] [4059002517050091] Data from DTLS to SCTP stack: 28 bytes
+[Tue Mar 13 18:41:06 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:41:06 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:41:06 2018]   -- 109
+[Tue Mar 13 18:41:06 2018] New list length: 1
+[Tue Mar 13 18:41:06 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:41:06 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:41:06 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:41:06 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:41:06 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:41:06 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:41:06 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:41:06 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:41:06 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:41:10 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:41:10 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:41:10 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:41:10 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:41:10 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:41:10 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:41:10 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:41:10 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:41:10 2018]   -- 109
+[Tue Mar 13 18:41:10 2018] New list length: 1
+[Tue Mar 13 18:41:10 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:41:10 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:41:10 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:41:20 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:41:20 2018] [4059002517050091]     ... and read 44 of them from SSL...
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Sending data (44 bytes) to the SCTP stack...
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Data from DTLS to SCTP stack: 44 bytes
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Message received of length 14 on channel with id 0: what the fuck
+
+[Tue Mar 13 18:41:20 2018] Got a DataChannel message (14 bytes) to bounce back: what the fuck
+
+[Tue Mar 13 18:41:20 2018] [4059002517050091] SCTP data to send (46 bytes) coming from a plugin: Janus EchoTest here! You wrote: what the fuck
+
+[Tue Mar 13 18:41:20 2018] [4059002517050091]   -- Using open channel 0
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Data from SCTP to DTLS stack: 92 bytes
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Message sent on channel 0
+[Tue Mar 13 18:41:20 2018] janus_dtls_bio_filter_write: 0x944bab8, 157
+[Tue Mar 13 18:41:20 2018]   -- 157
+[Tue Mar 13 18:41:20 2018] New list length: 1
+[Tue Mar 13 18:41:20 2018] [4059002517050091] >> Going to send DTLS data: 157 bytes
+[Tue Mar 13 18:41:20 2018] [4059002517050091] >> >> Read 157 bytes from the write_BIO...
+[Tue Mar 13 18:41:20 2018] [4059002517050091] >> >> ... and sent 157 of those bytes on the socket
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:41:20 2018] [4059002517050091]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:41:20 2018] [4059002517050091]     ... and read 28 of them from SSL...
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Sending data (28 bytes) to the SCTP stack...
+[Tue Mar 13 18:41:20 2018] [4059002517050091] Data from DTLS to SCTP stack: 28 bytes
+[Tue Mar 13 18:42:09 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:42:09 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:42:09 2018]   -- 109
+[Tue Mar 13 18:42:09 2018] New list length: 1
+[Tue Mar 13 18:42:09 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:42:09 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:42:09 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:42:09 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:42:09 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:42:09 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:42:09 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:42:09 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:42:09 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:42:12 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:42:12 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:42:12 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:42:12 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:42:12 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:42:12 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:42:12 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:42:12 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:42:12 2018]   -- 109
+[Tue Mar 13 18:42:12 2018] New list length: 1
+[Tue Mar 13 18:42:12 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:42:12 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:42:12 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:42:40 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:42:40 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:42:40 2018]   -- 109
+[Tue Mar 13 18:42:40 2018] New list length: 1
+[Tue Mar 13 18:42:40 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:42:40 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:42:40 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:42:40 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:42:40 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:42:40 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:42:40 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:42:40 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:42:40 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:42:44 2018] [4059002517050091] Looks like DTLS!
+[Tue Mar 13 18:42:44 2018] [4059002517050091]     Written 109 bytes on the read BIO...
+[Tue Mar 13 18:42:44 2018] [4059002517050091]     ... and read 56 of them from SSL...
+[Tue Mar 13 18:42:44 2018] [4059002517050091] Any data available?
+[Tue Mar 13 18:42:44 2018] [4059002517050091] Sending data (56 bytes) to the SCTP stack...
+[Tue Mar 13 18:42:44 2018] [4059002517050091] Data from DTLS to SCTP stack: 56 bytes
+[Tue Mar 13 18:42:44 2018] [4059002517050091] Data from SCTP to DTLS stack: 56 bytes
+[Tue Mar 13 18:42:44 2018] janus_dtls_bio_filter_write: 0x944bab8, 109
+[Tue Mar 13 18:42:44 2018]   -- 109
+[Tue Mar 13 18:42:44 2018] New list length: 1
+[Tue Mar 13 18:42:44 2018] [4059002517050091] >> Going to send DTLS data: 109 bytes
+[Tue Mar 13 18:42:44 2018] [4059002517050091] >> >> Read 109 bytes from the write_BIO...
+[Tue Mar 13 18:42:44 2018] [4059002517050091] >> >> ... and sent 109 of those bytes on the socket
+[Tue Mar 13 18:42:48 2018] Detaching handle from JANUS EchoTest plugin
+[Tue Mar 13 18:42:48 2018] Removing Echo Test session...
+[Tue Mar 13 18:42:48 2018] No WebRTC media anymore
+[Tue Mar 13 18:42:48 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Tue Mar 13 18:42:48 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Tue Mar 13 18:42:48 2018] [33m[WARN][0m incoming message: (null)[Tue Mar 13 18:42:48 2018] [31m[ERR][0m [ice.c:janus_plugin_session_is_alive:401] Invalid plugin session (0x9429610)
+[Tue Mar 13 18:42:48 2018] [33m[WARN][0m janus_plugin_session is not alive in push_event[Tue Mar 13 18:42:48 2018]   >> Pushing event: -2 (Unknown error)
+[Tue Mar 13 18:42:48 2018] [4059002517050091] Sending event to transport...
+[Tue Mar 13 18:42:48 2018] [33m[WARN][0m No transport, free the event[Tue Mar 13 18:42:48 2018] [4059002517050091] Handle detached (error=0), scheduling destruction
+[Tue Mar 13 18:42:48 2018] [4059002517050091] ICE thread ended!
+[Tue Mar 13 18:42:48 2018] [4059002517050091] ICE send thread leaving...
+[Tue Mar 13 18:42:48 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:48 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:49 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:49 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:50 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:50 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:51 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:51 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:51 2018] Cleaning up handle 4059002517050091...
+[Tue Mar 13 18:42:51 2018] [4059002517050091] Destroying SCTP association
+[Tue Mar 13 18:42:51 2018] [4059002517050091] Data from SCTP to DTLS stack: 20 bytes
+[Tue Mar 13 18:42:51 2018] [4059002517050091] Data from SCTP to DTLS stack: 20 bytes
+[Tue Mar 13 18:42:51 2018] [4059002517050091] WebRTC resources freed
+[Tue Mar 13 18:42:51 2018] [4059002517050091] Handle and related resources freed
+[Tue Mar 13 18:42:51 2018] [4059002517050091] Leaving SCTP association thread
+[Tue Mar 13 18:42:52 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:52 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:53 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:42:53 2018] Freeing old EchoTest session
+[Tue Mar 13 18:43:20 2018] Cleaning up session 8123385400495426...
+[Tue Mar 13 18:43:20 2018] Destroying session 8123385400495426
+[Tue Mar 13 18:43:47 2018] Creating new session: 380738079654541
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Tue Mar 13 18:44:21 2018] Ending watchdog mainloop...
+[Tue Mar 13 18:44:21 2018] Destroying sessions...
+[Tue Mar 13 18:44:21 2018] Freeing crypto resources...
+[Tue Mar 13 18:44:21 2018] De-initializing SCTP...
+[Tue Mar 13 18:44:21 2018] Ending ICE handles watchdog mainloop...
+[Tue Mar 13 18:44:21 2018] Closing plugins.
+[Tue Mar 13 18:44:21 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Tue Mar 13 18:44:21 2018] Leaving EchoTest handler thread
+[Tue Mar 13 18:44:21 2018] EchoTest watchdog stopped
+[Tue Mar 13 18:44:21 2018] JANUS EchoTest plugin destroyed!
+[Tue Mar 13 18:44:21 2018] Closing plugins: PLUGINS_SO IS NULL
+[Tue Mar 13 18:44:21 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Tue Mar 13 18:49:16 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Tue Mar 13 18:49:16 2018] TURN REST API backend: (disabled)
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.80.168) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Tue Mar 13 18:49:16 2018] Setting max NACK queue to 300ms
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m entering no_media_timer
+[Tue Mar 13 18:49:16 2018] Crypto: OpenSSL pre-1.1.0
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Tue Mar 13 18:49:16 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Tue Mar 13 18:49:16 2018] ICE handles watchdog started
+[Tue Mar 13 18:49:16 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Tue Mar 13 18:49:16 2018] Loading plugin 'libjanus_echotest.so'...
+[Tue Mar 13 18:49:16 2018] JANUS EchoTest plugin created!
+[Tue Mar 13 18:49:16 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Tue Mar 13 18:49:16 2018] [janus.plugin.echotest.cfg]
+[Tue Mar 13 18:49:16 2018]     [general]
+[Tue Mar 13 18:49:16 2018] JANUS EchoTest plugin initialized!
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Tue Mar 13 18:49:16 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Tue Mar 13 18:49:16 2018] Sessions watchdog started
+[Tue Mar 13 18:49:16 2018] Joining EchoTest handler thread
+[Tue Mar 13 18:49:16 2018] EchoTest watchdog started
+[Tue Mar 13 18:49:32 2018] Creating new session: 6421987774314243
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Tue Mar 13 18:50:10 2018] Ending watchdog mainloop...
+[Tue Mar 13 18:50:10 2018] Destroying sessions...
+[Tue Mar 13 18:50:10 2018] Freeing crypto resources...
+[Tue Mar 13 18:50:10 2018] De-initializing SCTP...
+[Tue Mar 13 18:50:10 2018] Ending ICE handles watchdog mainloop...
+[Tue Mar 13 18:50:10 2018] Closing plugins.
+[Tue Mar 13 18:50:10 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Tue Mar 13 18:50:10 2018] Leaving EchoTest handler thread
+[Tue Mar 13 18:50:11 2018] EchoTest watchdog stopped
+[Tue Mar 13 18:50:11 2018] JANUS EchoTest plugin destroyed!
+[Tue Mar 13 18:50:11 2018] Closing plugins: PLUGINS_SO IS NULL
+[Tue Mar 13 18:50:11 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Tue Mar 13 18:51:04 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Tue Mar 13 18:51:04 2018] TURN REST API backend: (disabled)
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.80.168) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Tue Mar 13 18:51:04 2018] ICE handles watchdog started
+[Tue Mar 13 18:51:04 2018] Setting max NACK queue to 300ms
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m entering no_media_timer
+[Tue Mar 13 18:51:04 2018] Crypto: OpenSSL pre-1.1.0
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Tue Mar 13 18:51:04 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Tue Mar 13 18:51:04 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Tue Mar 13 18:51:04 2018] Loading plugin 'libjanus_echotest.so'...
+[Tue Mar 13 18:51:04 2018] JANUS EchoTest plugin created!
+[Tue Mar 13 18:51:04 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Tue Mar 13 18:51:04 2018] [janus.plugin.echotest.cfg]
+[Tue Mar 13 18:51:04 2018]     [general]
+[Tue Mar 13 18:51:04 2018] JANUS EchoTest plugin initialized!
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Tue Mar 13 18:51:04 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Tue Mar 13 18:51:04 2018] Sessions watchdog started
+[Tue Mar 13 18:51:04 2018] Joining EchoTest handler thread
+[Tue Mar 13 18:51:04 2018] EchoTest watchdog started
+[Tue Mar 13 18:51:18 2018] Creating new session: 8853801701090765
+[Tue Mar 13 18:51:37 2018] Creating new handle in session 8853801701090765: 4601012786589238
+[Tue Mar 13 18:51:45 2018] [4601012786589238] There's a message for JANUS EchoTest plugin
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Remote SDP:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 7723857700611175110 0 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 E7:FF:E8:C2:1B:AE:FF:EB:15:DA:9C:EC:C8:F9:90:4A:45:61:91:B5:7A:5D:50:BC:9A:3F:55:DE:5F:3D:50:87
+a=group:BUNDLE sdparta_0
+a=ice-options:trickle
+a=msid-semantic:WMS *
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=sendrecv
+a=ice-pwd:b24bff16927b28e16fe5899e07970546
+a=ice-ufrag:492924ed
+a=mid:sdparta_0
+a=sctpmap:5000 webrtc-datachannel 256
+a=setup:actpass
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Creating ICE agent (ICE Full mode, controlled)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Adding 10.34.80.168 to the addresses to gather candidates for
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Gathering done for stream 1
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_ctrl: 6
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Fingerprint (global) : sha-256 E7:FF:E8:C2:1B:AE:FF:EB:15:DA:9C:EC:C8:F9:90:4A:45:61:91:B5:7A:5D:50:BC:9A:3F:55:DE:5F:3D:50:87
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Parsing SCTP candidates (stream=1)...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] ICE pwd (local):     b24bff16927b28e16fe5899e07970546
+[Tue Mar 13 18:51:45 2018] [4601012786589238] ICE ufrag (local):   492924ed
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data Channel mid: sdparta_0
+[Tue Mar 13 18:51:45 2018] [4601012786589238] DTLS setup (local):  actpass
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Setting connect state (DTLS client)
+[Tue Mar 13 18:51:45 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 256
+[Tue Mar 13 18:51:45 2018]  -------------------------------------------
+[Tue Mar 13 18:51:45 2018]   >> Anonymized
+[Tue Mar 13 18:51:45 2018]  -------------------------------------------
+[Tue Mar 13 18:51:45 2018] This is involving a negotiation (offer) as well:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 7723857700611175110 0 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Tue Mar 13 18:51:45 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Tue Mar 13 18:51:45 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Tue Mar 13 18:51:45 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=mozilla...THIS_IS_SDPARTA-56.0 7723857700611175110 0 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Tue Mar 13 18:51:45 2018]  -------------------------------------------
+[Tue Mar 13 18:51:45 2018]   >> Anonymized
+[Tue Mar 13 18:51:45 2018]  -------------------------------------------
+[Tue Mar 13 18:51:45 2018] [4601012786589238] We have 1 candidates for Stream #1, Component #1
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Address:    10.34.80.168:41310
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Priority:   2013266431
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Foundation: 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     1 1 udp 2013266431 10.34.80.168 41310 typ host
+[Tue Mar 13 18:51:45 2018]  -------------------------------------------
+[Tue Mar 13 18:51:45 2018]   >> Merged (557 bytes)
+[Tue Mar 13 18:51:45 2018]  -------------------------------------------
+[Tue Mar 13 18:51:45 2018] v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 1520981505566585 1 IN IP4 10.34.80.168
+s=-
+t=0 0
+a=group:BUNDLE sdparta_0
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.80.168
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:sdparta_0
+a=ice-ufrag:Dol+
+a=ice-pwd:oEzXLMh/rdzRNZxHI5g7lI
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.80.168 41310 typ host
+a=end-of-candidates
+
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Done! Ready to setup remote candidates and send connectivity checks...
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Sending event to transport...
+[Tue Mar 13 18:51:45 2018] [33m[WARN][0m No transport, free the event[Tue Mar 13 18:51:45 2018]   >> Pushing event: 0 (took 783 us)
+[Tue Mar 13 18:51:45 2018] Creating plugin result...
+[Tue Mar 13 18:51:45 2018] Destroying plugin result...
+[Tue Mar 13 18:51:45 2018] [33m[WARN][0m jsondone occured.[Tue Mar 13 18:51:45 2018] [4601012786589238] ICE thread started
+[Tue Mar 13 18:51:45 2018] [ice.c:janus_ice_thread:2663] [4601012786589238] Looping (ICE)...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Trickle candidate (sdparta_0): candidate:0 1 UDP 2122252543 10.34.80.168 53593 typ host
+[Tue Mar 13 18:51:45 2018] [4601012786589238]  Adding remote candidate component:1 stream:1 type:host 10.34.80.168:53593
+[Tue Mar 13 18:51:45 2018] [4601012786589238]  Transport: UDP
+[Tue Mar 13 18:51:45 2018] [4601012786589238]    Candidate added to the list! (1 elements for 1/1)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] ICE already started for this component, setting candidates we have up to now
+[Tue Mar 13 18:51:45 2018] [4601012786589238] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Remote Stream #1, Component #1
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Address:    10.34.80.168:53593
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Priority:   2122252543
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Foundation: 0
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Username:   492924ed
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Password:   b24bff16927b28e16fe5899e07970546
+[Tue Mar 13 18:51:45 2018] [4601012786589238]  Setting remote credentials...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Component state changed for component 1 in stream 1: 2 (connecting)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Remote candidates set!
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Trickle candidate (sdparta_0): candidate:1 1 TCP 2105524479 10.34.80.168 9 typ host tcptype active
+[Tue Mar 13 18:51:45 2018] [4601012786589238]  Adding remote candidate component:1 stream:1 type:host 10.34.80.168:9
+[Tue Mar 13 18:51:45 2018] [4601012786589238]    Skipping unsupported transport 'TCP' for media
+[Tue Mar 13 18:51:45 2018] [4601012786589238] New selected pair for component 1 in stream 1: 1 <-> 0
+[Tue Mar 13 18:51:45 2018] [4601012786589238]   Component is ready enough, starting DTLS handshake...
+[Tue Mar 13 18:51:45 2018] Advertizing MTU: 1440
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 199
+[Tue Mar 13 18:51:45 2018]   -- 199
+[Tue Mar 13 18:51:45 2018] New list length: 1
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_ctrl: 6
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Going to send DTLS data: 199 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> Read 199 bytes from the write_BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> ... and sent 199 of those bytes on the socket
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Creating retransmission timer with ID 4
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Component state changed for component 1 in stream 1: 3 (connected)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Component state changed for component 1 in stream 1: 4 (ready)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] ICE send thread started...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     Written 696 bytes on the read BIO...
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_write: 0xb0c13120, 1082
+[Tue Mar 13 18:51:45 2018]   -- 1082
+[Tue Mar 13 18:51:45 2018] New list length: 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     ... and read -1 of them from SSL...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Going to send DTLS data: 1082 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> Read 1082 bytes from the write_BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> ... and sent 1082 of those bytes on the socket
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Initialization not finished yet...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] DTLSv1_get_timeout: 991
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     Written 91 bytes on the read BIO...
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_ctrl: 7
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     ... and read -1 of them from SSL...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] DTLS established, yay!
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Computing sha-256 fingerprint of remote certificate...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Remote fingerprint (sha-256) of the client is E7:FF:E8:C2:1B:AE:FF:EB:15:DA:9C:EC:C8:F9:90:4A:45:61:91:B5:7A:5D:50:BC:9A:3F:55:DE:5F:3D:50:87
+[Tue Mar 13 18:51:45 2018] [4601012786589238]  Fingerprint is a match!
+[Tue Mar 13 18:51:45 2018] [4601012786589238] SRTP_AES128_CM_SHA1_80
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Key/Salt/Master: 30/16/14
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Created inbound SRTP session for component 1 in stream 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Created outbound SRTP session for component 1 in stream 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238] The DTLS handshake for the component 1 in stream 1 has been completed
+[Tue Mar 13 18:51:45 2018] [4601012786589238] The DTLS handshake has been completed
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Telling the plugin about it (JANUS EchoTest plugin)
+[Tue Mar 13 18:51:45 2018] WebRTC media is now available
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Sending event to transport...
+[Tue Mar 13 18:51:45 2018] [33m[WARN][0m No transport, free the event[Tue Mar 13 18:51:45 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     Written 157 bytes on the read BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     ... and read 100 of them from SSL...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Any data available?
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Sending data (100 bytes) to the SCTP stack...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from DTLS to SCTP stack: 100 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Started thread: setup of the SCTP association
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Connecting the SCTP association
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from SCTP to DTLS stack: 100 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Starting thread for SCTP association
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 157
+[Tue Mar 13 18:51:45 2018]   -- 157
+[Tue Mar 13 18:51:45 2018] New list length: 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Going to send DTLS data: 157 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> Read 157 bytes from the write_BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> ... and sent 157 of those bytes on the socket
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     Written 461 bytes on the read BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     ... and read 404 of them from SSL...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Any data available?
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Sending data (404 bytes) to the SCTP stack...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from DTLS to SCTP stack: 404 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from SCTP to DTLS stack: 316 bytes
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 381
+[Tue Mar 13 18:51:45 2018]   -- 381
+[Tue Mar 13 18:51:45 2018] New list length: 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Going to send DTLS data: 381 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> Read 381 bytes from the write_BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> ... and sent 381 of those bytes on the socket
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     Written 125 bytes on the read BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     ... and read 60 of them from SSL...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Any data available?
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Sending data (60 bytes) to the SCTP stack...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from DTLS to SCTP stack: 60 bytes
+[Tue Mar 13 18:51:45 2018] Association change [Tue Mar 13 18:51:45 2018] SCTP_COMM_UP[Tue Mar 13 18:51:45 2018] , streams (in/out) = (256/16)[Tue Mar 13 18:51:45 2018] , supports[Tue Mar 13 18:51:45 2018]  PR[Tue Mar 13 18:51:45 2018]  AUTH[Tue Mar 13 18:51:45 2018]  ASCONF[Tue Mar 13 18:51:45 2018]  MULTIBUF[Tue Mar 13 18:51:45 2018]  RE-CONFIG[Tue Mar 13 18:51:45 2018] .
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from SCTP to DTLS stack: 32 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Connected to the DataChannel peer
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Opened channel 'JanusDataChannel' (id=1) (0/0/0)
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from SCTP to DTLS stack: 28 bytes
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 93
+[Tue Mar 13 18:51:45 2018]   -- 93
+[Tue Mar 13 18:51:45 2018] New list length: 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Going to send DTLS data: 93 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> Read 93 bytes from the write_BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> ... and sent 93 of those bytes on the socket
+[Tue Mar 13 18:51:45 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 93
+[Tue Mar 13 18:51:45 2018]   -- 93
+[Tue Mar 13 18:51:45 2018] New list length: 1
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> Going to send DTLS data: 93 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> Read 93 bytes from the write_BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] >> >> ... and sent 93 of those bytes on the socket
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:51:45 2018] [4601012786589238]     ... and read 28 of them from SSL...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Any data available?
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Sending data (28 bytes) to the SCTP stack...
+[Tue Mar 13 18:51:45 2018] [4601012786589238] Data from DTLS to SCTP stack: 28 bytes
+[Tue Mar 13 18:51:45 2018] [4601012786589238] DTLS already set up, disabling retransmission timer!
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:56 2018] [4601012786589238]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:51:56 2018] [4601012786589238]     ... and read 36 of them from SSL...
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Any data available?
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Sending data (36 bytes) to the SCTP stack...
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Data from DTLS to SCTP stack: 36 bytes
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Message received of length 6 on channel with id 0: 
+what?
+[Tue Mar 13 18:51:56 2018] Got a DataChannel message (6 bytes) to bounce back: 
+what?
+[Tue Mar 13 18:51:56 2018] [4601012786589238] SCTP data to send (38 bytes) coming from a plugin: Janus EchoTest here! You wrote: 
+what?
+[Tue Mar 13 18:51:56 2018] [4601012786589238]   -- Using open channel 0
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Data from SCTP to DTLS stack: 84 bytes
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Message sent on channel 0
+[Tue Mar 13 18:51:56 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 141
+[Tue Mar 13 18:51:56 2018]   -- 141
+[Tue Mar 13 18:51:56 2018] New list length: 1
+[Tue Mar 13 18:51:56 2018] [4601012786589238] >> Going to send DTLS data: 141 bytes
+[Tue Mar 13 18:51:56 2018] [4601012786589238] >> >> Read 141 bytes from the write_BIO...
+[Tue Mar 13 18:51:56 2018] [4601012786589238] >> >> ... and sent 141 of those bytes on the socket
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Looks like DTLS!
+[Tue Mar 13 18:51:56 2018] [4601012786589238]     Written 93 bytes on the read BIO...
+[Tue Mar 13 18:51:56 2018] [4601012786589238]     ... and read 28 of them from SSL...
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Any data available?
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Sending data (28 bytes) to the SCTP stack...
+[Tue Mar 13 18:51:56 2018] [4601012786589238] Data from DTLS to SCTP stack: 28 bytes
+[Tue Mar 13 18:52:17 2018] Detaching handle from JANUS EchoTest plugin
+[Tue Mar 13 18:52:17 2018] Removing Echo Test session...
+[Tue Mar 13 18:52:17 2018] No WebRTC media anymore
+[Tue Mar 13 18:52:17 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Tue Mar 13 18:52:17 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Tue Mar 13 18:52:17 2018] [33m[WARN][0m incoming message: (null)[Tue Mar 13 18:52:17 2018] [31m[ERR][0m [ice.c:janus_plugin_session_is_alive:401] Invalid plugin session (0x87663a8)
+[Tue Mar 13 18:52:17 2018] [33m[WARN][0m janus_plugin_session is not alive in push_event[Tue Mar 13 18:52:17 2018]   >> Pushing event: -2 (Unknown error)
+[Tue Mar 13 18:52:17 2018] [4601012786589238] Sending event to transport...
+[Tue Mar 13 18:52:17 2018] [33m[WARN][0m No transport, free the event[Tue Mar 13 18:52:17 2018] [4601012786589238] Handle detached (error=0), scheduling destruction
+[Tue Mar 13 18:52:17 2018] [4601012786589238] ICE thread ended!
+[Tue Mar 13 18:52:17 2018] [4601012786589238] ICE send thread leaving...
+[Tue Mar 13 18:52:17 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:18 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:18 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:19 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:19 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:20 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:20 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:20 2018] Cleaning up handle 4601012786589238...
+[Tue Mar 13 18:52:20 2018] [4601012786589238] Destroying SCTP association
+[Tue Mar 13 18:52:20 2018] [4601012786589238] Data from SCTP to DTLS stack: 20 bytes
+[Tue Mar 13 18:52:20 2018] [4601012786589238] Data from SCTP to DTLS stack: 20 bytes
+[Tue Mar 13 18:52:20 2018] [4601012786589238] WebRTC resources freed
+[Tue Mar 13 18:52:20 2018] [4601012786589238] Handle and related resources freed
+[Tue Mar 13 18:52:20 2018] [4601012786589238] Leaving SCTP association thread
+[Tue Mar 13 18:52:21 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:21 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:22 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:22 2018] Checking 1 old EchoTest sessions...
+[Tue Mar 13 18:52:22 2018] Freeing old EchoTest session
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Tue Mar 13 18:57:28 2018] Ending watchdog mainloop...
+[Tue Mar 13 18:57:28 2018] Destroying sessions...
+[Tue Mar 13 18:57:28 2018] Freeing crypto resources...
+[Tue Mar 13 18:57:28 2018] De-initializing SCTP...
+[Tue Mar 13 18:57:28 2018] Ending ICE handles watchdog mainloop...
+[Tue Mar 13 18:57:28 2018] Closing plugins.
+[Tue Mar 13 18:57:28 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Tue Mar 13 18:57:28 2018] Leaving EchoTest handler thread
+[Tue Mar 13 18:57:28 2018] EchoTest watchdog stopped
+[Tue Mar 13 18:57:28 2018] JANUS EchoTest plugin destroyed!
+[Tue Mar 13 18:57:28 2018] Closing plugins: PLUGINS_SO IS NULL
+[Tue Mar 13 18:57:28 2018] Closing event handlers:
+Bye!
