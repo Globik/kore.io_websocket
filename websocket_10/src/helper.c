@@ -263,16 +263,22 @@ janus_plugin *janus_plugin_find(const gchar *package) {
 
 void janus_session_notify_event(janus_session *session, json_t *event) {
 // ws.send(json event); to browser
-	if(session != NULL && !g_atomic_int_get(&session->destroy) && session->source != NULL && session->source->transport != NULL) {
+	if(session != NULL && !g_atomic_int_get(&session->destroy)/* && session->source != NULL && session->source->transport != NULL*/) {
 		// Send this to the transport client 
-		JANUS_LOG(LOG_HUGE, "Sending event to %s (%p)\n", session->source->transport->get_package(), session->source->instance);
-		session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
-	} else {
+		JANUS_LOG(LOG_HUGE, "Sending event to, session->source->transport->get_package(), session->source->instance");
+	//	session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
+	//} 
+	//else {
 		JANUS_LOG(LOG_WARN,"No transport, free the event");
 		size_t size=json_dumpb(event,NULL,0,0);
 	if(size==0){JANUS_LOG(LOG_WARN, "json_dumpb Size is null\n");return;}
 	char*buf=alloca(size);
 	size=json_dumpb(event,buf,size,0);
+		JANUS_LOG(LOG_WARN,"HERE BEFORE");
+		g_print("DU KUUUUUUUUUUUUUUUUUUU\n");
+fwrite((char*)buf,1,size,stdout);
+	printf("\nKU KU KU!\n");
+		JANUS_LOG(LOG_WARN,"And HERE AFTER");
 
 	//kore_websocket_send(c, 1, buf,size);
 		kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);

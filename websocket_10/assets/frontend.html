@@ -112,7 +112,7 @@ function go_destroy(){
 		}
 function create_channel(){
 pc=new RTCPeerConnection(cf);
-dc = pc.createDataChannel("JanusDataChannel"/*, { reliable: false }*/);
+dc = pc.createDataChannel("JanusDataChannel", { });
 dc.onmessage = function (event) { msg("Remote: " + event.data); };
 dc.onopen = function () { msg("Web RTC Connected."); };
 pc.ondatachannel = onNewDataChannel;

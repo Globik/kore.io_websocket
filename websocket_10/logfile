@@ -4955,3 +4955,2031 @@ In a hurry? I'm trying to free resources cleanly, here!
 [Tue Mar 13 18:57:28 2018] Closing plugins: PLUGINS_SO IS NULL
 [Tue Mar 13 18:57:28 2018] Closing event handlers:
 Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 12:59:16 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 12:59:16 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.83.233) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 12:59:16 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 12:59:16 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 12:59:16 2018] ICE handles watchdog started
+[Thu Mar 15 12:59:16 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 12:59:16 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 12:59:16 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 12:59:16 2018] Sessions watchdog started
+[Thu Mar 15 12:59:16 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 12:59:16 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 12:59:16 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 12:59:16 2018]     [general]
+[Thu Mar 15 12:59:16 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 12:59:16 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 12:59:16 2018] Joining EchoTest handler thread
+[Thu Mar 15 12:59:16 2018] EchoTest watchdog started
+[Thu Mar 15 12:59:44 2018] Creating new session: 8017119634290683
+[Thu Mar 15 12:59:47 2018] Creating new handle in session 8017119634290683: 1986704551398540
+[Thu Mar 15 12:59:50 2018] [1986704551398540] There's a message for JANUS EchoTest plugin
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Remote SDP:
+v=0
+o=- 6243129921221814148 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:rZQw
+a=ice-pwd:0hlmUvsUJ+HIztmVxSNf9Sab
+a=ice-options:trickle
+a=fingerprint:sha-256 56:00:00:8A:E8:36:41:80:ED:14:70:C6:8D:92:08:62:31:D3:DA:FF:98:A3:81:20:0D:2E:FD:A4:28:F9:4B:82
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Creating ICE agent (ICE Full mode, controlled)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Adding 10.34.83.233 to the addresses to gather candidates for
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Gathering done for stream 1
+[Thu Mar 15 12:59:50 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Parsing SCTP candidates (stream=1)...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] ICE ufrag (local):   rZQw
+[Thu Mar 15 12:59:50 2018] [1986704551398540] ICE pwd (local):     0hlmUvsUJ+HIztmVxSNf9Sab
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Fingerprint (local) : sha-256 56:00:00:8A:E8:36:41:80:ED:14:70:C6:8D:92:08:62:31:D3:DA:FF:98:A3:81:20:0D:2E:FD:A4:28:F9:4B:82
+[Thu Mar 15 12:59:50 2018] [1986704551398540] DTLS setup (local):  actpass
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Setting connect state (DTLS client)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Data Channel mid: data
+[Thu Mar 15 12:59:50 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Thu Mar 15 12:59:50 2018]  -------------------------------------------
+[Thu Mar 15 12:59:50 2018]   >> Anonymized
+[Thu Mar 15 12:59:50 2018]  -------------------------------------------
+[Thu Mar 15 12:59:50 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 6243129921221814148 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Thu Mar 15 12:59:50 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Thu Mar 15 12:59:50 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Thu Mar 15 12:59:50 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 6243129921221814148 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Thu Mar 15 12:59:50 2018]  -------------------------------------------
+[Thu Mar 15 12:59:50 2018]   >> Anonymized
+[Thu Mar 15 12:59:50 2018]  -------------------------------------------
+[Thu Mar 15 12:59:50 2018] [1986704551398540] We have 1 candidates for Stream #1, Component #1
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Address:    10.34.83.233:60240
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Priority:   2013266431
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Foundation: 1
+[Thu Mar 15 12:59:50 2018] [1986704551398540]     1 1 udp 2013266431 10.34.83.233 60240 typ host
+[Thu Mar 15 12:59:50 2018]  -------------------------------------------
+[Thu Mar 15 12:59:50 2018]   >> Merged (521 bytes)
+[Thu Mar 15 12:59:50 2018]  -------------------------------------------
+[Thu Mar 15 12:59:50 2018] v=0
+o=- 6243129921221814148 2 IN IP4 10.34.83.233
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.83.233
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:P0s2
+a=ice-pwd:ZYvSx8iLL7TG923INaGYi0
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.83.233 60240 typ host
+a=end-of-candidates
+
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Done! Ready to setup remote candidates and send connectivity checks...
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Sending event to transport...
+[Thu Mar 15 12:59:50 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 12:59:50 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 12:59:50 2018]   >> Pushing event: 0 (took 971 us)
+[Thu Mar 15 12:59:50 2018] Creating plugin result...
+[Thu Mar 15 12:59:50 2018] Destroying plugin result...
+[Thu Mar 15 12:59:50 2018] [33m[WARN][0m jsondone occured.[Thu Mar 15 12:59:50 2018] [1986704551398540] ICE thread started
+[Thu Mar 15 12:59:50 2018] [ice.c:janus_ice_thread:2663] [1986704551398540] Looping (ICE)...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Trickle candidate (data): candidate:3459328374 1 udp 2113937151 10.34.83.233 37074 typ host generation 0 ufrag rZQw network-cost 50
+[Thu Mar 15 12:59:50 2018] [1986704551398540]  Adding remote candidate component:1 stream:1 type:host 10.34.83.233:37074
+[Thu Mar 15 12:59:50 2018] [1986704551398540]  Transport: UDP
+[Thu Mar 15 12:59:50 2018] [1986704551398540]    Candidate added to the list! (1 elements for 1/1)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] ICE already started for this component, setting candidates we have up to now
+[Thu Mar 15 12:59:50 2018] [1986704551398540] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] >> Remote Stream #1, Component #1
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Address:    10.34.83.233:37074
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Priority:   2113937151
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Foundation: 3459328374
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Username:   rZQw
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Password:   0hlmUvsUJ+HIztmVxSNf9Sab
+[Thu Mar 15 12:59:50 2018] [1986704551398540]  Setting remote credentials...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Component state changed for component 1 in stream 1: 2 (connecting)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Remote candidates set!
+[Thu Mar 15 12:59:50 2018] [1986704551398540] New selected pair for component 1 in stream 1: 1 <-> 3459328374
+[Thu Mar 15 12:59:50 2018] [1986704551398540]   Component is ready enough, starting DTLS handshake...
+[Thu Mar 15 12:59:50 2018] Advertizing MTU: 1440
+[Thu Mar 15 12:59:50 2018] janus_dtls_bio_filter_write: 0x8cbb2b8, 199
+[Thu Mar 15 12:59:50 2018]   -- 199
+[Thu Mar 15 12:59:50 2018] New list length: 1
+[Thu Mar 15 12:59:50 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 12:59:50 2018] [1986704551398540] >> Going to send DTLS data: 199 bytes
+[Thu Mar 15 12:59:50 2018] [1986704551398540] >> >> Read 199 bytes from the write_BIO...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] >> >> ... and sent 199 of those bytes on the socket
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Creating retransmission timer with ID 4
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Component state changed for component 1 in stream 1: 3 (connected)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Component state changed for component 1 in stream 1: 4 (ready)
+[Thu Mar 15 12:59:50 2018] [1986704551398540] ICE send thread started...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Looks like DTLS!
+[Thu Mar 15 12:59:50 2018] [1986704551398540]     Written 15 bytes on the read BIO...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] DTLS alert triggered on stream 1 (component 1), closing...
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Telling the plugin about the hangup because of a DTLS alert (JANUS EchoTest plugin)
+[Thu Mar 15 12:59:50 2018] No WebRTC media anymore
+[Thu Mar 15 12:59:50 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Thu Mar 15 12:59:50 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Thu Mar 15 12:59:50 2018] [33m[WARN][0m incoming message: (null)[Thu Mar 15 12:59:50 2018] [1986704551398540] Sending event to transport...
+[Thu Mar 15 12:59:50 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 12:59:50 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 12:59:50 2018]   >> Pushing event: 0 (Success)
+[Thu Mar 15 12:59:50 2018] [1986704551398540]     ... and read -1 of them from SSL...
+[Thu Mar 15 12:59:50 2018] [31m[ERR][0m [dtls.c:janus_dtls_srtp_incoming_msg:624] [1986704551398540] Handshake error: error:14102410:SSL routines:DTLS1_READ_BYTES:sslv3 alert handshake failure
+[Thu Mar 15 12:59:50 2018] janus_dtls_bio_filter_ctrl: 7
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Notifying WebRTC hangup
+[Thu Mar 15 12:59:50 2018] [1986704551398540] Sending event to transport...
+[Thu Mar 15 12:59:50 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 12:59:50 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 12:59:50 2018] [1986704551398540] WebRTC resources freed
+[Thu Mar 15 12:59:50 2018] [1986704551398540] ICE thread ended!
+Stopping gateway, please wait...
+[Thu Mar 15 13:02:32 2018] Ending watchdog mainloop...
+[Thu Mar 15 13:02:32 2018] Destroying sessions...
+[Thu Mar 15 13:02:32 2018] Freeing crypto resources...
+[Thu Mar 15 13:02:32 2018] De-initializing SCTP...
+[Thu Mar 15 13:02:32 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 13:02:32 2018] Closing plugins.
+[Thu Mar 15 13:02:32 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 13:02:32 2018] Leaving EchoTest handler thread
+[Thu Mar 15 13:02:33 2018] EchoTest watchdog stopped
+[Thu Mar 15 13:02:33 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 13:02:33 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 13:02:33 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 13:05:34 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 13:05:34 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.83.233) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 13:05:34 2018] ICE handles watchdog started
+[Thu Mar 15 13:05:34 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 13:05:34 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 13:05:34 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 13:05:34 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 13:05:34 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 13:05:34 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 13:05:34 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 13:05:34 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 13:05:34 2018]     [general]
+[Thu Mar 15 13:05:34 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 13:05:34 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 13:05:34 2018] Sessions watchdog started
+[Thu Mar 15 13:05:34 2018] Joining EchoTest handler thread
+[Thu Mar 15 13:05:34 2018] EchoTest watchdog started
+[Thu Mar 15 13:05:40 2018] Creating new session: 5231236225290870
+[Thu Mar 15 13:05:42 2018] Creating new handle in session 5231236225290870: 6487229581017455
+[Thu Mar 15 13:05:44 2018] [6487229581017455] There's a message for JANUS EchoTest plugin
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Remote SDP:
+v=0
+o=- 5373429174473729207 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:yzbe
+a=ice-pwd:leG10rWf1PSnBgCbgP33FTDn
+a=ice-options:trickle
+a=fingerprint:sha-256 EE:AC:84:E0:ED:0F:17:53:75:19:26:7D:8C:65:27:9A:18:CB:0A:D1:11:78:BF:09:25:7C:93:E8:88:F8:78:32
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Creating ICE agent (ICE Full mode, controlled)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Adding 10.34.83.233 to the addresses to gather candidates for
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Gathering done for stream 1
+[Thu Mar 15 13:05:44 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Parsing SCTP candidates (stream=1)...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] ICE ufrag (local):   yzbe
+[Thu Mar 15 13:05:44 2018] [6487229581017455] ICE pwd (local):     leG10rWf1PSnBgCbgP33FTDn
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Fingerprint (local) : sha-256 EE:AC:84:E0:ED:0F:17:53:75:19:26:7D:8C:65:27:9A:18:CB:0A:D1:11:78:BF:09:25:7C:93:E8:88:F8:78:32
+[Thu Mar 15 13:05:44 2018] [6487229581017455] DTLS setup (local):  actpass
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Setting connect state (DTLS client)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Data Channel mid: data
+[Thu Mar 15 13:05:44 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Thu Mar 15 13:05:44 2018]  -------------------------------------------
+[Thu Mar 15 13:05:44 2018]   >> Anonymized
+[Thu Mar 15 13:05:44 2018]  -------------------------------------------
+[Thu Mar 15 13:05:44 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 5373429174473729207 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Thu Mar 15 13:05:44 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Thu Mar 15 13:05:44 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Thu Mar 15 13:05:44 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 5373429174473729207 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Thu Mar 15 13:05:44 2018]  -------------------------------------------
+[Thu Mar 15 13:05:44 2018]   >> Anonymized
+[Thu Mar 15 13:05:44 2018]  -------------------------------------------
+[Thu Mar 15 13:05:44 2018] [6487229581017455] We have 1 candidates for Stream #1, Component #1
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Address:    10.34.83.233:40366
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Priority:   2013266431
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Foundation: 1
+[Thu Mar 15 13:05:44 2018] [6487229581017455]     1 1 udp 2013266431 10.34.83.233 40366 typ host
+[Thu Mar 15 13:05:44 2018]  -------------------------------------------
+[Thu Mar 15 13:05:44 2018]   >> Merged (521 bytes)
+[Thu Mar 15 13:05:44 2018]  -------------------------------------------
+[Thu Mar 15 13:05:44 2018] v=0
+o=- 5373429174473729207 2 IN IP4 10.34.83.233
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.83.233
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:JwRF
+a=ice-pwd:9tx33+DlLP25LJJqSun3rn
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.83.233 40366 typ host
+a=end-of-candidates
+
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Done! Ready to setup remote candidates and send connectivity checks...
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Sending event to transport...
+[Thu Mar 15 13:05:44 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 13:05:44 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 13:05:44 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 13:05:44 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 13:05:44 2018]   >> Pushing event: 0 (took 1040 us)
+[Thu Mar 15 13:05:44 2018] Creating plugin result...
+[Thu Mar 15 13:05:44 2018] Destroying plugin result...
+[Thu Mar 15 13:05:44 2018] [33m[WARN][0m jsondone occured.[Thu Mar 15 13:05:44 2018] [6487229581017455] ICE thread started
+[Thu Mar 15 13:05:44 2018] [ice.c:janus_ice_thread:2663] [6487229581017455] Looping (ICE)...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Trickle candidate (data): candidate:3459328374 1 udp 2113937151 10.34.83.233 42258 typ host generation 0 ufrag yzbe network-cost 50
+[Thu Mar 15 13:05:44 2018] [6487229581017455]  Adding remote candidate component:1 stream:1 type:host 10.34.83.233:42258
+[Thu Mar 15 13:05:44 2018] [6487229581017455]  Transport: UDP
+[Thu Mar 15 13:05:44 2018] [6487229581017455]    Candidate added to the list! (1 elements for 1/1)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] ICE already started for this component, setting candidates we have up to now
+[Thu Mar 15 13:05:44 2018] [6487229581017455] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] >> Remote Stream #1, Component #1
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Address:    10.34.83.233:42258
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Priority:   2113937151
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Foundation: 3459328374
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Username:   yzbe
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Password:   leG10rWf1PSnBgCbgP33FTDn
+[Thu Mar 15 13:05:44 2018] [6487229581017455]  Setting remote credentials...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Component state changed for component 1 in stream 1: 2 (connecting)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Remote candidates set!
+[Thu Mar 15 13:05:44 2018] [6487229581017455] New selected pair for component 1 in stream 1: 1 <-> 3459328374
+[Thu Mar 15 13:05:44 2018] [6487229581017455]   Component is ready enough, starting DTLS handshake...
+[Thu Mar 15 13:05:44 2018] Advertizing MTU: 1440
+[Thu Mar 15 13:05:44 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 199
+[Thu Mar 15 13:05:44 2018]   -- 199
+[Thu Mar 15 13:05:44 2018] New list length: 1
+[Thu Mar 15 13:05:44 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 13:05:44 2018] [6487229581017455] >> Going to send DTLS data: 199 bytes
+[Thu Mar 15 13:05:44 2018] [6487229581017455] >> >> Read 199 bytes from the write_BIO...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] >> >> ... and sent 199 of those bytes on the socket
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Creating retransmission timer with ID 4
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Component state changed for component 1 in stream 1: 3 (connected)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Component state changed for component 1 in stream 1: 4 (ready)
+[Thu Mar 15 13:05:44 2018] [6487229581017455] ICE send thread started...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Looks like DTLS!
+[Thu Mar 15 13:05:44 2018] [6487229581017455]     Written 15 bytes on the read BIO...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] DTLS alert triggered on stream 1 (component 1), closing...
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Telling the plugin about the hangup because of a DTLS alert (JANUS EchoTest plugin)
+[Thu Mar 15 13:05:44 2018] No WebRTC media anymore
+[Thu Mar 15 13:05:44 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Thu Mar 15 13:05:44 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Thu Mar 15 13:05:44 2018] [33m[WARN][0m incoming message: (null)[Thu Mar 15 13:05:44 2018] [6487229581017455] Sending event to transport...
+[Thu Mar 15 13:05:44 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 13:05:44 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 13:05:44 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 13:05:44 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 13:05:44 2018]   >> Pushing event: 0 (Success)
+[Thu Mar 15 13:05:44 2018] [6487229581017455]     ... and read -1 of them from SSL...
+[Thu Mar 15 13:05:44 2018] [31m[ERR][0m [dtls.c:janus_dtls_srtp_incoming_msg:624] [6487229581017455] Handshake error: error:14102410:SSL routines:DTLS1_READ_BYTES:sslv3 alert handshake failure
+[Thu Mar 15 13:05:44 2018] janus_dtls_bio_filter_ctrl: 7
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Notifying WebRTC hangup
+[Thu Mar 15 13:05:44 2018] [6487229581017455] Sending event to transport...
+[Thu Mar 15 13:05:44 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 13:05:44 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 13:05:44 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 13:05:44 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 13:05:44 2018] [6487229581017455] WebRTC resources freed
+[Thu Mar 15 13:05:44 2018] [6487229581017455] ICE thread ended!
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 13:06:14 2018] Ending watchdog mainloop...
+[Thu Mar 15 13:06:14 2018] Destroying sessions...
+[Thu Mar 15 13:06:14 2018] Freeing crypto resources...
+[Thu Mar 15 13:06:14 2018] De-initializing SCTP...
+[Thu Mar 15 13:06:14 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 13:06:14 2018] Closing plugins.
+[Thu Mar 15 13:06:14 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 13:06:14 2018] Leaving EchoTest handler thread
+[Thu Mar 15 13:06:14 2018] EchoTest watchdog stopped
+[Thu Mar 15 13:06:14 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 13:06:14 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 13:06:14 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 13:07:20 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 13:07:20 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.83.233) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 13:07:20 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 13:07:20 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 13:07:20 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 13:07:20 2018] ICE handles watchdog started
+[Thu Mar 15 13:07:20 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 13:07:20 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 13:07:20 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 13:07:20 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 13:07:20 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 13:07:20 2018]     [general]
+[Thu Mar 15 13:07:20 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 13:07:20 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 13:07:20 2018] Sessions watchdog started
+[Thu Mar 15 13:07:20 2018] Joining EchoTest handler thread
+[Thu Mar 15 13:07:20 2018] EchoTest watchdog started
+[Thu Mar 15 13:07:39 2018] Creating new session: 3523158805895325
+[Thu Mar 15 13:07:41 2018] Creating new handle in session 3523158805895325: 7704005015733339
+[Thu Mar 15 13:07:43 2018] [7704005015733339] There's a message for JANUS EchoTest plugin
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Remote SDP:
+v=0
+o=- 6397968064419423690 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:7uzE
+a=ice-pwd:6414aoQzbEhUCwUNPA6gHzbx
+a=ice-options:trickle
+a=fingerprint:sha-256 9D:34:32:7A:20:18:5F:84:5F:C9:9B:01:D0:D1:71:8D:66:83:3C:77:12:CD:B7:62:26:50:B3:64:DB:6D:FB:01
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Creating ICE agent (ICE Full mode, controlled)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Adding 10.34.83.233 to the addresses to gather candidates for
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Gathering done for stream 1
+[Thu Mar 15 13:07:43 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Parsing SCTP candidates (stream=1)...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] ICE ufrag (local):   7uzE
+[Thu Mar 15 13:07:43 2018] [7704005015733339] ICE pwd (local):     6414aoQzbEhUCwUNPA6gHzbx
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Fingerprint (local) : sha-256 9D:34:32:7A:20:18:5F:84:5F:C9:9B:01:D0:D1:71:8D:66:83:3C:77:12:CD:B7:62:26:50:B3:64:DB:6D:FB:01
+[Thu Mar 15 13:07:43 2018] [7704005015733339] DTLS setup (local):  actpass
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Setting connect state (DTLS client)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Data Channel mid: data
+[Thu Mar 15 13:07:43 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Thu Mar 15 13:07:43 2018]  -------------------------------------------
+[Thu Mar 15 13:07:43 2018]   >> Anonymized
+[Thu Mar 15 13:07:43 2018]  -------------------------------------------
+[Thu Mar 15 13:07:43 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 6397968064419423690 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Thu Mar 15 13:07:43 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Thu Mar 15 13:07:43 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Thu Mar 15 13:07:43 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 6397968064419423690 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Thu Mar 15 13:07:43 2018]  -------------------------------------------
+[Thu Mar 15 13:07:43 2018]   >> Anonymized
+[Thu Mar 15 13:07:43 2018]  -------------------------------------------
+[Thu Mar 15 13:07:43 2018] [7704005015733339] We have 1 candidates for Stream #1, Component #1
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Address:    10.34.83.233:44600
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Priority:   2013266431
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Foundation: 1
+[Thu Mar 15 13:07:43 2018] [7704005015733339]     1 1 udp 2013266431 10.34.83.233 44600 typ host
+[Thu Mar 15 13:07:43 2018]  -------------------------------------------
+[Thu Mar 15 13:07:43 2018]   >> Merged (521 bytes)
+[Thu Mar 15 13:07:43 2018]  -------------------------------------------
+[Thu Mar 15 13:07:43 2018] v=0
+o=- 6397968064419423690 2 IN IP4 10.34.83.233
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.83.233
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:Q901
+a=ice-pwd:z0F1no0cIO9XoPvNNGV/hs
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.83.233 44600 typ host
+a=end-of-candidates
+
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Done! Ready to setup remote candidates and send connectivity checks...
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Sending event to transport...
+[Thu Mar 15 13:07:43 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 13:07:43 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 13:07:43 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 13:07:43 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 13:07:43 2018]   >> Pushing event: 0 (took 847 us)
+[Thu Mar 15 13:07:43 2018] Creating plugin result...
+[Thu Mar 15 13:07:43 2018] Destroying plugin result...
+[Thu Mar 15 13:07:43 2018] [33m[WARN][0m jsondone occured.[Thu Mar 15 13:07:43 2018] [7704005015733339] ICE thread started
+[Thu Mar 15 13:07:43 2018] [ice.c:janus_ice_thread:2663] [7704005015733339] Looping (ICE)...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Trickle candidate (data): candidate:3459328374 1 udp 2113937151 10.34.83.233 55368 typ host generation 0 ufrag 7uzE network-cost 50
+[Thu Mar 15 13:07:43 2018] [7704005015733339]  Adding remote candidate component:1 stream:1 type:host 10.34.83.233:55368
+[Thu Mar 15 13:07:43 2018] [7704005015733339]  Transport: UDP
+[Thu Mar 15 13:07:43 2018] [7704005015733339]    Candidate added to the list! (1 elements for 1/1)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] ICE already started for this component, setting candidates we have up to now
+[Thu Mar 15 13:07:43 2018] [7704005015733339] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] >> Remote Stream #1, Component #1
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Address:    10.34.83.233:55368
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Priority:   2113937151
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Foundation: 3459328374
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Username:   7uzE
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Password:   6414aoQzbEhUCwUNPA6gHzbx
+[Thu Mar 15 13:07:43 2018] [7704005015733339]  Setting remote credentials...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Component state changed for component 1 in stream 1: 2 (connecting)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Remote candidates set!
+[Thu Mar 15 13:07:43 2018] [7704005015733339] New selected pair for component 1 in stream 1: 1 <-> 3459328374
+[Thu Mar 15 13:07:43 2018] [7704005015733339]   Component is ready enough, starting DTLS handshake...
+[Thu Mar 15 13:07:43 2018] Advertizing MTU: 1440
+[Thu Mar 15 13:07:43 2018] janus_dtls_bio_filter_write: 0xb0c0dc50, 199
+[Thu Mar 15 13:07:43 2018]   -- 199
+[Thu Mar 15 13:07:43 2018] New list length: 1
+[Thu Mar 15 13:07:43 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 13:07:43 2018] [7704005015733339] >> Going to send DTLS data: 199 bytes
+[Thu Mar 15 13:07:43 2018] [7704005015733339] >> >> Read 199 bytes from the write_BIO...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] >> >> ... and sent 199 of those bytes on the socket
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Creating retransmission timer with ID 4
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Component state changed for component 1 in stream 1: 3 (connected)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Component state changed for component 1 in stream 1: 4 (ready)
+[Thu Mar 15 13:07:43 2018] [7704005015733339] ICE send thread started...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Looks like DTLS!
+[Thu Mar 15 13:07:43 2018] [7704005015733339]     Written 15 bytes on the read BIO...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] DTLS alert triggered on stream 1 (component 1), closing...
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Telling the plugin about the hangup because of a DTLS alert (JANUS EchoTest plugin)
+[Thu Mar 15 13:07:43 2018] No WebRTC media anymore
+[Thu Mar 15 13:07:43 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Thu Mar 15 13:07:43 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Thu Mar 15 13:07:43 2018] [33m[WARN][0m incoming message: (null)[Thu Mar 15 13:07:43 2018] [7704005015733339] Sending event to transport...
+[Thu Mar 15 13:07:43 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 13:07:43 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 13:07:43 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 13:07:43 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 13:07:43 2018]   >> Pushing event: 0 (Success)
+[Thu Mar 15 13:07:43 2018] [7704005015733339]     ... and read -1 of them from SSL...
+[Thu Mar 15 13:07:43 2018] [31m[ERR][0m [dtls.c:janus_dtls_srtp_incoming_msg:624] [7704005015733339] Handshake error: error:14102410:SSL routines:DTLS1_READ_BYTES:sslv3 alert handshake failure
+[Thu Mar 15 13:07:43 2018] janus_dtls_bio_filter_ctrl: 7
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Notifying WebRTC hangup
+[Thu Mar 15 13:07:43 2018] [7704005015733339] Sending event to transport...
+[Thu Mar 15 13:07:43 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 13:07:43 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 13:07:43 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 13:07:43 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 13:07:43 2018] [7704005015733339] WebRTC resources freed
+[Thu Mar 15 13:07:43 2018] [7704005015733339] ICE thread ended!
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 13:09:06 2018] Ending watchdog mainloop...
+[Thu Mar 15 13:09:06 2018] Destroying sessions...
+[Thu Mar 15 13:09:06 2018] Freeing crypto resources...
+[Thu Mar 15 13:09:06 2018] De-initializing SCTP...
+[Thu Mar 15 13:09:06 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 13:09:06 2018] Closing plugins.
+[Thu Mar 15 13:09:06 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 13:09:06 2018] Leaving EchoTest handler thread
+[Thu Mar 15 13:09:06 2018] EchoTest watchdog stopped
+[Thu Mar 15 13:09:06 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 13:09:06 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 13:09:06 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 13:09:10 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 13:09:10 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.83.233) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 13:09:10 2018] ICE handles watchdog started
+[Thu Mar 15 13:09:10 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 13:09:10 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 13:09:10 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 13:09:10 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 13:09:10 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 13:09:10 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 13:09:10 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 13:09:10 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 13:09:10 2018]     [general]
+[Thu Mar 15 13:09:10 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 13:09:10 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 13:09:10 2018] Sessions watchdog started
+[Thu Mar 15 13:09:10 2018] Joining EchoTest handler thread
+[Thu Mar 15 13:09:10 2018] EchoTest watchdog started
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 13:09:27 2018] Ending watchdog mainloop...
+[Thu Mar 15 13:09:27 2018] Destroying sessions...
+[Thu Mar 15 13:09:27 2018] Freeing crypto resources...
+[Thu Mar 15 13:09:27 2018] De-initializing SCTP...
+[Thu Mar 15 13:09:27 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 13:09:27 2018] Closing plugins.
+[Thu Mar 15 13:09:27 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 13:09:27 2018] Leaving EchoTest handler thread
+[Thu Mar 15 13:09:28 2018] EchoTest watchdog stopped
+[Thu Mar 15 13:09:28 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 13:09:28 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 13:09:28 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 14:25:59 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 14:25:59 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 14:25:59 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 14:25:59 2018] ICE handles watchdog started
+[Thu Mar 15 14:25:59 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 14:25:59 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 14:25:59 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 14:25:59 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 14:25:59 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 14:25:59 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 14:25:59 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 14:25:59 2018]     [general]
+[Thu Mar 15 14:25:59 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 14:25:59 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 14:25:59 2018] Sessions watchdog started
+[Thu Mar 15 14:25:59 2018] Joining EchoTest handler thread
+[Thu Mar 15 14:25:59 2018] EchoTest watchdog started
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 14:26:15 2018] Ending watchdog mainloop...
+[Thu Mar 15 14:26:15 2018] Destroying sessions...
+[Thu Mar 15 14:26:15 2018] Freeing crypto resources...
+[Thu Mar 15 14:26:15 2018] De-initializing SCTP...
+[Thu Mar 15 14:26:15 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 14:26:15 2018] Closing plugins.
+[Thu Mar 15 14:26:15 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 14:26:15 2018] Leaving EchoTest handler thread
+[Thu Mar 15 14:26:15 2018] EchoTest watchdog stopped
+[Thu Mar 15 14:26:15 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 14:26:15 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 14:26:15 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 14:26:37 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 14:26:37 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.22.161) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 14:26:37 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 14:26:37 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 14:26:37 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 14:26:37 2018] ICE handles watchdog started
+[Thu Mar 15 14:26:37 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 14:26:37 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 14:26:37 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 14:26:37 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 14:26:37 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 14:26:37 2018]     [general]
+[Thu Mar 15 14:26:37 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 14:26:37 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 14:26:37 2018] Sessions watchdog started
+[Thu Mar 15 14:26:37 2018] Joining EchoTest handler thread
+[Thu Mar 15 14:26:37 2018] EchoTest watchdog started
+[Thu Mar 15 14:26:44 2018] Creating new session: 2288859467761586
+[Thu Mar 15 14:26:46 2018] Creating new handle in session 2288859467761586: 84665429335041
+[Thu Mar 15 14:26:48 2018] [84665429335041] There's a message for JANUS EchoTest plugin
+[Thu Mar 15 14:26:48 2018] [84665429335041] Remote SDP:
+v=0
+o=- 4166954540121898517 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:gMaI
+a=ice-pwd:2Nqvk9BEzkrxjnHOXgB4rrXo
+a=ice-options:trickle
+a=fingerprint:sha-256 F9:CA:26:A7:B8:11:AE:31:75:23:7C:7F:2C:06:3D:13:E8:74:4D:E6:19:3E:9E:4D:82:FA:4D:DC:05:96:77:6F
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Thu Mar 15 14:26:48 2018] [84665429335041] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Thu Mar 15 14:26:48 2018] [84665429335041] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Thu Mar 15 14:26:48 2018] [84665429335041] Creating ICE agent (ICE Full mode, controlled)
+[Thu Mar 15 14:26:48 2018] [84665429335041] Adding 10.34.22.161 to the addresses to gather candidates for
+[Thu Mar 15 14:26:48 2018] [84665429335041] Gathering done for stream 1
+[Thu Mar 15 14:26:48 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 14:26:48 2018] [84665429335041] Parsing SCTP candidates (stream=1)...
+[Thu Mar 15 14:26:48 2018] [84665429335041] ICE ufrag (local):   gMaI
+[Thu Mar 15 14:26:48 2018] [84665429335041] ICE pwd (local):     2Nqvk9BEzkrxjnHOXgB4rrXo
+[Thu Mar 15 14:26:48 2018] [84665429335041] Fingerprint (local) : sha-256 F9:CA:26:A7:B8:11:AE:31:75:23:7C:7F:2C:06:3D:13:E8:74:4D:E6:19:3E:9E:4D:82:FA:4D:DC:05:96:77:6F
+[Thu Mar 15 14:26:48 2018] [84665429335041] DTLS setup (local):  actpass
+[Thu Mar 15 14:26:48 2018] [84665429335041] Setting connect state (DTLS client)
+[Thu Mar 15 14:26:48 2018] [84665429335041] Data Channel mid: data
+[Thu Mar 15 14:26:48 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Thu Mar 15 14:26:48 2018]  -------------------------------------------
+[Thu Mar 15 14:26:48 2018]   >> Anonymized
+[Thu Mar 15 14:26:48 2018]  -------------------------------------------
+[Thu Mar 15 14:26:48 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 4166954540121898517 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Thu Mar 15 14:26:48 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Thu Mar 15 14:26:48 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Thu Mar 15 14:26:48 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 4166954540121898517 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Thu Mar 15 14:26:48 2018]  -------------------------------------------
+[Thu Mar 15 14:26:48 2018]   >> Anonymized
+[Thu Mar 15 14:26:48 2018]  -------------------------------------------
+[Thu Mar 15 14:26:48 2018] [84665429335041] We have 1 candidates for Stream #1, Component #1
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Address:    10.34.22.161:36564
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Priority:   2013266431
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Foundation: 1
+[Thu Mar 15 14:26:48 2018] [84665429335041]     1 1 udp 2013266431 10.34.22.161 36564 typ host
+[Thu Mar 15 14:26:48 2018]  -------------------------------------------
+[Thu Mar 15 14:26:48 2018]   >> Merged (521 bytes)
+[Thu Mar 15 14:26:48 2018]  -------------------------------------------
+[Thu Mar 15 14:26:48 2018] v=0
+o=- 4166954540121898517 2 IN IP4 10.34.22.161
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.22.161
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:Ajsx
+a=ice-pwd:srXj0o0zCmdt/zmvpBBt9G
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.22.161 36564 typ host
+a=end-of-candidates
+
+[Thu Mar 15 14:26:48 2018] [84665429335041] Done! Ready to setup remote candidates and send connectivity checks...
+[Thu Mar 15 14:26:48 2018] [84665429335041]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Thu Mar 15 14:26:48 2018] [84665429335041] Sending event to transport...
+[Thu Mar 15 14:26:48 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 14:26:48 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 14:26:48 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 14:26:48 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 14:26:48 2018]   >> Pushing event: 0 (took 1177 us)
+[Thu Mar 15 14:26:48 2018] Creating plugin result...
+[Thu Mar 15 14:26:48 2018] Destroying plugin result...
+[Thu Mar 15 14:26:48 2018] [33m[WARN][0m jsondone occured.[Thu Mar 15 14:26:48 2018] [84665429335041] Trickle candidate (data): candidate:1942525475 1 udp 2113937151 10.34.22.161 41266 typ host generation 0 ufrag gMaI network-cost 50
+[Thu Mar 15 14:26:48 2018] [84665429335041]  Adding remote candidate component:1 stream:1 type:host 10.34.22.161:41266
+[Thu Mar 15 14:26:48 2018] [84665429335041]  Transport: UDP
+[Thu Mar 15 14:26:48 2018] [84665429335041]    Candidate added to the list! (1 elements for 1/1)
+[Thu Mar 15 14:26:48 2018] [84665429335041] ICE already started for this component, setting candidates we have up to now
+[Thu Mar 15 14:26:48 2018] [84665429335041] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Thu Mar 15 14:26:48 2018] [84665429335041] >> Remote Stream #1, Component #1
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Address:    10.34.22.161:41266
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Priority:   2113937151
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Foundation: 1942525475
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Username:   gMaI
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Password:   2Nqvk9BEzkrxjnHOXgB4rrXo
+[Thu Mar 15 14:26:48 2018] [84665429335041]  Setting remote credentials...
+[Thu Mar 15 14:26:48 2018] [84665429335041] Component state changed for component 1 in stream 1: 2 (connecting)
+[Thu Mar 15 14:26:48 2018] [84665429335041] Remote candidates set!
+[Thu Mar 15 14:26:48 2018] [84665429335041] ICE thread started
+[Thu Mar 15 14:26:48 2018] [ice.c:janus_ice_thread:2663] [84665429335041] Looping (ICE)...
+[Thu Mar 15 14:26:48 2018] [84665429335041] New selected pair for component 1 in stream 1: 1 <-> 1942525475
+[Thu Mar 15 14:26:48 2018] [84665429335041]   Component is ready enough, starting DTLS handshake...
+[Thu Mar 15 14:26:48 2018] Advertizing MTU: 1440
+[Thu Mar 15 14:26:48 2018] janus_dtls_bio_filter_write: 0xb0b0d2b8, 129
+[Thu Mar 15 14:26:48 2018]   -- 129
+[Thu Mar 15 14:26:48 2018] New list length: 1
+[Thu Mar 15 14:26:48 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 14:26:48 2018] [84665429335041] >> Going to send DTLS data: 129 bytes
+[Thu Mar 15 14:26:48 2018] [84665429335041] >> >> Read 129 bytes from the write_BIO...
+[Thu Mar 15 14:26:48 2018] [84665429335041] >> >> ... and sent 129 of those bytes on the socket
+[Thu Mar 15 14:26:48 2018] [84665429335041] Creating retransmission timer with ID 4
+[Thu Mar 15 14:26:48 2018] [84665429335041] Component state changed for component 1 in stream 1: 3 (connected)
+[Thu Mar 15 14:26:48 2018] [84665429335041] Component state changed for component 1 in stream 1: 4 (ready)
+[Thu Mar 15 14:26:48 2018] [84665429335041] Looks like DTLS!
+[Thu Mar 15 14:26:48 2018] [84665429335041]     Written 15 bytes on the read BIO...
+[Thu Mar 15 14:26:48 2018] [84665429335041] DTLS alert triggered on stream 1 (component 1), closing...
+[Thu Mar 15 14:26:48 2018] [84665429335041] Telling the plugin about the hangup because of a DTLS alert (JANUS EchoTest plugin)
+[Thu Mar 15 14:26:48 2018] No WebRTC media anymore
+[Thu Mar 15 14:26:48 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Thu Mar 15 14:26:48 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Thu Mar 15 14:26:48 2018] [33m[WARN][0m incoming message: (null)[Thu Mar 15 14:26:48 2018] [84665429335041] Sending event to transport...
+[Thu Mar 15 14:26:48 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 14:26:48 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 14:26:48 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 14:26:48 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 14:26:48 2018]   >> Pushing event: 0 (Success)
+[Thu Mar 15 14:26:48 2018] [84665429335041]     ... and read -1 of them from SSL...
+[Thu Mar 15 14:26:48 2018] [31m[ERR][0m [dtls.c:janus_dtls_srtp_incoming_msg:628] [84665429335041] Handshake error: error:14102410:SSL routines:DTLS1_READ_BYTES:sslv3 alert handshake failure
+[Thu Mar 15 14:26:48 2018] [84665429335041] ICE send thread started...
+[Thu Mar 15 14:26:48 2018] janus_dtls_bio_filter_ctrl: 7
+[Thu Mar 15 14:26:48 2018] [84665429335041] Notifying WebRTC hangup
+[Thu Mar 15 14:26:48 2018] [84665429335041] Sending event to transport...
+[Thu Mar 15 14:26:48 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 14:26:48 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 14:26:48 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 14:26:48 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 14:26:48 2018] [84665429335041] WebRTC resources freed
+[Thu Mar 15 14:26:48 2018] [84665429335041] ICE thread ended!
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 14:27:51 2018] Ending watchdog mainloop...
+[Thu Mar 15 14:27:51 2018] Destroying sessions...
+[Thu Mar 15 14:27:51 2018] Freeing crypto resources...
+[Thu Mar 15 14:27:51 2018] De-initializing SCTP...
+[Thu Mar 15 14:27:51 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 14:27:51 2018] Closing plugins.
+[Thu Mar 15 14:27:51 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 14:27:51 2018] Leaving EchoTest handler thread
+[Thu Mar 15 14:27:51 2018] EchoTest watchdog stopped
+[Thu Mar 15 14:27:51 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 14:27:51 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 14:27:51 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 15:10:55 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 15:10:55 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 15:10:55 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 15:10:55 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 15:10:55 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 15:10:55 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 15:10:55 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 15:10:55 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 15:10:55 2018] ICE handles watchdog started
+[Thu Mar 15 15:10:56 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 15:10:56 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 15:10:56 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 15:10:56 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 15:10:56 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 15:10:56 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 15:10:56 2018]     [general]
+[Thu Mar 15 15:10:56 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 15:10:56 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 15:10:56 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 15:10:56 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 15:10:56 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 15:10:56 2018] Sessions watchdog started
+[Thu Mar 15 15:10:56 2018] Joining EchoTest handler thread
+[Thu Mar 15 15:10:56 2018] EchoTest watchdog started
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 15:10:58 2018] Ending watchdog mainloop...
+[Thu Mar 15 15:10:58 2018] Destroying sessions...
+[Thu Mar 15 15:10:58 2018] Freeing crypto resources...
+[Thu Mar 15 15:10:58 2018] De-initializing SCTP...
+[Thu Mar 15 15:10:58 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 15:10:58 2018] Closing plugins.
+[Thu Mar 15 15:10:58 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 15:10:58 2018] Leaving EchoTest handler thread
+[Thu Mar 15 15:10:59 2018] EchoTest watchdog stopped
+[Thu Mar 15 15:10:59 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 15:10:59 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 15:10:59 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 15:12:03 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 15:12:03 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.86.121) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 15:12:03 2018] ICE handles watchdog started
+[Thu Mar 15 15:12:03 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 15:12:03 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 15:12:03 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 15:12:03 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 15:12:03 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 15:12:03 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 15:12:03 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 15:12:03 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 15:12:03 2018]     [general]
+[Thu Mar 15 15:12:03 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 15:12:03 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 15:12:03 2018] Sessions watchdog started
+[Thu Mar 15 15:12:03 2018] Joining EchoTest handler thread
+[Thu Mar 15 15:12:03 2018] EchoTest watchdog started
+[Thu Mar 15 15:12:12 2018] Creating new session: 2711630958354946
+[Thu Mar 15 15:12:14 2018] Creating new handle in session 2711630958354946: 6406206753577896
+[Thu Mar 15 15:12:16 2018] [6406206753577896] There's a message for JANUS EchoTest plugin
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Remote SDP:
+v=0
+o=- 6754550923492079095 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:ombz
+a=ice-pwd:6+vYrh60h3/y2yeyOyglJsuz
+a=ice-options:trickle
+a=fingerprint:sha-256 D5:81:AE:A7:6D:CD:FD:5A:6C:AC:58:F9:46:95:90:13:D3:F4:A6:C4:6A:89:44:66:04:75:1F:DF:F8:9A:B4:0A
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Creating ICE agent (ICE Full mode, controlled)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Adding 10.34.86.121 to the addresses to gather candidates for
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Gathering done for stream 1
+[Thu Mar 15 15:12:16 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Parsing SCTP candidates (stream=1)...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] ICE ufrag (local):   ombz
+[Thu Mar 15 15:12:16 2018] [6406206753577896] ICE pwd (local):     6+vYrh60h3/y2yeyOyglJsuz
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Fingerprint (local) : sha-256 D5:81:AE:A7:6D:CD:FD:5A:6C:AC:58:F9:46:95:90:13:D3:F4:A6:C4:6A:89:44:66:04:75:1F:DF:F8:9A:B4:0A
+[Thu Mar 15 15:12:16 2018] [6406206753577896] DTLS setup (local):  actpass
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Setting connect state (DTLS client)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Data Channel mid: data
+[Thu Mar 15 15:12:16 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Thu Mar 15 15:12:16 2018]  -------------------------------------------
+[Thu Mar 15 15:12:16 2018]   >> Anonymized
+[Thu Mar 15 15:12:16 2018]  -------------------------------------------
+[Thu Mar 15 15:12:16 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 6754550923492079095 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Thu Mar 15 15:12:16 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Thu Mar 15 15:12:16 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Thu Mar 15 15:12:16 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 6754550923492079095 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Thu Mar 15 15:12:16 2018]  -------------------------------------------
+[Thu Mar 15 15:12:16 2018]   >> Anonymized
+[Thu Mar 15 15:12:16 2018]  -------------------------------------------
+[Thu Mar 15 15:12:16 2018] [6406206753577896] We have 1 candidates for Stream #1, Component #1
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Address:    10.34.86.121:53858
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Priority:   2013266431
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Foundation: 1
+[Thu Mar 15 15:12:16 2018] [6406206753577896]     1 1 udp 2013266431 10.34.86.121 53858 typ host
+[Thu Mar 15 15:12:16 2018]  -------------------------------------------
+[Thu Mar 15 15:12:16 2018]   >> Merged (521 bytes)
+[Thu Mar 15 15:12:16 2018]  -------------------------------------------
+[Thu Mar 15 15:12:16 2018] v=0
+o=- 6754550923492079095 2 IN IP4 10.34.86.121
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.86.121
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:NjKu
+a=ice-pwd:p2Mbn5oviIcLmo1vlYk4o7
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.86.121 53858 typ host
+a=end-of-candidates
+
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Done! Ready to setup remote candidates and send connectivity checks...
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Sending event to transport...
+[Thu Mar 15 15:12:16 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 15:12:16 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 15:12:16 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 15:12:16 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 15:12:16 2018]   >> Pushing event: 0 (took 1127 us)
+[Thu Mar 15 15:12:16 2018] Creating plugin result...
+[Thu Mar 15 15:12:16 2018] Destroying plugin result...
+[Thu Mar 15 15:12:16 2018] [33m[WARN][0m jsondone occured.[Thu Mar 15 15:12:16 2018] [6406206753577896] ICE thread started
+[Thu Mar 15 15:12:16 2018] [ice.c:janus_ice_thread:2663] [6406206753577896] Looping (ICE)...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Trickle candidate (data): candidate:2536289415 1 udp 2113937151 10.34.86.121 41571 typ host generation 0 ufrag ombz network-cost 50
+[Thu Mar 15 15:12:16 2018] [6406206753577896]  Adding remote candidate component:1 stream:1 type:host 10.34.86.121:41571
+[Thu Mar 15 15:12:16 2018] [6406206753577896]  Transport: UDP
+[Thu Mar 15 15:12:16 2018] [6406206753577896]    Candidate added to the list! (1 elements for 1/1)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] ICE already started for this component, setting candidates we have up to now
+[Thu Mar 15 15:12:16 2018] [6406206753577896] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] >> Remote Stream #1, Component #1
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Address:    10.34.86.121:41571
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Priority:   2113937151
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Foundation: 2536289415
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Username:   ombz
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Password:   6+vYrh60h3/y2yeyOyglJsuz
+[Thu Mar 15 15:12:16 2018] [6406206753577896]  Setting remote credentials...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Component state changed for component 1 in stream 1: 2 (connecting)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Remote candidates set!
+[Thu Mar 15 15:12:16 2018] [6406206753577896] New selected pair for component 1 in stream 1: 1 <-> 2536289415
+[Thu Mar 15 15:12:16 2018] [6406206753577896]   Component is ready enough, starting DTLS handshake...
+[Thu Mar 15 15:12:16 2018] Advertizing MTU: 1440
+[Thu Mar 15 15:12:16 2018] janus_dtls_bio_filter_write: 0xb0b0d850, 129
+[Thu Mar 15 15:12:16 2018]   -- 129
+[Thu Mar 15 15:12:16 2018] New list length: 1
+[Thu Mar 15 15:12:16 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 15:12:16 2018] [6406206753577896] >> Going to send DTLS data: 129 bytes
+[Thu Mar 15 15:12:16 2018] [6406206753577896] >> >> Read 129 bytes from the write_BIO...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] >> >> ... and sent 129 of those bytes on the socket
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Creating retransmission timer with ID 4
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Component state changed for component 1 in stream 1: 3 (connected)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Component state changed for component 1 in stream 1: 4 (ready)
+[Thu Mar 15 15:12:16 2018] [6406206753577896] ICE send thread started...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Looks like DTLS!
+[Thu Mar 15 15:12:16 2018] [6406206753577896]     Written 15 bytes on the read BIO...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] DTLS alert triggered on stream 1 (component 1), closing...
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Telling the plugin about the hangup because of a DTLS alert (JANUS EchoTest plugin)
+[Thu Mar 15 15:12:16 2018] No WebRTC media anymore
+[Thu Mar 15 15:12:16 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Thu Mar 15 15:12:16 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Thu Mar 15 15:12:16 2018] [33m[WARN][0m incoming message: (null)[Thu Mar 15 15:12:16 2018] [6406206753577896] Sending event to transport...
+[Thu Mar 15 15:12:16 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 15:12:16 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 15:12:16 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 15:12:16 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 15:12:16 2018]   >> Pushing event: 0 (Success)
+[Thu Mar 15 15:12:16 2018] [6406206753577896]     ... and read -1 of them from SSL...
+[Thu Mar 15 15:12:16 2018] [31m[ERR][0m [dtls.c:janus_dtls_srtp_incoming_msg:628] [6406206753577896] Handshake error: error:14102410:SSL routines:DTLS1_READ_BYTES:sslv3 alert handshake failure
+[Thu Mar 15 15:12:16 2018] janus_dtls_bio_filter_ctrl: 7
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Notifying WebRTC hangup
+[Thu Mar 15 15:12:16 2018] [6406206753577896] Sending event to transport...
+[Thu Mar 15 15:12:16 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 15:12:16 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 15:12:16 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 15:12:16 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 15:12:16 2018] [6406206753577896] WebRTC resources freed
+[Thu Mar 15 15:12:16 2018] [6406206753577896] ICE thread ended!
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Thu Mar 15 15:14:06 2018] Ending watchdog mainloop...
+[Thu Mar 15 15:14:06 2018] Destroying sessions...
+[Thu Mar 15 15:14:06 2018] Freeing crypto resources...
+[Thu Mar 15 15:14:06 2018] De-initializing SCTP...
+[Thu Mar 15 15:14:06 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 15:14:06 2018] Closing plugins.
+[Thu Mar 15 15:14:06 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 15:14:06 2018] Leaving EchoTest handler thread
+[Thu Mar 15 15:14:07 2018] EchoTest watchdog stopped
+[Thu Mar 15 15:14:07 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 15:14:07 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 15:14:07 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Thu Mar 15 15:24:03 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Thu Mar 15 15:24:03 2018] TURN REST API backend: (disabled)
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.86.121) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Thu Mar 15 15:24:03 2018] ICE handles watchdog started
+[Thu Mar 15 15:24:03 2018] Setting max NACK queue to 300ms
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m entering no_media_timer
+[Thu Mar 15 15:24:03 2018] Crypto: OpenSSL pre-1.1.0
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Thu Mar 15 15:24:03 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Thu Mar 15 15:24:03 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Thu Mar 15 15:24:03 2018] Loading plugin 'libjanus_echotest.so'...
+[Thu Mar 15 15:24:03 2018] JANUS EchoTest plugin created!
+[Thu Mar 15 15:24:03 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Thu Mar 15 15:24:03 2018] [janus.plugin.echotest.cfg]
+[Thu Mar 15 15:24:03 2018]     [general]
+[Thu Mar 15 15:24:03 2018] JANUS EchoTest plugin initialized!
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Thu Mar 15 15:24:03 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Thu Mar 15 15:24:03 2018] Sessions watchdog started
+[Thu Mar 15 15:24:03 2018] Joining EchoTest handler thread
+[Thu Mar 15 15:24:03 2018] EchoTest watchdog started
+[Thu Mar 15 15:24:06 2018] Creating new session: 5270712581094529
+[Thu Mar 15 15:24:08 2018] Creating new handle in session 5270712581094529: 2700316035619425
+[Thu Mar 15 15:24:10 2018] [2700316035619425] There's a message for JANUS EchoTest plugin
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Remote SDP:
+v=0
+o=- 1698891097226989501 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:wqau
+a=ice-pwd:1LUBAXxehAV7GmSu/Or1K0YA
+a=ice-options:trickle
+a=fingerprint:sha-256 12:D9:59:02:89:48:99:3B:59:D2:A0:64:1E:9E:26:46:AF:0E:B5:A4:12:CA:AD:8B:4E:3E:14:6F:EA:9F:F0:9F
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Creating ICE agent (ICE Full mode, controlled)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Adding 10.34.86.121 to the addresses to gather candidates for
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Gathering done for stream 1
+[Thu Mar 15 15:24:10 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Parsing SCTP candidates (stream=1)...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ICE ufrag (local):   wqau
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ICE pwd (local):     1LUBAXxehAV7GmSu/Or1K0YA
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Fingerprint (local) : sha-256 12:D9:59:02:89:48:99:3B:59:D2:A0:64:1E:9E:26:46:AF:0E:B5:A4:12:CA:AD:8B:4E:3E:14:6F:EA:9F:F0:9F
+[Thu Mar 15 15:24:10 2018] [2700316035619425] DTLS setup (local):  actpass
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Setting connect state (DTLS client)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Data Channel mid: data
+[Thu Mar 15 15:24:10 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Thu Mar 15 15:24:10 2018]  -------------------------------------------
+[Thu Mar 15 15:24:10 2018]   >> Anonymized
+[Thu Mar 15 15:24:10 2018]  -------------------------------------------
+[Thu Mar 15 15:24:10 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 1698891097226989501 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Thu Mar 15 15:24:10 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Thu Mar 15 15:24:10 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Thu Mar 15 15:24:10 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 1698891097226989501 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Thu Mar 15 15:24:10 2018]  -------------------------------------------
+[Thu Mar 15 15:24:10 2018]   >> Anonymized
+[Thu Mar 15 15:24:10 2018]  -------------------------------------------
+[Thu Mar 15 15:24:10 2018] [2700316035619425] We have 1 candidates for Stream #1, Component #1
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Address:    10.34.86.121:49043
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Priority:   2013266431
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Foundation: 1
+[Thu Mar 15 15:24:10 2018] [2700316035619425]     1 1 udp 2013266431 10.34.86.121 49043 typ host
+[Thu Mar 15 15:24:10 2018]  -------------------------------------------
+[Thu Mar 15 15:24:10 2018]   >> Merged (521 bytes)
+[Thu Mar 15 15:24:10 2018]  -------------------------------------------
+[Thu Mar 15 15:24:10 2018] v=0
+o=- 1698891097226989501 2 IN IP4 10.34.86.121
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.86.121
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:flKq
+a=ice-pwd:onnbOzOx6gdxBba4ULRY4T
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.86.121 49043 typ host
+a=end-of-candidates
+
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Done! Ready to setup remote candidates and send connectivity checks...
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Sending event to transport...
+[Thu Mar 15 15:24:10 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 15:24:10 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 15:24:10 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 15:24:10 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 15:24:10 2018]   >> Pushing event: 0 (took 890 us)
+[Thu Mar 15 15:24:10 2018] Creating plugin result...
+[Thu Mar 15 15:24:10 2018] Destroying plugin result...
+[Thu Mar 15 15:24:10 2018] [33m[WARN][0m jsondone occured.[Thu Mar 15 15:24:10 2018] [2700316035619425] Trickle candidate (data): candidate:2536289415 1 udp 2113937151 10.34.86.121 40143 typ host generation 0 ufrag wqau network-cost 50
+[Thu Mar 15 15:24:10 2018] [2700316035619425]  Adding remote candidate component:1 stream:1 type:host 10.34.86.121:40143
+[Thu Mar 15 15:24:10 2018] [2700316035619425]  Transport: UDP
+[Thu Mar 15 15:24:10 2018] [2700316035619425]    Candidate added to the list! (1 elements for 1/1)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ICE already started for this component, setting candidates we have up to now
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] >> Remote Stream #1, Component #1
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Address:    10.34.86.121:40143
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Priority:   2113937151
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Foundation: 2536289415
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Username:   wqau
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Password:   1LUBAXxehAV7GmSu/Or1K0YA
+[Thu Mar 15 15:24:10 2018] [2700316035619425]  Setting remote credentials...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Component state changed for component 1 in stream 1: 2 (connecting)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Remote candidates set!
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ICE thread started
+[Thu Mar 15 15:24:10 2018] [ice.c:janus_ice_thread:2663] [2700316035619425] Looping (ICE)...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] New selected pair for component 1 in stream 1: 1 <-> 2536289415
+[Thu Mar 15 15:24:10 2018] [2700316035619425]   Component is ready enough, starting DTLS handshake...
+[Thu Mar 15 15:24:10 2018] Advertizing MTU: 1440
+[Thu Mar 15 15:24:10 2018] janus_dtls_bio_filter_write: 0x874fab8, 199
+[Thu Mar 15 15:24:10 2018]   -- 199
+[Thu Mar 15 15:24:10 2018] New list length: 1
+[Thu Mar 15 15:24:10 2018] janus_dtls_bio_filter_ctrl: 6
+[Thu Mar 15 15:24:10 2018] [2700316035619425] >> Going to send DTLS data: 199 bytes
+[Thu Mar 15 15:24:10 2018] [2700316035619425] >> >> Read 199 bytes from the write_BIO...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] >> >> ... and sent 199 of those bytes on the socket
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Creating retransmission timer with ID 4
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Component state changed for component 1 in stream 1: 3 (connected)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Component state changed for component 1 in stream 1: 4 (ready)
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ICE send thread started...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Looks like DTLS!
+[Thu Mar 15 15:24:10 2018] [2700316035619425]     Written 15 bytes on the read BIO...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] DTLS alert triggered on stream 1 (component 1), closing...
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Telling the plugin about the hangup because of a DTLS alert (JANUS EchoTest plugin)
+[Thu Mar 15 15:24:10 2018] No WebRTC media anymore
+[Thu Mar 15 15:24:10 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = (null)[Thu Mar 15 15:24:10 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "done"}[Thu Mar 15 15:24:10 2018] [33m[WARN][0m incoming message: (null)[Thu Mar 15 15:24:10 2018] [2700316035619425] Sending event to transport...
+[Thu Mar 15 15:24:10 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 15:24:10 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 15:24:10 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 15:24:10 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 15:24:10 2018]   >> Pushing event: 0 (Success)
+[Thu Mar 15 15:24:10 2018] [2700316035619425]     ... and read -1 of them from SSL...
+[Thu Mar 15 15:24:10 2018] [31m[ERR][0m [dtls.c:janus_dtls_srtp_incoming_msg:628] [2700316035619425] Handshake error: error:14102410:SSL routines:DTLS1_READ_BYTES:sslv3 alert handshake failure
+[Thu Mar 15 15:24:10 2018] janus_dtls_bio_filter_ctrl: 7
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Notifying WebRTC hangup
+[Thu Mar 15 15:24:10 2018] [2700316035619425] Sending event to transport...
+[Thu Mar 15 15:24:10 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Thu Mar 15 15:24:10 2018] [33m[WARN][0m No transport, free the event[Thu Mar 15 15:24:10 2018] [33m[WARN][0m HERE BEFORE[Thu Mar 15 15:24:10 2018] [33m[WARN][0m And HERE AFTER[Thu Mar 15 15:24:10 2018] [2700316035619425] WebRTC resources freed
+[Thu Mar 15 15:24:10 2018] [2700316035619425] ICE thread ended!
+Stopping gateway, please wait...
+[Thu Mar 15 15:24:24 2018] Ending watchdog mainloop...
+[Thu Mar 15 15:24:24 2018] Destroying sessions...
+[Thu Mar 15 15:24:24 2018] Freeing crypto resources...
+[Thu Mar 15 15:24:24 2018] De-initializing SCTP...
+[Thu Mar 15 15:24:24 2018] Ending ICE handles watchdog mainloop...
+[Thu Mar 15 15:24:24 2018] Closing plugins.
+[Thu Mar 15 15:24:24 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Thu Mar 15 15:24:24 2018] Leaving EchoTest handler thread
+[Thu Mar 15 15:24:25 2018] EchoTest watchdog stopped
+[Thu Mar 15 15:24:25 2018] JANUS EchoTest plugin destroyed!
+[Thu Mar 15 15:24:25 2018] Closing plugins: PLUGINS_SO IS NULL
+[Thu Mar 15 15:24:25 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Fri Mar 16 16:31:53 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Fri Mar 16 16:31:53 2018] TURN REST API backend: (disabled)
+[Fri Mar 16 16:31:53 2018] Setting max NACK queue to 300ms
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m entering no_media_timer
+[Fri Mar 16 16:31:53 2018] Crypto: OpenSSL pre-1.1.0
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Fri Mar 16 16:31:53 2018] ICE handles watchdog started
+[Fri Mar 16 16:31:53 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Fri Mar 16 16:31:53 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Fri Mar 16 16:31:53 2018] Loading plugin 'libjanus_echotest.so'...
+[Fri Mar 16 16:31:53 2018] Sessions watchdog started
+[Fri Mar 16 16:31:53 2018] JANUS EchoTest plugin created!
+[Fri Mar 16 16:31:53 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Fri Mar 16 16:31:53 2018] [janus.plugin.echotest.cfg]
+[Fri Mar 16 16:31:53 2018]     [general]
+[Fri Mar 16 16:31:53 2018] JANUS EchoTest plugin initialized!
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Fri Mar 16 16:31:53 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Fri Mar 16 16:31:53 2018] Joining EchoTest handler thread
+[Fri Mar 16 16:31:53 2018] EchoTest watchdog started
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Fri Mar 16 16:32:58 2018] Ending watchdog mainloop...
+[Fri Mar 16 16:32:58 2018] Destroying sessions...
+[Fri Mar 16 16:32:58 2018] Freeing crypto resources...
+[Fri Mar 16 16:32:58 2018] De-initializing SCTP...
+[Fri Mar 16 16:32:58 2018] Ending ICE handles watchdog mainloop...
+[Fri Mar 16 16:32:58 2018] Closing plugins.
+[Fri Mar 16 16:32:58 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Fri Mar 16 16:32:58 2018] Leaving EchoTest handler thread
+[Fri Mar 16 16:32:58 2018] EchoTest watchdog stopped
+[Fri Mar 16 16:32:58 2018] JANUS EchoTest plugin destroyed!
+[Fri Mar 16 16:32:58 2018] Closing plugins: PLUGINS_SO IS NULL
+[Fri Mar 16 16:32:58 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Fri Mar 16 16:37:17 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Fri Mar 16 16:37:17 2018] TURN REST API backend: (disabled)
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.75.211) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Fri Mar 16 16:37:17 2018] ICE handles watchdog started
+[Fri Mar 16 16:37:17 2018] Setting max NACK queue to 300ms
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m entering no_media_timer
+[Fri Mar 16 16:37:17 2018] Crypto: OpenSSL pre-1.1.0
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Fri Mar 16 16:37:17 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Fri Mar 16 16:37:17 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Fri Mar 16 16:37:17 2018] Loading plugin 'libjanus_echotest.so'...
+[Fri Mar 16 16:37:17 2018] JANUS EchoTest plugin created!
+[Fri Mar 16 16:37:17 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Fri Mar 16 16:37:17 2018] [janus.plugin.echotest.cfg]
+[Fri Mar 16 16:37:17 2018]     [general]
+[Fri Mar 16 16:37:17 2018] JANUS EchoTest plugin initialized!
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Fri Mar 16 16:37:17 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Fri Mar 16 16:37:17 2018] Sessions watchdog started
+[Fri Mar 16 16:37:17 2018] Joining EchoTest handler thread
+[Fri Mar 16 16:37:17 2018] EchoTest watchdog started
+[Fri Mar 16 16:37:29 2018] Creating new session: 5435917728925197
+[Fri Mar 16 16:37:31 2018] Creating new handle in session 5435917728925197: 6720611457801107
+[Fri Mar 16 16:37:35 2018] [6720611457801107] There's a message for JANUS EchoTest plugin
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Remote SDP:
+v=0
+o=- 7995544256129305815 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:eBYz
+a=ice-pwd:rx++6Fem1MVsC1Bp4QREmLYb
+a=ice-options:trickle
+a=fingerprint:sha-256 C8:10:33:6A:CF:A6:CC:02:CB:14:14:FA:CF:5E:0C:2F:39:A0:94:23:90:43:1C:8A:B9:82:11:36:11:06:E7:89
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Creating ICE agent (ICE Full mode, controlled)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Adding 10.34.75.211 to the addresses to gather candidates for
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Gathering done for stream 1
+[Fri Mar 16 16:37:35 2018] janus_dtls_bio_filter_ctrl: 6
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Parsing SCTP candidates (stream=1)...
+[Fri Mar 16 16:37:35 2018] [6720611457801107] ICE ufrag (local):   eBYz
+[Fri Mar 16 16:37:35 2018] [6720611457801107] ICE pwd (local):     rx++6Fem1MVsC1Bp4QREmLYb
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Fingerprint (local) : sha-256 C8:10:33:6A:CF:A6:CC:02:CB:14:14:FA:CF:5E:0C:2F:39:A0:94:23:90:43:1C:8A:B9:82:11:36:11:06:E7:89
+[Fri Mar 16 16:37:35 2018] [6720611457801107] DTLS setup (local):  actpass
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Setting connect state (DTLS client)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Data Channel mid: data
+[Fri Mar 16 16:37:35 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Fri Mar 16 16:37:35 2018]  -------------------------------------------
+[Fri Mar 16 16:37:35 2018]   >> Anonymized
+[Fri Mar 16 16:37:35 2018]  -------------------------------------------
+[Fri Mar 16 16:37:35 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 7995544256129305815 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Fri Mar 16 16:37:35 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Fri Mar 16 16:37:35 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Fri Mar 16 16:37:35 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 7995544256129305815 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Fri Mar 16 16:37:35 2018]  -------------------------------------------
+[Fri Mar 16 16:37:35 2018]   >> Anonymized
+[Fri Mar 16 16:37:35 2018]  -------------------------------------------
+[Fri Mar 16 16:37:35 2018] [6720611457801107] We have 1 candidates for Stream #1, Component #1
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Address:    10.34.75.211:37753
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Priority:   2013266431
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Foundation: 1
+[Fri Mar 16 16:37:35 2018] [6720611457801107]     1 1 udp 2013266431 10.34.75.211 37753 typ host
+[Fri Mar 16 16:37:35 2018]  -------------------------------------------
+[Fri Mar 16 16:37:35 2018]   >> Merged (521 bytes)
+[Fri Mar 16 16:37:35 2018]  -------------------------------------------
+[Fri Mar 16 16:37:35 2018] v=0
+o=- 7995544256129305815 2 IN IP4 10.34.75.211
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.75.211
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:qBIM
+a=ice-pwd:SYdZZZzbgQ4xOTDs8cll9+
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.75.211 37753 typ host
+a=end-of-candidates
+
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Done! Ready to setup remote candidates and send connectivity checks...
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Sending event to transport...
+[Fri Mar 16 16:37:35 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Fri Mar 16 16:37:35 2018] [33m[WARN][0m No transport, free the event[Fri Mar 16 16:37:35 2018] [33m[WARN][0m HERE BEFORE[Fri Mar 16 16:37:35 2018] [33m[WARN][0m And HERE AFTER[Fri Mar 16 16:37:35 2018]   >> Pushing event: 0 (took 903 us)
+[Fri Mar 16 16:37:35 2018] Creating plugin result...
+[Fri Mar 16 16:37:35 2018] Destroying plugin result...
+[Fri Mar 16 16:37:35 2018] [33m[WARN][0m jsondone occured.[Fri Mar 16 16:37:35 2018] [6720611457801107] ICE thread started
+[Fri Mar 16 16:37:35 2018] [ice.c:janus_ice_thread:2663] [6720611457801107] Looping (ICE)...
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Trickle candidate (data): candidate:120485067 1 udp 2113937151 10.34.75.211 43855 typ host generation 0 ufrag eBYz network-cost 50
+[Fri Mar 16 16:37:35 2018] [6720611457801107]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:43855
+[Fri Mar 16 16:37:35 2018] [6720611457801107]  Transport: UDP
+[Fri Mar 16 16:37:35 2018] [6720611457801107]    Candidate added to the list! (1 elements for 1/1)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] ICE already started for this component, setting candidates we have up to now
+[Fri Mar 16 16:37:35 2018] [6720611457801107] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] >> Remote Stream #1, Component #1
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Address:    10.34.75.211:43855
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Priority:   2113937151
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Foundation: 120485067
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Username:   eBYz
+[Fri Mar 16 16:37:35 2018] [6720611457801107]   Password:   rx++6Fem1MVsC1Bp4QREmLYb
+[Fri Mar 16 16:37:35 2018] [6720611457801107]  Setting remote credentials...
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Component state changed for component 1 in stream 1: 2 (connecting)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Remote candidates set!
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Component state changed for component 1 in stream 1: 3 (connected)
+[Fri Mar 16 16:37:35 2018] [6720611457801107] ICE send thread started...
+[Fri Mar 16 16:37:35 2018] [6720611457801107] Component state changed for component 1 in stream 1: 4 (ready)
+Stopping gateway, please wait...
+[Fri Mar 16 16:40:16 2018] Ending watchdog mainloop...
+[Fri Mar 16 16:40:16 2018] Destroying sessions...
+[Fri Mar 16 16:40:16 2018] Freeing crypto resources...
+[Fri Mar 16 16:40:16 2018] De-initializing SCTP...
+[Fri Mar 16 16:40:16 2018] Ending ICE handles watchdog mainloop...
+[Fri Mar 16 16:40:16 2018] Closing plugins.
+[Fri Mar 16 16:40:16 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Fri Mar 16 16:40:16 2018] Leaving EchoTest handler thread
+[Fri Mar 16 16:40:17 2018] EchoTest watchdog stopped
+[Fri Mar 16 16:40:17 2018] JANUS EchoTest plugin destroyed!
+[Fri Mar 16 16:40:17 2018] Closing plugins: PLUGINS_SO IS NULL
+[Fri Mar 16 16:40:17 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Fri Mar 16 16:40:25 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Fri Mar 16 16:40:25 2018] TURN REST API backend: (disabled)
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.75.211) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Fri Mar 16 16:40:25 2018] ICE handles watchdog started
+[Fri Mar 16 16:40:25 2018] Setting max NACK queue to 300ms
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m entering no_media_timer
+[Fri Mar 16 16:40:25 2018] Crypto: OpenSSL pre-1.1.0
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Fri Mar 16 16:40:25 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Fri Mar 16 16:40:25 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Fri Mar 16 16:40:25 2018] Loading plugin 'libjanus_echotest.so'...
+[Fri Mar 16 16:40:25 2018] JANUS EchoTest plugin created!
+[Fri Mar 16 16:40:25 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Fri Mar 16 16:40:25 2018] [janus.plugin.echotest.cfg]
+[Fri Mar 16 16:40:25 2018]     [general]
+[Fri Mar 16 16:40:25 2018] JANUS EchoTest plugin initialized!
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Fri Mar 16 16:40:25 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Fri Mar 16 16:40:25 2018] Sessions watchdog started
+[Fri Mar 16 16:40:25 2018] Joining EchoTest handler thread
+[Fri Mar 16 16:40:25 2018] EchoTest watchdog started
+[Fri Mar 16 16:40:34 2018] Creating new session: 6735142666048015
+[Fri Mar 16 16:40:37 2018] Creating new handle in session 6735142666048015: 2922110161108052
+[Fri Mar 16 16:40:40 2018] [2922110161108052] There's a message for JANUS EchoTest plugin
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Remote SDP:
+v=0
+o=- 5215157625703785295 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:rQI+
+a=ice-pwd:KVGJjftpEK6364Zw1fX5mdy5
+a=ice-options:trickle
+a=fingerprint:sha-256 B5:74:2A:86:4E:7C:E9:70:9C:C0:23:B8:44:7D:D6:D3:F0:EB:A1:3F:3B:E8:BC:47:69:D2:B1:7D:85:75:BA:2C
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Creating ICE agent (ICE Full mode, controlled)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Adding 10.34.75.211 to the addresses to gather candidates for
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Gathering done for stream 1
+[Fri Mar 16 16:40:40 2018] janus_dtls_bio_filter_ctrl: 6
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Parsing SCTP candidates (stream=1)...
+[Fri Mar 16 16:40:40 2018] [2922110161108052] ICE ufrag (local):   rQI+
+[Fri Mar 16 16:40:40 2018] [2922110161108052] ICE pwd (local):     KVGJjftpEK6364Zw1fX5mdy5
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Fingerprint (local) : sha-256 B5:74:2A:86:4E:7C:E9:70:9C:C0:23:B8:44:7D:D6:D3:F0:EB:A1:3F:3B:E8:BC:47:69:D2:B1:7D:85:75:BA:2C
+[Fri Mar 16 16:40:40 2018] [2922110161108052] DTLS setup (local):  actpass
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Setting connect state (DTLS client)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Data Channel mid: data
+[Fri Mar 16 16:40:40 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Fri Mar 16 16:40:40 2018]  -------------------------------------------
+[Fri Mar 16 16:40:40 2018]   >> Anonymized
+[Fri Mar 16 16:40:40 2018]  -------------------------------------------
+[Fri Mar 16 16:40:40 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 5215157625703785295 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Fri Mar 16 16:40:40 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Fri Mar 16 16:40:40 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Fri Mar 16 16:40:40 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 5215157625703785295 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Fri Mar 16 16:40:40 2018]  -------------------------------------------
+[Fri Mar 16 16:40:40 2018]   >> Anonymized
+[Fri Mar 16 16:40:40 2018]  -------------------------------------------
+[Fri Mar 16 16:40:40 2018] [2922110161108052] We have 1 candidates for Stream #1, Component #1
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Address:    10.34.75.211:45813
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Priority:   2013266431
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Foundation: 1
+[Fri Mar 16 16:40:40 2018] [2922110161108052]     1 1 udp 2013266431 10.34.75.211 45813 typ host
+[Fri Mar 16 16:40:40 2018]  -------------------------------------------
+[Fri Mar 16 16:40:40 2018]   >> Merged (521 bytes)
+[Fri Mar 16 16:40:40 2018]  -------------------------------------------
+[Fri Mar 16 16:40:40 2018] v=0
+o=- 5215157625703785295 2 IN IP4 10.34.75.211
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.75.211
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:zpKZ
+a=ice-pwd:OzjhlNNH+/Rvf6go7HcE45
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.75.211 45813 typ host
+a=end-of-candidates
+
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Done! Ready to setup remote candidates and send connectivity checks...
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Sending event to transport...
+[Fri Mar 16 16:40:40 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Fri Mar 16 16:40:40 2018] [33m[WARN][0m No transport, free the event[Fri Mar 16 16:40:40 2018] [33m[WARN][0m HERE BEFORE[Fri Mar 16 16:40:40 2018] [33m[WARN][0m And HERE AFTER[Fri Mar 16 16:40:40 2018]   >> Pushing event: 0 (took 1155 us)
+[Fri Mar 16 16:40:40 2018] Creating plugin result...
+[Fri Mar 16 16:40:40 2018] Destroying plugin result...
+[Fri Mar 16 16:40:40 2018] [33m[WARN][0m jsondone occured.[Fri Mar 16 16:40:40 2018] [2922110161108052] ICE thread started
+[Fri Mar 16 16:40:40 2018] [ice.c:janus_ice_thread:2663] [2922110161108052] Looping (ICE)...
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Trickle candidate (data): candidate:120485067 1 udp 2113937151 10.34.75.211 47847 typ host generation 0 ufrag rQI+ network-cost 50
+[Fri Mar 16 16:40:40 2018] [2922110161108052]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:47847
+[Fri Mar 16 16:40:40 2018] [2922110161108052]  Transport: UDP
+[Fri Mar 16 16:40:40 2018] [2922110161108052]    Candidate added to the list! (1 elements for 1/1)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] ICE already started for this component, setting candidates we have up to now
+[Fri Mar 16 16:40:40 2018] [2922110161108052] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] >> Remote Stream #1, Component #1
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Address:    10.34.75.211:47847
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Priority:   2113937151
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Foundation: 120485067
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Username:   rQI+
+[Fri Mar 16 16:40:40 2018] [2922110161108052]   Password:   KVGJjftpEK6364Zw1fX5mdy5
+[Fri Mar 16 16:40:40 2018] [2922110161108052]  Setting remote credentials...
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Component state changed for component 1 in stream 1: 2 (connecting)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Remote candidates set!
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Component state changed for component 1 in stream 1: 3 (connected)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] Component state changed for component 1 in stream 1: 4 (ready)
+[Fri Mar 16 16:40:40 2018] [2922110161108052] ICE send thread started...
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Fri Mar 16 16:42:36 2018] Ending watchdog mainloop...
+[Fri Mar 16 16:42:36 2018] Destroying sessions...
+[Fri Mar 16 16:42:36 2018] Freeing crypto resources...
+[Fri Mar 16 16:42:36 2018] De-initializing SCTP...
+[Fri Mar 16 16:42:36 2018] Ending ICE handles watchdog mainloop...
+[Fri Mar 16 16:42:36 2018] Closing plugins.
+[Fri Mar 16 16:42:36 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Fri Mar 16 16:42:36 2018] Leaving EchoTest handler thread
+[Fri Mar 16 16:42:36 2018] EchoTest watchdog stopped
+[Fri Mar 16 16:42:36 2018] JANUS EchoTest plugin destroyed!
+[Fri Mar 16 16:42:36 2018] Closing plugins: PLUGINS_SO IS NULL
+[Fri Mar 16 16:42:36 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Fri Mar 16 16:42:39 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Fri Mar 16 16:42:39 2018] TURN REST API backend: (disabled)
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.75.211) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Fri Mar 16 16:42:39 2018] ICE handles watchdog started
+[Fri Mar 16 16:42:39 2018] Setting max NACK queue to 300ms
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m entering no_media_timer
+[Fri Mar 16 16:42:39 2018] Crypto: OpenSSL pre-1.1.0
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Fri Mar 16 16:42:39 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Fri Mar 16 16:42:39 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Fri Mar 16 16:42:39 2018] Loading plugin 'libjanus_echotest.so'...
+[Fri Mar 16 16:42:39 2018] JANUS EchoTest plugin created!
+[Fri Mar 16 16:42:39 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Fri Mar 16 16:42:39 2018] [janus.plugin.echotest.cfg]
+[Fri Mar 16 16:42:39 2018]     [general]
+[Fri Mar 16 16:42:39 2018] JANUS EchoTest plugin initialized!
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Fri Mar 16 16:42:39 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Fri Mar 16 16:42:39 2018] Sessions watchdog started
+[Fri Mar 16 16:42:39 2018] Joining EchoTest handler thread
+[Fri Mar 16 16:42:39 2018] EchoTest watchdog started
+[Fri Mar 16 16:42:47 2018] Creating new session: 4279879712906490
+[Fri Mar 16 16:42:49 2018] Creating new handle in session 4279879712906490: 8910192994290457
+[Fri Mar 16 16:42:51 2018] [8910192994290457] There's a message for JANUS EchoTest plugin
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Remote SDP:
+v=0
+o=- 3871432845767650783 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=ice-ufrag:KdAb
+a=ice-pwd:bPc/hIoBLnGCg02Crf5SEb43
+a=ice-options:trickle
+a=fingerprint:sha-256 DB:74:1A:C6:E4:7C:D0:B8:C8:C0:5E:97:AA:33:2B:B6:D6:58:D7:DC:7C:4E:3F:FC:FE:84:6C:62:1D:A0:C4:DB
+a=setup:actpass
+a=mid:data
+a=sctpmap:5000 webrtc-datachannel 1024
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Creating ICE agent (ICE Full mode, controlled)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Adding 10.34.75.211 to the addresses to gather candidates for
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Gathering done for stream 1
+[Fri Mar 16 16:42:51 2018] janus_dtls_bio_filter_ctrl: 6
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Parsing SCTP candidates (stream=1)...
+[Fri Mar 16 16:42:51 2018] [8910192994290457] ICE ufrag (local):   KdAb
+[Fri Mar 16 16:42:51 2018] [8910192994290457] ICE pwd (local):     bPc/hIoBLnGCg02Crf5SEb43
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Fingerprint (local) : sha-256 DB:74:1A:C6:E4:7C:D0:B8:C8:C0:5E:97:AA:33:2B:B6:D6:58:D7:DC:7C:4E:3F:FC:FE:84:6C:62:1D:A0:C4:DB
+[Fri Mar 16 16:42:51 2018] [8910192994290457] DTLS setup (local):  actpass
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Setting connect state (DTLS client)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Data Channel mid: data
+[Fri Mar 16 16:42:51 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 1024
+[Fri Mar 16 16:42:51 2018]  -------------------------------------------
+[Fri Mar 16 16:42:51 2018]   >> Anonymized
+[Fri Mar 16 16:42:51 2018]  -------------------------------------------
+[Fri Mar 16 16:42:51 2018] This is involving a negotiation (offer) as well:
+v=0
+o=- 3871432845767650783 2 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Fri Mar 16 16:42:51 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Fri Mar 16 16:42:51 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Fri Mar 16 16:42:51 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=- 3871432845767650783 2 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Fri Mar 16 16:42:51 2018]  -------------------------------------------
+[Fri Mar 16 16:42:51 2018]   >> Anonymized
+[Fri Mar 16 16:42:51 2018]  -------------------------------------------
+[Fri Mar 16 16:42:51 2018] [8910192994290457] We have 1 candidates for Stream #1, Component #1
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Address:    10.34.75.211:39783
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Priority:   2013266431
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Foundation: 1
+[Fri Mar 16 16:42:51 2018] [8910192994290457]     1 1 udp 2013266431 10.34.75.211 39783 typ host
+[Fri Mar 16 16:42:51 2018]  -------------------------------------------
+[Fri Mar 16 16:42:51 2018]   >> Merged (521 bytes)
+[Fri Mar 16 16:42:51 2018]  -------------------------------------------
+[Fri Mar 16 16:42:51 2018] v=0
+o=- 3871432845767650783 2 IN IP4 10.34.75.211
+s=-
+t=0 0
+a=group:BUNDLE data
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.75.211
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:data
+a=ice-ufrag:IUIb
+a=ice-pwd:l+FTOtl7FgCu7Dn4rap2hE
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.75.211 39783 typ host
+a=end-of-candidates
+
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Done! Ready to setup remote candidates and send connectivity checks...
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Sending event to transport...
+[Fri Mar 16 16:42:51 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Fri Mar 16 16:42:51 2018] [33m[WARN][0m No transport, free the event[Fri Mar 16 16:42:51 2018] [33m[WARN][0m HERE BEFORE[Fri Mar 16 16:42:51 2018] [33m[WARN][0m And HERE AFTER[Fri Mar 16 16:42:51 2018]   >> Pushing event: 0 (took 862 us)
+[Fri Mar 16 16:42:51 2018] Creating plugin result...
+[Fri Mar 16 16:42:51 2018] Destroying plugin result...
+[Fri Mar 16 16:42:51 2018] [33m[WARN][0m jsondone occured.[Fri Mar 16 16:42:51 2018] [8910192994290457] ICE thread started
+[Fri Mar 16 16:42:51 2018] [ice.c:janus_ice_thread:2663] [8910192994290457] Looping (ICE)...
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Trickle candidate (data): candidate:120485067 1 udp 2113937151 10.34.75.211 48428 typ host generation 0 ufrag KdAb network-cost 50
+[Fri Mar 16 16:42:51 2018] [8910192994290457]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:48428
+[Fri Mar 16 16:42:51 2018] [8910192994290457]  Transport: UDP
+[Fri Mar 16 16:42:51 2018] [8910192994290457]    Candidate added to the list! (1 elements for 1/1)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] ICE already started for this component, setting candidates we have up to now
+[Fri Mar 16 16:42:51 2018] [8910192994290457] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] >> Remote Stream #1, Component #1
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Address:    10.34.75.211:48428
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Priority:   2113937151
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Foundation: 120485067
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Username:   KdAb
+[Fri Mar 16 16:42:51 2018] [8910192994290457]   Password:   bPc/hIoBLnGCg02Crf5SEb43
+[Fri Mar 16 16:42:51 2018] [8910192994290457]  Setting remote credentials...
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Component state changed for component 1 in stream 1: 2 (connecting)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Remote candidates set!
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Component state changed for component 1 in stream 1: 3 (connected)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] Component state changed for component 1 in stream 1: 4 (ready)
+[Fri Mar 16 16:42:51 2018] [8910192994290457] ICE send thread started...
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Fri Mar 16 16:43:16 2018] Ending watchdog mainloop...
+[Fri Mar 16 16:43:16 2018] Destroying sessions...
+[Fri Mar 16 16:43:16 2018] Freeing crypto resources...
+[Fri Mar 16 16:43:16 2018] De-initializing SCTP...
+[Fri Mar 16 16:43:16 2018] Ending ICE handles watchdog mainloop...
+[Fri Mar 16 16:43:16 2018] Closing plugins.
+[Fri Mar 16 16:43:16 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Fri Mar 16 16:43:16 2018] Leaving EchoTest handler thread
+[Fri Mar 16 16:43:16 2018] EchoTest watchdog stopped
+[Fri Mar 16 16:43:16 2018] JANUS EchoTest plugin destroyed!
+[Fri Mar 16 16:43:16 2018] Closing plugins: PLUGINS_SO IS NULL
+[Fri Mar 16 16:43:16 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Fri Mar 16 16:43:57 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Fri Mar 16 16:43:57 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Fri Mar 16 16:43:57 2018] ICE handles watchdog started
+[Fri Mar 16 16:43:57 2018] TURN REST API backend: (disabled)
+[Fri Mar 16 16:43:57 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.75.211) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Fri Mar 16 16:43:57 2018] Setting max NACK queue to 300ms
+[Fri Mar 16 16:43:57 2018] [33m[WARN][0m entering no_media_timer
+[Fri Mar 16 16:43:57 2018] Crypto: OpenSSL pre-1.1.0
+[Fri Mar 16 16:43:57 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Fri Mar 16 16:43:57 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Fri Mar 16 16:43:58 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Fri Mar 16 16:43:58 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Fri Mar 16 16:43:58 2018] Loading plugin 'libjanus_echotest.so'...
+[Fri Mar 16 16:43:58 2018] JANUS EchoTest plugin created!
+[Fri Mar 16 16:43:58 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Fri Mar 16 16:43:58 2018] [janus.plugin.echotest.cfg]
+[Fri Mar 16 16:43:58 2018]     [general]
+[Fri Mar 16 16:43:58 2018] JANUS EchoTest plugin initialized!
+[Fri Mar 16 16:43:58 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Fri Mar 16 16:43:58 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Fri Mar 16 16:43:58 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Fri Mar 16 16:43:58 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Fri Mar 16 16:43:58 2018] Sessions watchdog started
+[Fri Mar 16 16:43:58 2018] Joining EchoTest handler thread
+[Fri Mar 16 16:43:58 2018] EchoTest watchdog started
+[Fri Mar 16 16:44:04 2018] Creating new session: 4375510437055638
+[Fri Mar 16 16:44:06 2018] Creating new handle in session 4375510437055638: 4291177645577538
+[Fri Mar 16 16:44:08 2018] [4291177645577538] There's a message for JANUS EchoTest plugin
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Remote SDP:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 2047436642232748592 0 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 D5:2E:13:43:3C:42:89:E6:AC:4E:DA:27:64:FB:4C:5D:16:37:6C:35:B9:E6:E5:4B:61:B4:03:51:09:0F:60:4C
+a=group:BUNDLE sdparta_0
+a=ice-options:trickle
+a=msid-semantic:WMS *
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=sendrecv
+a=ice-pwd:77b76a68a6830cfcdedd495034a4c77e
+a=ice-ufrag:4fb4c304
+a=mid:sdparta_0
+a=sctpmap:5000 webrtc-datachannel 256
+a=setup:actpass
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Creating ICE agent (ICE Full mode, controlled)
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Adding 10.34.75.211 to the addresses to gather candidates for
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Gathering done for stream 1
+[Fri Mar 16 16:44:08 2018] janus_dtls_bio_filter_ctrl: 6
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Fingerprint (global) : sha-256 D5:2E:13:43:3C:42:89:E6:AC:4E:DA:27:64:FB:4C:5D:16:37:6C:35:B9:E6:E5:4B:61:B4:03:51:09:0F:60:4C
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Parsing SCTP candidates (stream=1)...
+[Fri Mar 16 16:44:08 2018] [4291177645577538] ICE pwd (local):     77b76a68a6830cfcdedd495034a4c77e
+[Fri Mar 16 16:44:08 2018] [4291177645577538] ICE ufrag (local):   4fb4c304
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Data Channel mid: sdparta_0
+[Fri Mar 16 16:44:08 2018] [4291177645577538] DTLS setup (local):  actpass
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Setting connect state (DTLS client)
+[Fri Mar 16 16:44:08 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 256
+[Fri Mar 16 16:44:08 2018]  -------------------------------------------
+[Fri Mar 16 16:44:08 2018]   >> Anonymized
+[Fri Mar 16 16:44:08 2018]  -------------------------------------------
+[Fri Mar 16 16:44:08 2018] This is involving a negotiation (offer) as well:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 2047436642232748592 0 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Fri Mar 16 16:44:08 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Fri Mar 16 16:44:08 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Fri Mar 16 16:44:08 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=mozilla...THIS_IS_SDPARTA-56.0 2047436642232748592 0 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Fri Mar 16 16:44:08 2018]  -------------------------------------------
+[Fri Mar 16 16:44:08 2018]   >> Anonymized
+[Fri Mar 16 16:44:08 2018]  -------------------------------------------
+[Fri Mar 16 16:44:08 2018] [4291177645577538] We have 1 candidates for Stream #1, Component #1
+[Fri Mar 16 16:44:08 2018] [4291177645577538]   Address:    10.34.75.211:37915
+[Fri Mar 16 16:44:08 2018] [4291177645577538]   Priority:   2013266431
+[Fri Mar 16 16:44:08 2018] [4291177645577538]   Foundation: 1
+[Fri Mar 16 16:44:08 2018] [4291177645577538]     1 1 udp 2013266431 10.34.75.211 37915 typ host
+[Fri Mar 16 16:44:08 2018]  -------------------------------------------
+[Fri Mar 16 16:44:08 2018]   >> Merged (557 bytes)
+[Fri Mar 16 16:44:08 2018]  -------------------------------------------
+[Fri Mar 16 16:44:08 2018] v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 1521233048738240 1 IN IP4 10.34.75.211
+s=-
+t=0 0
+a=group:BUNDLE sdparta_0
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.75.211
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:sdparta_0
+a=ice-ufrag:d0Tq
+a=ice-pwd:yO1ar6ozCAPurVigXVsj6v
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.75.211 37915 typ host
+a=end-of-candidates
+
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Done! Ready to setup remote candidates and send connectivity checks...
+[Fri Mar 16 16:44:08 2018] [4291177645577538]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Fri Mar 16 16:44:08 2018] [4291177645577538] Sending event to transport...
+[Fri Mar 16 16:44:08 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Fri Mar 16 16:44:08 2018] [33m[WARN][0m No transport, free the event[Fri Mar 16 16:44:08 2018] [33m[WARN][0m HERE BEFORE[Fri Mar 16 16:44:08 2018] [33m[WARN][0m And HERE AFTER[Fri Mar 16 16:44:08 2018]   >> Pushing event: 0 (took 898 us)
+[Fri Mar 16 16:44:08 2018] Creating plugin result...
+[Fri Mar 16 16:44:08 2018] Destroying plugin result...
+[Fri Mar 16 16:44:08 2018] [33m[WARN][0m jsondone occured.[Fri Mar 16 16:44:08 2018] [4291177645577538] ICE thread started
+[Fri Mar 16 16:44:08 2018] [ice.c:janus_ice_thread:2663] [4291177645577538] Looping (ICE)...
+[Fri Mar 16 16:44:09 2018] [4291177645577538] Trickle candidate (sdparta_0): candidate:0 1 UDP 2122252543 10.34.75.211 41687 typ host
+[Fri Mar 16 16:44:09 2018] [4291177645577538]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:41687
+[Fri Mar 16 16:44:09 2018] [4291177645577538]  Transport: UDP
+[Fri Mar 16 16:44:09 2018] [4291177645577538]    Candidate added to the list! (1 elements for 1/1)
+[Fri Mar 16 16:44:09 2018] [4291177645577538] ICE already started for this component, setting candidates we have up to now
+[Fri Mar 16 16:44:09 2018] [4291177645577538] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Fri Mar 16 16:44:09 2018] [4291177645577538] >> Remote Stream #1, Component #1
+[Fri Mar 16 16:44:09 2018] [4291177645577538]   Address:    10.34.75.211:41687
+[Fri Mar 16 16:44:09 2018] [4291177645577538]   Priority:   2122252543
+[Fri Mar 16 16:44:09 2018] [4291177645577538]   Foundation: 0
+[Fri Mar 16 16:44:09 2018] [4291177645577538]   Username:   4fb4c304
+[Fri Mar 16 16:44:09 2018] [4291177645577538]   Password:   77b76a68a6830cfcdedd495034a4c77e
+[Fri Mar 16 16:44:09 2018] [4291177645577538]  Setting remote credentials...
+[Fri Mar 16 16:44:09 2018] [4291177645577538] Component state changed for component 1 in stream 1: 2 (connecting)
+[Fri Mar 16 16:44:09 2018] [4291177645577538] Remote candidates set!
+[Fri Mar 16 16:44:09 2018] [4291177645577538] Trickle candidate (sdparta_0): candidate:1 1 TCP 2105524479 10.34.75.211 9 typ host tcptype active
+[Fri Mar 16 16:44:09 2018] [4291177645577538]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:9
+[Fri Mar 16 16:44:09 2018] [4291177645577538]    Skipping unsupported transport 'TCP' for media
+[Fri Mar 16 16:44:09 2018] [4291177645577538] Component state changed for component 1 in stream 1: 3 (connected)
+[Fri Mar 16 16:44:09 2018] [4291177645577538] Component state changed for component 1 in stream 1: 4 (ready)
+[Fri Mar 16 16:44:09 2018] [4291177645577538] ICE send thread started...
+[Fri Mar 16 16:46:00 2018] Creating new session: 8567698085607826
+[Fri Mar 16 16:46:02 2018] Creating new handle in session 8567698085607826: 2604093629810447
+[Fri Mar 16 16:46:05 2018] [2604093629810447] There's a message for JANUS EchoTest plugin
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Remote SDP:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 8025573580091835340 0 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 4D:53:10:AB:6D:6B:71:04:67:54:25:CF:DF:9F:CA:A7:54:9F:AF:45:C1:89:31:0A:CA:B6:1A:25:07:10:F1:DF
+a=group:BUNDLE sdparta_0
+a=ice-options:trickle
+a=msid-semantic:WMS *
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=sendrecv
+a=ice-pwd:05fa36c40b71931b9fe1ef3363a142e8
+a=ice-ufrag:2842ff5d
+a=mid:sdparta_0
+a=sctpmap:5000 webrtc-datachannel 256
+a=setup:actpass
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Creating ICE agent (ICE Full mode, controlled)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Adding 10.34.75.211 to the addresses to gather candidates for
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Gathering done for stream 1
+[Fri Mar 16 16:46:05 2018] janus_dtls_bio_filter_ctrl: 6
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Fingerprint (global) : sha-256 4D:53:10:AB:6D:6B:71:04:67:54:25:CF:DF:9F:CA:A7:54:9F:AF:45:C1:89:31:0A:CA:B6:1A:25:07:10:F1:DF
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Parsing SCTP candidates (stream=1)...
+[Fri Mar 16 16:46:05 2018] [2604093629810447] ICE pwd (local):     05fa36c40b71931b9fe1ef3363a142e8
+[Fri Mar 16 16:46:05 2018] [2604093629810447] ICE ufrag (local):   2842ff5d
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Data Channel mid: sdparta_0
+[Fri Mar 16 16:46:05 2018] [2604093629810447] DTLS setup (local):  actpass
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Setting connect state (DTLS client)
+[Fri Mar 16 16:46:05 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 256
+[Fri Mar 16 16:46:05 2018]  -------------------------------------------
+[Fri Mar 16 16:46:05 2018]   >> Anonymized
+[Fri Mar 16 16:46:05 2018]  -------------------------------------------
+[Fri Mar 16 16:46:05 2018] Creating plugin result...
+[Fri Mar 16 16:46:05 2018] Destroying plugin result...
+[Fri Mar 16 16:46:05 2018] [33m[WARN][0m jsondone occured.[Fri Mar 16 16:46:05 2018] This is involving a negotiation (offer) as well:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 8025573580091835340 0 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Fri Mar 16 16:46:05 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Fri Mar 16 16:46:05 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Fri Mar 16 16:46:05 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=mozilla...THIS_IS_SDPARTA-56.0 8025573580091835340 0 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Fri Mar 16 16:46:05 2018]  -------------------------------------------
+[Fri Mar 16 16:46:05 2018]   >> Anonymized
+[Fri Mar 16 16:46:05 2018]  -------------------------------------------
+[Fri Mar 16 16:46:05 2018] [2604093629810447] We have 1 candidates for Stream #1, Component #1
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Address:    10.34.75.211:52900
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Priority:   2013266431
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Foundation: 1
+[Fri Mar 16 16:46:05 2018] [2604093629810447]     1 1 udp 2013266431 10.34.75.211 52900 typ host
+[Fri Mar 16 16:46:05 2018]  -------------------------------------------
+[Fri Mar 16 16:46:05 2018]   >> Merged (557 bytes)
+[Fri Mar 16 16:46:05 2018]  -------------------------------------------
+[Fri Mar 16 16:46:05 2018] v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 1521233165139438 1 IN IP4 10.34.75.211
+s=-
+t=0 0
+a=group:BUNDLE sdparta_0
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.75.211
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:sdparta_0
+a=ice-ufrag:zd8e
+a=ice-pwd:zb5q7RzRuswDOYDXtf8Myz
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.75.211 52900 typ host
+a=end-of-candidates
+
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Done! Ready to setup remote candidates and send connectivity checks...
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Sending event to transport...
+[Fri Mar 16 16:46:05 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Fri Mar 16 16:46:05 2018] [33m[WARN][0m No transport, free the event[Fri Mar 16 16:46:05 2018] [33m[WARN][0m HERE BEFORE[Fri Mar 16 16:46:05 2018] [33m[WARN][0m And HERE AFTER[Fri Mar 16 16:46:05 2018]   >> Pushing event: 0 (took 1099 us)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] ICE thread started
+[Fri Mar 16 16:46:05 2018] [ice.c:janus_ice_thread:2663] [2604093629810447] Looping (ICE)...
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Trickle candidate (sdparta_0): candidate:0 1 UDP 2122252543 10.34.75.211 60355 typ host
+[Fri Mar 16 16:46:05 2018] [2604093629810447]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:60355
+[Fri Mar 16 16:46:05 2018] [2604093629810447]  Transport: UDP
+[Fri Mar 16 16:46:05 2018] [2604093629810447]    Candidate added to the list! (1 elements for 1/1)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] ICE already started for this component, setting candidates we have up to now
+[Fri Mar 16 16:46:05 2018] [2604093629810447] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] >> Remote Stream #1, Component #1
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Address:    10.34.75.211:60355
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Priority:   2122252543
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Foundation: 0
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Username:   2842ff5d
+[Fri Mar 16 16:46:05 2018] [2604093629810447]   Password:   05fa36c40b71931b9fe1ef3363a142e8
+[Fri Mar 16 16:46:05 2018] [2604093629810447]  Setting remote credentials...
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Component state changed for component 1 in stream 1: 2 (connecting)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Remote candidates set!
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Trickle candidate (sdparta_0): candidate:1 1 TCP 2105524479 10.34.75.211 9 typ host tcptype active
+[Fri Mar 16 16:46:05 2018] [2604093629810447]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:9
+[Fri Mar 16 16:46:05 2018] [2604093629810447]    Skipping unsupported transport 'TCP' for media
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Component state changed for component 1 in stream 1: 3 (connected)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] Component state changed for component 1 in stream 1: 4 (ready)
+[Fri Mar 16 16:46:05 2018] [2604093629810447] ICE send thread started...
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Fri Mar 16 16:47:33 2018] Ending watchdog mainloop...
+[Fri Mar 16 16:47:33 2018] Destroying sessions...
+[Fri Mar 16 16:47:33 2018] Freeing crypto resources...
+[Fri Mar 16 16:47:33 2018] De-initializing SCTP...
+[Fri Mar 16 16:47:33 2018] Ending ICE handles watchdog mainloop...
+[Fri Mar 16 16:47:33 2018] Closing plugins.
+[Fri Mar 16 16:47:33 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Fri Mar 16 16:47:33 2018] Leaving EchoTest handler thread
+[Fri Mar 16 16:47:33 2018] EchoTest watchdog stopped
+[Fri Mar 16 16:47:33 2018] JANUS EchoTest plugin destroyed!
+[Fri Mar 16 16:47:33 2018] Closing plugins: PLUGINS_SO IS NULL
+[Fri Mar 16 16:47:33 2018] Closing event handlers:
+Bye!
+---------------------------------------------------
+---------------------------------------------------
+
+Adding 'vmnet' to the ICE ignore list...
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m  Check if we need to enable the ICE Lite mode 
+[Fri Mar 16 16:47:36 2018] Initializing ICE stuff (Full mode, ICE-TCP candidates disabled, half-trickle, IPv6 support disabled)
+[Fri Mar 16 16:47:36 2018] TURN REST API backend: (disabled)
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m Janus is deployed on a private address (10.34.75.211) but you didn't specify any STUN server! Expect trouble if this is supposed to work over the internet and not just in a LAN...
+[Fri Mar 16 16:47:36 2018] ICE handles watchdog started
+[Fri Mar 16 16:47:36 2018] Setting max NACK queue to 300ms
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m entering no_media_timer
+[Fri Mar 16 16:47:36 2018] Crypto: OpenSSL pre-1.1.0
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m The libsrtp installation does not support AES-GCM profiles
+[Fri Mar 16 16:47:36 2018] Fingerprint of our certificate: D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+[Fri Mar 16 16:47:36 2018] Plugins folder: /home/globik/kore.io_websocket/websocket_10/plugins
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m LOADING PLUGIN libjanus_echotest.so
+[Fri Mar 16 16:47:36 2018] Loading plugin 'libjanus_echotest.so'...
+[Fri Mar 16 16:47:36 2018] JANUS EchoTest plugin created!
+[Fri Mar 16 16:47:36 2018] Configuration file: /home/globik/kore.io_websocket/websocket_10/configs/janus.plugin.echotest.cfg
+[Fri Mar 16 16:47:36 2018] [janus.plugin.echotest.cfg]
+[Fri Mar 16 16:47:36 2018]     [general]
+[Fri Mar 16 16:47:36 2018] JANUS EchoTest plugin initialized!
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m 	Version: 7 (0.0.7)
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m 	   [janus.plugin.echotest] JANUS EchoTest plugin
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m 	   This is a trivial EchoTest plugin for Janus, just used to showcase the plugin interface.
+[Fri Mar 16 16:47:36 2018] [33m[WARN][0m 	   Plugin API version: 9
+[Fri Mar 16 16:47:36 2018] Sessions watchdog started
+[Fri Mar 16 16:47:36 2018] Joining EchoTest handler thread
+[Fri Mar 16 16:47:36 2018] EchoTest watchdog started
+[Fri Mar 16 16:47:45 2018] Creating new session: 348965503968250
+[Fri Mar 16 16:47:46 2018] Creating new handle in session 348965503968250: 5655819896420564
+[Fri Mar 16 16:47:48 2018] [5655819896420564] There's a message for JANUS EchoTest plugin
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Remote SDP:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 6476916416738298929 0 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 A2:D9:2C:77:43:6F:54:CF:A6:CC:4A:B3:47:31:40:2F:80:48:A1:03:F3:B2:8E:F3:6B:BE:53:B0:0A:DE:8F:72
+a=group:BUNDLE sdparta_0
+a=ice-options:trickle
+a=msid-semantic:WMS *
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 0.0.0.0
+a=sendrecv
+a=ice-pwd:fad02640e1830b032d37656379aa7bf9
+a=ice-ufrag:04af0552
+a=mid:sdparta_0
+a=sctpmap:5000 webrtc-datachannel 256
+a=setup:actpass
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Audio has NOT been negotiated, Video has NOT been negotiated, SCTP/DataChannels have been negotiated
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Setting ICE locally: got OFFER (0 audios, 0 videos)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Creating ICE agent (ICE Full mode, controlled)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Adding 10.34.75.211 to the addresses to gather candidates for
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Gathering done for stream 1
+[Fri Mar 16 16:47:48 2018] janus_dtls_bio_filter_ctrl: 6
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Fingerprint (global) : sha-256 A2:D9:2C:77:43:6F:54:CF:A6:CC:4A:B3:47:31:40:2F:80:48:A1:03:F3:B2:8E:F3:6B:BE:53:B0:0A:DE:8F:72
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Parsing SCTP candidates (stream=1)...
+[Fri Mar 16 16:47:48 2018] [5655819896420564] ICE pwd (local):     fad02640e1830b032d37656379aa7bf9
+[Fri Mar 16 16:47:48 2018] [5655819896420564] ICE ufrag (local):   04af0552
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Data Channel mid: sdparta_0
+[Fri Mar 16 16:47:48 2018] [5655819896420564] DTLS setup (local):  actpass
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Setting connect state (DTLS client)
+[Fri Mar 16 16:47:48 2018] Got a sctpmap attribute: 5000 webrtc-datachannel 256
+[Fri Mar 16 16:47:48 2018]  -------------------------------------------
+[Fri Mar 16 16:47:48 2018]   >> Anonymized
+[Fri Mar 16 16:47:48 2018]  -------------------------------------------
+[Fri Mar 16 16:47:48 2018] This is involving a negotiation (offer) as well:
+v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 6476916416738298929 0 IN IP4 1.1.1.1
+s=-
+t=0 0
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 1.1.1.1
+a=sendrecv
+
+[Fri Mar 16 16:47:48 2018] [33m[WARN][0m ENTERING INTO JANUS_PLUGIN_PUSH_EVENT : trans = trans_janus[Fri Mar 16 16:47:48 2018] [33m[WARN][0m incoming message: {"echotest": "event", "result": "ok"}[Fri Mar 16 16:47:48 2018] [33m[WARN][0m incoming message: {"type": "answer", "sdp": "v=0\r\no=mozilla...THIS_IS_SDPARTA-56.0 6476916416738298929 0 IN IP4 1.1.1.1\r\ns=-\r\nt=0 0\r\nc=IN IP4 127.0.0.1\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 127.0.0.1\r\n"}[Fri Mar 16 16:47:48 2018]  -------------------------------------------
+[Fri Mar 16 16:47:48 2018]   >> Anonymized
+[Fri Mar 16 16:47:48 2018]  -------------------------------------------
+[Fri Mar 16 16:47:48 2018] [5655819896420564] We have 1 candidates for Stream #1, Component #1
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Address:    10.34.75.211:58090
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Priority:   2013266431
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Foundation: 1
+[Fri Mar 16 16:47:48 2018] [5655819896420564]     1 1 udp 2013266431 10.34.75.211 58090 typ host
+[Fri Mar 16 16:47:48 2018]  -------------------------------------------
+[Fri Mar 16 16:47:48 2018]   >> Merged (557 bytes)
+[Fri Mar 16 16:47:48 2018]  -------------------------------------------
+[Fri Mar 16 16:47:48 2018] v=0
+o=mozilla...THIS_IS_SDPARTA-56.0 1521233268565050 1 IN IP4 10.34.75.211
+s=-
+t=0 0
+a=group:BUNDLE sdparta_0
+a=msid-semantic: WMS janus
+m=application 9 DTLS/SCTP 5000
+c=IN IP4 10.34.75.211
+a=sendrecv
+a=sctpmap:5000 webrtc-datachannel 16
+a=mid:sdparta_0
+a=ice-ufrag:eb4d
+a=ice-pwd:25bEhysFxz3AMYWe5M51e6
+a=ice-options:trickle
+a=fingerprint:sha-256 D2:B9:31:8F:DF:24:D8:0E:ED:D2:EF:25:9E:AF:6F:B8:34:AE:53:9C:E6:F3:8F:F2:64:15:FA:E8:7F:53:2D:38
+a=setup:active
+a=candidate:1 1 udp 2013266431 10.34.75.211 58090 typ host
+a=end-of-candidates
+
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Done! Ready to setup remote candidates and send connectivity checks...
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   -- ICE Trickling is supported by the browser, waiting for remote candidates...
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Sending event to transport...
+[Fri Mar 16 16:47:48 2018] Sending event to, session->source->transport->get_package(), session->source->instance[Fri Mar 16 16:47:48 2018] [33m[WARN][0m No transport, free the event[Fri Mar 16 16:47:48 2018] [33m[WARN][0m HERE BEFORE[Fri Mar 16 16:47:48 2018] [33m[WARN][0m And HERE AFTER[Fri Mar 16 16:47:48 2018]   >> Pushing event: 0 (took 883 us)
+[Fri Mar 16 16:47:48 2018] Creating plugin result...
+[Fri Mar 16 16:47:48 2018] Destroying plugin result...
+[Fri Mar 16 16:47:48 2018] [33m[WARN][0m jsondone occured.[Fri Mar 16 16:47:48 2018] [5655819896420564] ICE thread started
+[Fri Mar 16 16:47:48 2018] [ice.c:janus_ice_thread:2663] [5655819896420564] Looping (ICE)...
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Trickle candidate (sdparta_0): candidate:0 1 UDP 2122252543 10.34.75.211 49067 typ host
+[Fri Mar 16 16:47:48 2018] [5655819896420564]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:49067
+[Fri Mar 16 16:47:48 2018] [5655819896420564]  Transport: UDP
+[Fri Mar 16 16:47:48 2018] [5655819896420564]    Candidate added to the list! (1 elements for 1/1)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] ICE already started for this component, setting candidates we have up to now
+[Fri Mar 16 16:47:48 2018] [5655819896420564] ## Setting remote candidates: stream 1, component 1 (1 in the list)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] >> Remote Stream #1, Component #1
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Address:    10.34.75.211:49067
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Priority:   2122252543
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Foundation: 0
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Username:   04af0552
+[Fri Mar 16 16:47:48 2018] [5655819896420564]   Password:   fad02640e1830b032d37656379aa7bf9
+[Fri Mar 16 16:47:48 2018] [5655819896420564]  Setting remote credentials...
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Component state changed for component 1 in stream 1: 2 (connecting)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Remote candidates set!
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Trickle candidate (sdparta_0): candidate:1 1 TCP 2105524479 10.34.75.211 9 typ host tcptype active
+[Fri Mar 16 16:47:48 2018] [5655819896420564]  Adding remote candidate component:1 stream:1 type:host 10.34.75.211:9
+[Fri Mar 16 16:47:48 2018] [5655819896420564]    Skipping unsupported transport 'TCP' for media
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Component state changed for component 1 in stream 1: 3 (connected)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] Component state changed for component 1 in stream 1: 4 (ready)
+[Fri Mar 16 16:47:48 2018] [5655819896420564] ICE send thread started...
+Stopping gateway, please wait...
+In a hurry? I'm trying to free resources cleanly, here!
+[Fri Mar 16 16:48:28 2018] Ending watchdog mainloop...
+[Fri Mar 16 16:48:28 2018] Destroying sessions...
+[Fri Mar 16 16:48:28 2018] Freeing crypto resources...
+[Fri Mar 16 16:48:28 2018] De-initializing SCTP...
+[Fri Mar 16 16:48:28 2018] Ending ICE handles watchdog mainloop...
+[Fri Mar 16 16:48:28 2018] Closing plugins.
+[Fri Mar 16 16:48:28 2018] [33m[WARN][0m PLUGINS NOT NULL, DELETENG NOW!!!!!!!!!!!!!!!!
+[Fri Mar 16 16:48:28 2018] Leaving EchoTest handler thread
+[Fri Mar 16 16:48:29 2018] EchoTest watchdog stopped
+[Fri Mar 16 16:48:29 2018] JANUS EchoTest plugin destroyed!
+[Fri Mar 16 16:48:29 2018] Closing plugins: PLUGINS_SO IS NULL
+[Fri Mar 16 16:48:29 2018] Closing event handlers:
+Bye!
