@@ -1,4 +1,25 @@
-    ./configure --disable-plugin-sip  --disable-plugin-sipre  --disable-plugin-nosip  --disable-plugin-recordplay  --disable-plugin-streaming --enable-boringssl --enable-dtls-settimeout
+    ./configure SRTP15X_CFLAGS='/usr/include/srtp' SRTP15X_LIBS='/usr/lib'  --enable-libsrtp2=no --disable-plugin-sip --disable-plugin-videocall --disable-unix-sockets --disable-plugin-sipre  --disable-plugin-nosip  --disable-plugin-recordplay  --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge
+
+  ./configure --disable-turn-rest-api --disable-plugin-sip --disable-rest --disable-plugin-videocall --disable-unix-sockets --disable-plugin-sipre
+  --disable-plugin-nosip --disable-plugin-recordplay --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge 
+JANUS_CFLAGS="-v -Wall -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" 
+JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
+
+
+
+
+
+JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp"
+
+SRTP15X_CFLAGS
+              C compiler flags for SRTP15X, overriding pkg-config
+  SRTP15X_LIBS
+
+JANUS_CFLAGS=-I/usr/local/ssl/include
+JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
+
+-L/usr/lib/i386-linux-gnu -lglib-2.0
+-L/usr/local/lib -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0
 
 -disable-rabbitmq-event-handler
                           Disable RabbitMQ event handler
@@ -32,6 +53,18 @@
   --enable-post-processing
                           Enable building post-processing utility
 
+OLLECT_GCC_OPTIONS='-D' 'PACKAGE_NAME="Janus Gateway"' '-D' 'PACKAGE_TARNAME="janus-gateway"' '-D' 'PACKAGE_VERSION="0.3.1"' '-D' 'PACKAGE_STRING="Janus Gateway 0.3.1"' '-D' 'PACKAGE_BUGREPORT="https://github.com/meetecho/janus-gateway"' '-D' 'PACKAGE_URL="https://janus.conf.meetecho.com"' '-D' 'PACKAGE="janus-gateway"' '-D' 'VERSION="0.3.1"' '-D' 'STDC_HEADERS=1' '-D' 'HAVE_SYS_TYPES_H=1' '-D' 'HAVE_SYS_STAT_H=1' '-D' 'HAVE_STDLIB_H=1' '-D' 'HAVE_STRING_H=1' '-D' 'HAVE_MEMORY_H=1' '-D' 'HAVE_STRINGS_H=1' '-D' 'HAVE_INTTYPES_H=1' '-D' 'HAVE_STDINT_H=1' '-D' 'HAVE_UNISTD_H=1' '-D' '__EXTENSIONS__=1' '-D' '_ALL_SOURCE=1' '-D' '_GNU_SOURCE=1' '-D' '_POSIX_PTHREAD_SEMANTICS=1' '-D' '_TANDEM_SOURCE=1' '-D' 'HAVE_DLFCN_H=1' '-D' 'LT_OBJDIR=".libs/"' '-D' 'HAVE_PORTRANGE=1' '-D' 'HAVE_LIBNICE_TCP=1' '-D' 'HAVE_SRTP_2=1' '-D' 'HAVE_SRTP_AESGCM=1' '-D' 'HAVE_SCTP=1' '-D' 'HAVE_SAMPLEEVH=1' '-D' 'HAVE_WEBSOCKETS=1' '-D' 'HAVE_LIBWEBSOCKETS_PEER_SIMPLE=1' '-I' '.' '-Wmissing-prototypes' '-Wmissing-declarations' '-Wunused' '-fstrict-aliasing' '-Wextra' '-Wformat=2' '-Winit-self' '-Winline' '-Wpacked' '-Wpointer-arith' '-Wsuggest-attribute=format' '-Wsuggest-attribute=noreturn' '-Wnested-externs' '-Wstrict-prototypes' '-Wunsafe-loop-optimizations' '-Wwrite-strings' '-Wno-missing-field-initializers' '-Wno-unused-parameter' '-Wcast-align' '-Wformat-nonliteral' '-Wformat-security' '-Wswitch-default' '-Wmissing-include-dirs' '-Wno-aggregate-return' '-Wunused-but-set-variable' '-Warray-bounds' '-Wold-style-definition' '-Wsign-compare' '-Wlarger-than=65537' '-Wno-undef' '-Wno-redundant-decls' '-Wno-override-init' '-fstack-protector-all' '-g' '-ggdb' '-fPIC' '-rdynamic' '-pthread' '-v' '-Wall' '-I' '/usr/local/ssl/include' '-I' '/usr/local/include' '-I' '/usr/include/glib-2.0' '-I' '/usr/lib/i386-linux-gnu/glib-2.0/include' '-I' '/usr/local/include/nice' '-pthread' '-D' 'PLUGINDIR="/usr/local/lib/janus/plugins"' '-D' 'TRANSPORTDIR="/usr/local/lib/janus/transports"' '-D' 'EVENTDIR="/usr/local/lib/janus/events"' '-D' 'CONFDIR="/usr/local/etc/janus"' '-g' '-O2' '-MT' 'janus-ip-utils.o' '-MD' '-MP' '-MF' '.deps/janus-ip-utils.Tpo' '-c' '-o' 'janus-ip-utils.o' '-mtune=generic' '-march=i686'
+ as -v -I . -I /usr/local/ssl/include -I /usr/local/include -I /usr/include/glib-2.0 -I /usr/lib/i386-linux-gnu/glib-2.0/include -I /usr/local/include/nice --32 -o janus-ip-utils.o /tmp/cc8Ny6wF.s
+GNU assembler version 2.24 (i686-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.24
+COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/4.8/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/4.8/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/4.8/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-D' 'PACKAGE_NAME="Janus Gateway"' '-D' 'PACKAGE_TARNAME="janus-gateway"' '-D' 'PACKAGE_VERSION="0.3.1"' '-D' 'PACKAGE_STRING="Janus Gateway 0.3.1"' '-D' 'PACKAGE_BUGREPORT="https://github.com/meetecho/janus-gateway"' '-D' 'PACKAGE_URL="https://janus.conf.meetecho.com"' '-D' 'PACKAGE="janus-gateway"' '-D' 'VERSION="0.3.1"' '-D' 'STDC_HEADERS=1' '-D' 'HAVE_SYS_TYPES_H=1' '-D' 'HAVE_SYS_STAT_H=1' '-D' 'HAVE_STDLIB_H=1' '-D' 'HAVE_STRING_H=1' '-D' 'HAVE_MEMORY_H=1' '-D' 'HAVE_STRINGS_H=1' '-D' 'HAVE_INTTYPES_H=1' '-D' 'HAVE_STDINT_H=1' '-D' 'HAVE_UNISTD_H=1' '-D' '__EXTENSIONS__=1' '-D' '_ALL_SOURCE=1' '-D' '_GNU_SOURCE=1' '-D' '_POSIX_PTHREAD_SEMANTICS=1' '-D' '_TANDEM_SOURCE=1' '-D' 'HAVE_DLFCN_H=1' '-D' 'LT_OBJDIR=".libs/"' '-D' 'HAVE_PORTRANGE=1' '-D' 'HAVE_LIBNICE_TCP=1' '-D' 'HAVE_SRTP_2=1' '-D' 'HAVE_SRTP_AESGCM=1' '-D' 'HAVE_SCTP=1' '-D' 'HAVE_SAMPLEEVH=1' '-D' 'HAVE_WEBSOCKETS=1' '-D' 'HAVE_LIBWEBSOCKETS_PEER_SIMPLE=1' '-I' '.' '-Wmissing-prototypes' '-Wmissing-declarations' '-Wunused' '-fstrict-aliasing' '-Wextra' '-Wformat=2' '-Winit-self' '-Winline' '-Wpacked' '-Wpointer-arith' '-Wsuggest-attribute=format' '-Wsuggest-attribute=noreturn' '-Wnested-externs' '-Wstrict-prototypes' '-Wunsafe-loop-optimizations' '-Wwrite-strings' '-Wno-missing-field-initializers' '-Wno-unused-parameter' '-Wcast-align' '-Wformat-nonliteral' '-Wformat-security' '-Wswitch-default' '-Wmissing-include-dirs' '-Wno-aggregate-return' '-Wunused-but-set-variable' '-Warray-bounds' '-Wold-style-definition' '-Wsign-compare' '-Wlarger-than=65537' '-Wno-undef' '-Wno-redundant-decls' '-Wno-override-init' '-fstack-protector-all' '-g' '-ggdb' '-fPIC' '-rdynamic' '-pthread' '-v' '-Wall' '-I' '/usr/local/ssl/include' '-I' '/usr/local/include' '-I' '/usr/include/glib-2.0' '-I' '/usr/lib/i386-linux-gnu/glib-2.0/include' '-I' '/usr/local/include/nice' '-pthread' '-D' 'PLUGINDIR="/usr/local/lib/janus/plugins"' '-D' 'TRANSPORTDIR="/usr/local/lib/janus/transports"' '-D' 'EVENTDIR="/usr/local/lib/janus/events"' '-D' 'CONFDIR="/usr/local/etc/janus"' '-g' '-O2' '-MT' 'janus-ip-utils.o' '-MD' '-MP' '-MF' '.deps/janus-ip-utils.Tpo' '-c' '-o' 'janus-ip-utils.o' '-mtune=generic' '-march=i686'
+  CC       janus-turnrest.o
+Using built-in specs.
+COLLECT_GCC=gcc
+Target: i686-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.8.4-2ubuntu1~14.04.3' --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.8 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.8 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-i386/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-i386 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.8-i386 --with-arch-directory=i386 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
+Thread model: posix
 
 
 {
