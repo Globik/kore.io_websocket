@@ -147,7 +147,74 @@ janus_session *janus_session_create(guint64 session_id) {
 
 	return NULL;
 }
+//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
+static void websocket_frame_build(struct kore_buf *, u_int8_t, const void *,size_t);
+static void kore_websocket_broadcast_target(guint64,u_int8_t,const void*,size_t,int);
+static void kore_websocket_broadcast_target(guint64 sender_id, u_int8_t op, const void *data,size_t len, int scope)
+{
+	JANUS_LOG(LOG_WARN, "[%"SCNu64"] Entering in broadcast_target\n", sender_id);
+	struct connection	*c;
+	struct kore_buf		*frame;
+//struct ex*emi=(struct emi*)c->hdlr_extra;
+//	g_print("%d\n",emi->b);
+	frame = kore_buf_alloc(len);
+	websocket_frame_build(frame, op, data, len);
 
+	TAILQ_FOREACH(c, &connections, list) {
+		struct ex*l=c->hdlr_extra;
+		JANUS_LOG(LOG_WARN, "UND HERE EMI->SENDER_ID?  MMM");
+		//JANUS_LOG(LOG_WARN, "[%"id"] Entering in broadcast_target_2222\n", emi->id);
+		g_print("%d fuuuu\n",l->b);
+		if (/*c != src && */ /*emi->sender_id==sender_id &&*/ c->proto == CONN_PROTO_WEBSOCKET) {
+			net_send_queue(c, frame->data, frame->offset);
+			net_send_flush(c);
+		}
+	}
+
+	if (scope == WEBSOCKET_BROADCAST_GLOBAL) {
+		kore_msg_send(KORE_MSG_WORKER_ALL,
+		    KORE_MSG_WEBSOCKET, frame->data, frame->offset);
+	}
+
+	kore_buf_free(frame);
+}
+
+static void websocket_frame_build(struct kore_buf *frame, u_int8_t op, const void *data,size_t len)
+{
+	u_int8_t		len_1;
+	u_int16_t		len16;
+	u_int64_t		len64;
+
+	if (len > WEBSOCKET_PAYLOAD_SINGLE) {
+		if (len < USHRT_MAX)
+			len_1 = WEBSOCKET_PAYLOAD_EXTEND_1;
+		else
+			len_1 = WEBSOCKET_PAYLOAD_EXTEND_2;
+	} else {
+		len_1 = len;
+	}
+
+	op |= (1 << 7);
+	kore_buf_append(frame, &op, sizeof(op));
+
+	len_1 &= ~(1 << 7);
+	kore_buf_append(frame, &len_1, sizeof(len_1));
+
+	if (len_1 > WEBSOCKET_PAYLOAD_SINGLE) {
+		switch (len_1) {
+		case WEBSOCKET_PAYLOAD_EXTEND_1:
+			net_write16((u_int8_t *)&len16, len);
+			kore_buf_append(frame, &len16, sizeof(len16));
+			break;
+		case WEBSOCKET_PAYLOAD_EXTEND_2:
+			net_write64((u_int8_t *)&len64, len);
+			kore_buf_append(frame, &len64, sizeof(len64));
+			break;
+		}
+	}
+
+	kore_buf_append(frame, data, len);
+}
 
 //static 
 	gboolean janus_check_sessions(gpointer user_data) {
@@ -269,21 +336,32 @@ void janus_session_notify_event(janus_session *session, json_t *event) {
 	//	session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
 	//} 
 	//else {
+		guint64 mmm=0;
+		json_auto_t *hsessid=json_object_get(event,"sender");//guint64 handle_id
+		if(hsessid && json_is_integer(hsessid)) mmm=json_integer_value(hsessid);
 		JANUS_LOG(LOG_WARN,"No transport, free the event");
 		size_t size=json_dumpb(event,NULL,0,0);
 	if(size==0){JANUS_LOG(LOG_WARN, "json_dumpb Size is null\n");return;}
 	char*buf=alloca(size);
 	size=json_dumpb(event,buf,size,0);
-		JANUS_LOG(LOG_WARN,"HERE BEFORE");
+		//JANUS_LOG(LOG_WARN,"HERE BEFORE");
 		g_print("DU KUUUUUUUUUUUUUUUUUUU\n");
 fwrite((char*)buf,1,size,stdout);
-	printf("\nKU KU KU!\n");
-		JANUS_LOG(LOG_WARN,"And HERE AFTER");
+	g_print("\nKU KU KU!\n");
+		//JANUS_LOG(LOG_WARN,"And HERE AFTER");
 
 	//kore_websocket_send(c, 1, buf,size);
-		kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
+		//guint64 session_id
+		//kore_task_channel_write(t,"mama\0",5);
+	//	g_print("[%"SCNu64"mmmm]\n",mmm);
+JANUS_LOG(LOG_WARN, "[%"SCNu64"] PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP MMM\n", mmm);
+		kore_websocket_broadcast_target(mmm,WEBSOCKET_OP_TEXT,buf,size,/*WEBSOCKET_BROADCAST_GLOBAL*/9);
 		json_decref(event);
+		//onError: Failed to set remote answer sdp: Called in wrong state: STATE_INPROGRESS
+		//{"janus": "webrtcup", "session_id": 6042085187546594, "sender": 8053318000419074}
+
 	}
+	return;
 } 
 
 
@@ -870,7 +948,7 @@ void janus_eventhandlerso_close(gpointer key, gpointer value, gpointer user_data
 }
 
 
-void fuck_up()
+void fuck_up(struct kore_task*taski)
 	{
 	janus_log_level=7;
 	gboolean use_stdout = TRUE;
@@ -938,11 +1016,12 @@ OpenSSL_add_all_algorithms();
 // janus_use_openssl_pre_1_1_api	
 		
 //guint a=0;		
-guint a=janus_dtls_srtp_init(server_pem, server_key);
+		const char*password=NULL;
+guint a=janus_dtls_srtp_init(server_pem, server_key,password);
 g_print("aaa %d\n",a);
 if(a < 0) {
 g_print("SRTP_INIT IS NOT OK!!!!! EXIT!\n");
-//exit(1);
+exit(1);
 }else{
 g_print("SRTP INIT OK!\n");
 }

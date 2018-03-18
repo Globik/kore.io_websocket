@@ -188,10 +188,13 @@ json_t *load_json(const char *text,size_t buflen) {
 
 
 int ab=0;
- struct ex{
+/*
+struct ex{
 int id;
 int b;
+guint64 sender_id;
 };
+*/
 typedef struct{
 	int a;
 	void*data;
@@ -203,6 +206,7 @@ void websocket_connect(struct connection *c)
 l=kore_malloc(sizeof(*l));
 	l->id=ab;
 	l->b=46;
+	l->sender_id=0;
 	
 	//m->data=malloc(sizeof(m->data));
 	//m->data=l;
@@ -311,6 +315,7 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		if(handle_id > 0){
 		janus_mutex_lock(&session->mutex);
 			handle=janus_ice_handle_find(session,handle_id);
+			
 			janus_mutex_unlock(&session->mutex);
 			if(!handle){kore_log(LOG_INFO,"handle_id not found");}
 		}
@@ -335,6 +340,8 @@ void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len
 		return;
 			}
 			handle_id=handle->handle_id;
+			r->sender_id=handle_id;
+			
 			janus_plugin *plugin_t=janus_plugin_find("janus.plugin.echotest");
 			if(plugin_t==NULL){
 			kore_log(LOG_INFO,"plugin_t is NULL");
@@ -490,6 +497,7 @@ websocket_disconnect(struct connection *c)
 	struct ex*l=c->hdlr_extra;
 	printf("on disconnect: b: %d id: %d\n",l->id,l->b);
 	ab--;
+	l->sender_id=0;
 	kore_free(l);
 c->hdlr_extra=NULL;
 }
@@ -549,7 +557,7 @@ return 0;
 }
 */
 int rtc_loop(struct kore_task*t){
-	fuck_up();
+	fuck_up(t);
 	//kore_task_channel_write(t,"mama\0",5);
 return (KORE_RESULT_OK);
 }

@@ -10,6 +10,7 @@
 #include <glib.h>
 
 #include <kore/kore.h>
+#include <kore/tasks.h>
 
 #include "debug.h" //janus_print
 #include "utils.h" //janus_pidfile_remove
@@ -36,7 +37,17 @@
 #define DEFAULT_SESSION_TIMEOUT		3000
 
 #define CONFDIR "/home/globik/kore.io_websocket/websocket_10/configs"
+
+#define WEBSOCKET_PAYLOAD_SINGLE	125
+#define WEBSOCKET_PAYLOAD_EXTEND_1	126
+#define WEBSOCKET_PAYLOAD_EXTEND_2	127
 //#define CONFDIR "/usr/local/etc/janus"
+
+struct ex{
+int id;
+int b;
+guint64 sender_id;
+};
 
 //#include "log.h"
 extern const char* janus_get_api_error(int);
@@ -174,7 +185,7 @@ gboolean use_stdout;
 void puzomerka(gboolean);
 
 void set_conf_file(char*);
-void fuck_up(void);
+void fuck_up(struct kore_task*);
 
 GHashTable *transports;
 GHashTable *transports_so;
