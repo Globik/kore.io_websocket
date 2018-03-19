@@ -201,13 +201,16 @@ typedef struct{
 }suka;
 void websocket_connect(struct connection *c)
 {
+	char*dama="dama";
 	ab++;
+	
 	struct ex *l;
 l=kore_malloc(sizeof(*l));
 	l->id=ab;
 	l->b=46;
 	l->sender_id=0;
 	
+	//c->hdlr_extra=dama;
 	//m->data=malloc(sizeof(m->data));
 	//m->data=l;
 	//l=m->data;
@@ -275,6 +278,11 @@ kore_log(LOG_NOTICE,"The session already in use");
 	//kore_buf_free(buf);
 	//kore_free(l);
 	kore_free(buf);
+	/*
+	TAILQ_FOREACH(c, &connections, list) {
+		kore_log(LOG_NOTICE,"\nON_CONNECTION STUFF %s, c->proto: %d\n",(char*)c->hdlr_extra,c->proto);
+	}
+	*/
 	
 }
 void websocket_message(struct connection *c, u_int8_t op, void *data, size_t len)
@@ -492,6 +500,7 @@ free(foo);
 void
 websocket_disconnect(struct connection *c)
 {
+	//kore_log(LOG_NOTICE,"disconnecting %s",(char*)c->hdlr_extra);
 	//c->hdlr_extra=NULL;
 	kore_log(LOG_NOTICE, "%p: disconnecting", c);
 	struct ex*l=c->hdlr_extra;
@@ -500,6 +509,7 @@ websocket_disconnect(struct connection *c)
 	l->sender_id=0;
 	kore_free(l);
 c->hdlr_extra=NULL;
+
 }
 
 int page(struct http_request *req)

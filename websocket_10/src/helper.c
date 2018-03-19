@@ -155,19 +155,22 @@ static void kore_websocket_broadcast_target(guint64 sender_id, u_int8_t op, cons
 	JANUS_LOG(LOG_WARN, "[%"SCNu64"] Entering in broadcast_target\n", sender_id);
 	struct connection	*c;
 	struct kore_buf		*frame;
-//struct ex*emi=(struct emi*)c->hdlr_extra;
-//	g_print("%d\n",emi->b);
 	frame = kore_buf_alloc(len);
 	websocket_frame_build(frame, op, data, len);
 
 	TAILQ_FOREACH(c, &connections, list) {
-		struct ex*l=c->hdlr_extra;
-		JANUS_LOG(LOG_WARN, "UND HERE EMI->SENDER_ID?  MMM");
-		//JANUS_LOG(LOG_WARN, "[%"id"] Entering in broadcast_target_2222\n", emi->id);
-		g_print("%d fuuuu\n",l->b);
-		if (/*c != src && */ /*emi->sender_id==sender_id &&*/ c->proto == CONN_PROTO_WEBSOCKET) {
+		if (c->proto == CONN_PROTO_WEBSOCKET) {
+			g_print("\n ME TOO!\n");
+			if(c->hdlr_extra !=NULL){
+			struct ex*t=c->hdlr_extra;
+				g_print("\nSOME HDLR_EXTRA STUFF. id: %d, c->proto: %d c->sender_id: %"SCNu64"\n",t->id,c->proto,t->sender_id);
+			
+			if(t->sender_id==sender_id) {
+				g_print("\n SHould be sending only ONCE!\n");
 			net_send_queue(c, frame->data, frame->offset);
 			net_send_flush(c);
+										}
+			}
 		}
 	}
 
