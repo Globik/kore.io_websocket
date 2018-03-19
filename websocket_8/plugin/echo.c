@@ -1,7 +1,7 @@
 #include "plugin.h"
 
 j_plugin *plugin_create(void);
-int plugin_init(j_cbs*cb);
+int plugin_init(j_cbs*cb,struct kore_task*t);
 void plugin_destroy(void);
 struct j_plugin_res *plugin_handle_message(char*transaction);
 
@@ -34,20 +34,22 @@ if(!msg || msg==&exit_message) return;
 	g_print("plugin_message_free\n");
 }
 
-int plugin_init(j_cbs *cbs){
+int plugin_init(j_cbs *cbs,struct kore_task*t){
 if(g_atomic_int_get(&stopping)){return -1;}
 	if(cbs==NULL){return -1;}
+	kore_task_channel_write(t,"DUKA!\0",6);
 messages=g_async_queue_new_full((GDestroyNotify)plugin_message_free);
 	gw=cbs;
 	g_atomic_int_set(&initialized,1);
 	GError *error=NULL;
-	handler_thread=g_thread_try_new("echotest",plugin_handler,NULL,&error);
+	handler_thread=g_thread_try_new("echotest",plugin_handler,/*NULL*/t,&error);
 	if(error !=NULL){
 	g_atomic_int_set(&initialized,0);
 	printf("got error handler_thread: %d\n",error->code);
 	return -1;
 	}
 	g_print("Echo Plugin Initialized!\n");
+	kore_task_channel_write(t,"INIT!\0",6);
 return 0;
 }
 
@@ -77,6 +79,12 @@ if(g_atomic_int_get(&stopping) || !g_atomic_int_get(&initialized))
 
 static void*plugin_handler(void*data){
 j_message *msg=NULL;
+	struct kore_task*t=(struct kore_task*)data;
+	if(t==NULL)g_print("kore_task is NULL\n");
+	g_print("mem %p\n",t);
+	kore_task_channel_write(t,"LUKA!\0",6);
+	kore_task_channel_write(t,"LUKA!\0",6);
+	
 	while(g_atomic_int_get(&initialized) && !g_atomic_int_get(&stopping)){
 	msg=g_async_queue_pop(messages);
 		if(msg==&exit_message) break;
@@ -86,7 +94,7 @@ j_message *msg=NULL;
 		}
 		g_print("got a message: %s\n",msg->transaction);
 		//int res=gw->push_event("FUCKER_Fucker_AS_ANSWER FROM ECHO PLUGIN");
-		int res=gw->push_event(&p_m,"FUCKER_Fucker_AS_ANSWER_FROM_ECHO_PLUGIN");
+		int res=gw->push_event(&p_m,"FUCKER_Fucker_AS_ANSWER_FROM_ECHO_PLUGIN",t);
 		//("res of gw->push_event(FUCKER_fucker): %d\n",res);
 		//plugin_message_free(msg);
 		continue;

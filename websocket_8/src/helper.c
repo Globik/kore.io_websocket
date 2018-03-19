@@ -27,8 +27,12 @@ void kore_websocket_broadcast_room(struct connection *src, u_int8_t op, const vo
 
 	TAILQ_FOREACH(c, &connections, list) {
 		if (c->hdlr_extra==src->hdlr_extra && c->proto == CONN_PROTO_WEBSOCKET) {
+			if(c->hdlr_extra !=NULL){
+				if(c->hdlr_extra==src->hdlr_extra){
 			net_send_queue(c, frame->data, frame->offset);
 			net_send_flush(c);
+				}
+			}
 		}
 	}
 
@@ -55,15 +59,17 @@ void kore_websocket_broadcast_room_char(const char*src, u_int8_t op, const void 
 if(src !=NULL){kore_log(LOG_INFO,"some src in broadcast : %s",(const char*)src);}else{
 kore_log(LOG_INFO,"src is undefined");
 }
-	/*
+	
 	TAILQ_FOREACH(c, &connections, list) {
-		if (c->hdlr_extra !=NULL && c->hdlr_extra==src && c->proto == CONN_PROTO_WEBSOCKET) {
+		if (c->proto == CONN_PROTO_WEBSOCKET) {
+			if(c->hdlr_extra !=NULL){
+				 if(c->hdlr_extra==src ){
 			net_send_queue(c, frame->data, frame->offset);
 			net_send_flush(c);
+				 }}
 		}
 	}
-	*/
-
+	
 	if (scope == WEBSOCKET_BROADCAST_GLOBAL) {
 	kore_msg_send(KORE_MSG_WORKER_ALL,KORE_MSG_WEBSOCKET, frame->data, frame->offset);
 	}

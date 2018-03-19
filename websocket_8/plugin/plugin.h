@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <glib.h>
+
+#include <kore/kore.h>
+#include <kore/tasks.h>
+
 #define J_PLUGIN_INIT(...){ \
 .init=NULL, \
 .destroy=NULL, \
@@ -15,12 +19,13 @@ typedef struct j_cbs j_cbs;
 typedef struct j_plugin j_plugin;
 typedef struct j_plugin_res j_plugin_res;
 struct j_plugin{
-	int (* const init)(j_cbs *cbs);
+	int (* const init)(j_cbs *cbs,struct kore_task*t);
 	void (* const destroy)(void);
 	struct j_plugin_res * (* const handle_message)(char*transaction);
 };
 struct j_cbs{
-int (* const push_event)(j_plugin*plugin,const char*transaction);
+struct kore_task*ta;
+int (* const push_event)(j_plugin*plugin,const char*transaction,struct kore_task*t);
 };
 
 typedef j_plugin* create_p(void);
