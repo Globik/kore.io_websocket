@@ -1,2 +1,8 @@
 /*/*.so
 tmp
+uv/cli
+uv/cli1
+uv/client
+uv/srv
+uv/srv1
+uv/tcpsrv
