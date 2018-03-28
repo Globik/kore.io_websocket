@@ -15,6 +15,12 @@ int init(int);
 int page(struct http_request*);
 int pipe_reader(struct kore_task*);
 void pipe_data_available(struct kore_task*);
+uv_loop_t *loop=NULL;
+uv_async_t async;
+uv_work_t lreq;
+void print_progress(uv_async_t*);
+void fake_download(uv_work_t*);
+void after(uv_work_t*,int);
 //void idle_cb(uv_idle_t*);
 struct kore_task pipe_task;
 int init(int state){
@@ -27,7 +33,12 @@ if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 }
 int page(struct http_request*req){
 http_response_header(req,"content-type","text/html");
+	if(loop !=NULL){kore_log(LOG_NOTICE,"loop here");
+	uv_queue_work(loop,&lreq,fake_download,after);
+	}
+	kore_log(LOG_NOTICE,"loop after");
 http_response(req,200,asset_frontend_html,asset_len_frontend_html);
+kore_log(LOG_NOTICE,"http request should be sent");
 return (KORE_RESULT_OK);
 }
 #define MAX_REPORT_LEN 1024
@@ -36,7 +47,30 @@ printf("%s : [%s(%d): %s]\n",msg,uv_err_name((r)),(int) r,uv_strerror((r))); \
 exit(1); \
 }
 #define BUF_SIZE 255
-static const char *filename="/home/globik/kore.io_websocket/uv/m.c";
+//static const char *filename="/home/globik/kore.io_websocket/uv/m.c";
+
+
+void print_progress(uv_async_t*handle/*,int status*/){
+double p=*((double*)handle->data);
+	fprintf(stderr,"downloaded: %.2f%%\n",p);
+}
+void fake_download(uv_work_t*req){
+int size=*((int*)req->data);
+	int d=0;
+	double p;
+	while(d<size){
+	p=d*100.0/size;
+		fprintf(stderr,"a?\n");
+		async.data=(void*)&p;
+		uv_async_send(&async);
+		sleep(1);
+		d+=(200+random())%1000;
+	}
+}
+void after(uv_work_t*req,int status){
+fprintf(stderr,"download complete %d status: %d\n",*((int*)req->data),status);
+//uv_close((uv_handle_t*)&async,NULL);
+}
 void open_cb(uv_fs_t*);
 void read_cb(uv_fs_t*);
 void close_cb(uv_fs_t*);
@@ -98,7 +132,7 @@ mic(context->mt);
 	context->mt=NULL;
 	free(context);
 }
-
+/*
 void binit(uv_loop_t*loop,struct kore_task*t){
 int r;
 uv_fs_t*open_req=malloc(sizeof(uv_fs_t));
@@ -111,7 +145,7 @@ r=uv_fs_open(loop,open_req,filename,O_RDONLY,S_IRUSR,open_cb);
 if(r<0)check(r,"uv_fs_open");
 }
 
-
+*/
 /*
 void idle_cb(uv_idle_t*handle){
 static int64_t count=-1;
@@ -129,12 +163,26 @@ int pipe_reader(struct kore_task*t){
 	uv_run(loop,UV_RUN_DEFAULT);
 	//return 0;
 	*/
+	/*
 uv_loop_t*loop=uv_default_loop();
 binit(loop,t);
 uv_run(loop,UV_RUN_DEFAULT);
+	*/
 	
+	loop=uv_default_loop();
+//	uv_work_t req;
+	int size=1020;
+	lreq.data=(void*)&size;
+	uv_async_init(loop,&async,print_progress);
+	//uv_queue_work(loop,&req,fake_download,after);
+	uv_run(loop,UV_RUN_DEFAULT);
+	kore_task_channel_write(t,"mama\0",5);
+	int b=uv_loop_close(loop);
+kore_log(LOG_NOTICE,"b: %d",b);
+	loop=NULL;
+	//sleep(1);
+//kore_task_channel_write(t,"mama\0",5);
 	
-kore_task_channel_write(t,"mama\0",5);
 	return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
