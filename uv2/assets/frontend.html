@@ -1,0 +1,93 @@
+<!DOCTYPE>
+<html>
+<body>
+	User: <b id="vuser"></b><br>
+
+<form action="/" onsubmit="connect(); return false;">
+<input type="submit" value="connect">
+</form>
+	<input type="text" id="f" value="alice"/>
+	<button onclick="send_message();">send message</button>
+	<div id="counter"></div>
+<output id="mout"></output>
+
+	<script>
+var socket = null;
+var sent = 0;
+var recv = 0;
+var length = 2;//5536;
+var id=fuser();
+	function gid(i){return document.getElementById(i);}
+//var mout=document.getElementById("mout");
+	//mout.innerHTML="";
+function open(evt) {
+vuser.textContent=id;
+var m = {};
+mout.innerHTML+="websocket opened<br>";
+m.name=id;
+m.type="login";
+var lu=JSON.stringify(m);
+//socket.send(lu+'\0');
+	if(socket)socket.send(lu);
+}
+
+function fuser(){
+var users=["alice","bob","john","willy"];	
+return users[Math.floor(Math.random()*users.length)];
+}
+function message(msg) {
+	var mout=gid("mout");
+	mout.innerHTML+=msg+"<br>";
+	try{
+	var mi=JSON.parse(msg);
+	}catch(e){console.error(e);return;}
+	sent = sent + 1;
+	//id=msg;
+	update();
+	console.log('msg: ',msg);
+	if(mi.type=="login"){
+	console.log("login");
+	}else if(mi.type=="message"){
+		//message
+	console.log("message");
+	mout.innerHTML+=msg+"<br>";
+	}else{
+	mout.innerHTML+="uknown type: "+mi.type+" raw data: "+msg+"<br>";
+	}
+	}
+
+function update() {
+	var cnt = document.getElementById("counter");
+
+	cnt.innerHTML = "Recv: " + recv + " Sent: " + sent+" id: "+id;
+}
+
+function onmessage(evt) {
+	recv = recv + 1;
+	update();
+
+	message(evt.data);
+}
+
+function connect() {
+	socket = new WebSocket("ws://127.0.0.1:8888/connect");///"+id);
+
+	socket.onopen = function(evt) { open(evt) };
+	socket.onclose = function(evt) { mout.innerHTML+="closed<br>"; };
+	socket.onmessage = function(evt) { onmessage(evt) };
+	socket.onerror = function(evt) { mout.innerHTML+="onerror<br>"; };
+}
+	//var f=document.getElementById("f");
+	function send_message(){
+	var d={};
+		d.type="message";
+		d.id=id;
+		d.msg=f.value;
+		var su=JSON.stringify(d);
+		//alert(su);
+	if(socket)socket.send(su);
+	}
+	</script>
+
+</body>
+</html>
