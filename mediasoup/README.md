@@ -1,3 +1,5 @@
+# Prototype!
+
 Trying to  mimic(in C code) the [mediasoup](https://github.com/versatica/mediasoup/) basis. 
 Based on version 1.2.8
 
@@ -12,6 +14,7 @@ WebRTC Video Conferencing
 ### kodev run
 
 ```
+
 [parent]: running on http://127.0.0.1:8888
 ignoring "tls_dhparam" on line 6
 ignoring "certfile" on line 16
@@ -21,57 +24,107 @@ ignoring "certkey" on line 17
 [wrk 0]: worker 0 started (cpu#0)
 [wrk 0]: worker configure
 [wrk 0]: A task created
+Entering deplibuv::classinit()
+uv_callback_t &to_cpp init: 0
+uv_callback_t &from_cpp init: 0
+Libuv version:  1.19.3-dev
+Entering Room::ClassInit().
+[wrk 0]: uv_callback_t &to_cpp fire 0
 [wrk 0]: A message came: mama
-here class init
-rc to cpp init: 0
-rc from_cpp init: 0
-rc stop_w init: 0
-version:  1.19.3-dev
-Parse all RTP capabilities.
-[wrk 0]: rc to_cpp fire 0
-Set us as Channel's listener.
-unixstreamsocket::setlistener()
-loop::mfuck
-loop::mfuck
-starting libuv loop
-Loop was allocated?
-HERE AND HERE ON_TO_CPP occured: {"mama":"papa"}
-loop::mfuck
-unixstreamsocket::useronunixstreamread() {"mama":"papa"}
-loop::mfuck
-Here inner parse
+Channel's listener starting.
+Entering UnixStreamSocket::SetListener(listener)
+A dummy method: loop::mfuck()
+Hello libuv's loop!
+Loop is allocated successfully
+uv_callback_t UnixStreamSocket::on_to_cpp occured!: {"id":3444444333,"method":"worker.createRoom","internal":{"roomId":35,"sister":"sister_1"},"data":{"a":1}}
+Entering UnixStreamSocket::UserOnUnixStreamRead() {"id":3444444333,"method":"worker.createRoom","internal":{"roomId":35,"sister":"sister_1"},"data":{"a":1}}
+After json parsing.
 {
-	"mama" : "papa"
+	"data" : 
+	{
+		"a" : 1
+	},
+	"id" : 3444444333,
+	"internal" : 
+	{
+		"roomId" : 35,
+		"sister" : "sister_1"
+	},
+	"method" : "worker.createRoom"
 }
-request 1
-here must be within request::request
+Creating ::Request.
+Entering Request::Request(channel, json)
 {
-	"mama" : "papa"
+	"data" : 
+	{
+		"a" : 1
+	},
+	"id" : 3444444333,
+	"internal" : 
+	{
+		"roomId" : 35,
+		"sister" : "sister_1"
+	},
+	"method" : "worker.createRoom"
 }
-unixstreamsocket::sendlog() occured.
-[id:unset] Channel::UnixStreamSocket::UserOnUnixStreamRead() | discarding wrong Channel request
-^Csignal INT received, exiting
+Request is not nullptr
+Entering Loop::OnChannelRequest(channel, request)
+'worker.createRoom' request
+Getting a room from a request.
+No room found.
+The room must be created.
+Entering Room::Room(listener, notifier, roomId, json
+Room created roomId:35]
+Entering Request::Accept(json)
+Entering UnixStreamSocket::Send(Json)
+{
+	"accepted" : true,
+	"data" : {},
+	"id" : 3444444333
+}
+uv_callback_t &from_cpp fire: 0
+Deleting the Request.
+Look ma, ~Request() destructor!
+[wrk 0]: ON_FROM_CPP data came. HALLO from cpp!!!
+
+^C
+ Signal INT received, exiting.
+Loop::Close() entered.
 [parent]: server shutting down
-loop::close() occured
+Closing signalsHandler.
 [parent]: waiting for workers to drain and shutdown
-CLOSE SIGNALSHANDLER DESTROY
-rc fire from_cpp: 0
-What the f in destractor in unixstreamsocket?
+Entering Room::Destroy().
+Notifier::Emit(uint32_t targetId, const std::string& event, Json::Value& data) occured.
+Entering UnixStreamSocket::Send(Json)
+{
+	"data" : 
+	{
+		"class" : "Room"
+	},
+	"event" : "close",
+	"targetId" : 35
+}
+uv_callback_t &from_cpp fire: 0
+Entering OnRoomClosed(room)
+Look ma, ~Room() destructor!
+uv_callback_t &from_cpp fire: 0
+Look ma, ~UnixStreamSocket() destructor!
+[wrk 0]: ON_FROM_CPP data came. HALLO from cpp!!!
+
 [wrk 0]: ON_FROM_CPP data came. exit
 
 EXIT!!!
-libuv loop ended
-
-loop destructer occured loooop destructure
+Good bye, libuv's loop!
+The loop should be ending now!
+Look ma, ~Loop() destructor.
 [wrk 0]: Destoy func.
-Loop was destroyd?
-[wrk 0]: A message came: mama
+Look ma, loop is destroyd.
 [wrk 0]: Bye. *******
 
+[wrk 0]: A message came: mama
 [wrk 0]: SUCCESS: And exit with success status.
-[parent]: worker 0 (6762)-> status 0
+[parent]: worker 0 (6772)-> status 0
 [parent]: goodbye
-
 
 ```
 

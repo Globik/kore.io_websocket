@@ -1,8 +1,8 @@
 #define MS_CLASS "Channel::Notifier"
-// #define MS_LOG_DEV
+ #define MS_LOG_DEV
 
 #include "Channel/Notifier.hpp"
-//#include "Logger.hpp"
+#include "Logger.hpp"
 
 namespace Channel
 {
@@ -10,12 +10,12 @@ namespace Channel
 
 	Notifier::Notifier(Channel::UnixStreamSocket* channel) : channel(channel)
 	{
-		//MS_TRACE();
+		MS_TRACE();
 	}
 
 	void Notifier::Emit(uint32_t targetId, const std::string& event)
 	{
-		//MS_TRACE();
+		MS_TRACE();
 std::printf("Notifier::Emit(uint32_t targetId, const std::string& event)\n");
 		static const Json::StaticString JsonStringTargetId{ "targetId" };
 		static const Json::StaticString JsonStringEvent{ "event" };
@@ -30,7 +30,7 @@ std::printf("Notifier::Emit(uint32_t targetId, const std::string& event)\n");
 
 	void Notifier::Emit(uint32_t targetId, const std::string& event, Json::Value& data)
 	{
-		//MS_TRACE();
+		MS_TRACE();
 std::printf("Notifier::Emit(uint32_t targetId, const std::string& event, Json::Value& data) occured.\n");
 		static const Json::StaticString JsonStringTargetId{ "targetId" };
 		static const Json::StaticString JsonStringEvent{ "event" };
@@ -52,7 +52,7 @@ std::printf("Notifier::Emit(uint32_t targetId, const std::string& event, Json::V
 	    const uint8_t* binaryData,
 	    size_t binaryLen)
 	{
-		//MS_TRACE();
+		MS_TRACE();
 std::printf("Notifier::EmitWithBinary() occured\n");
 		static const Json::StaticString JsonStringTargetId{ "targetId" };
 		static const Json::StaticString JsonStringEvent{ "event" };
@@ -67,6 +67,6 @@ std::printf("Notifier::EmitWithBinary() occured\n");
 		json[JsonStringBinary]   = true;
 
 		this->channel->Send(json);
-		//this->channel->SendBinary(binaryData, binaryLen);
+		this->channel->SendBinary(binaryData, binaryLen);
 	}
 } // namespace Channel

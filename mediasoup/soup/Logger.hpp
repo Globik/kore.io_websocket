@@ -141,7 +141,7 @@ public:
 			if (LogLevel::LOG_DEBUG == Settings::configuration.logLevel) \
 			{ \
 				int loggerWritten = std::snprintf(Logger::buffer, Logger::bufferSize, "D(trace) " _MS_LOG_STR, _MS_LOG_ARG); \
-				//Logger::channel->SendLog(Logger::buffer, loggerWritten); \
+				Logger::channel->SendLog(Logger::buffer, loggerWritten); \
 			} \
 		} \
 		while (false)
@@ -173,7 +173,7 @@ public:
 		if (LogLevel::LOG_DEBUG == Settings::configuration.logLevel && (_MS_TAG_ENABLED(tag) || _MS_LOG_DEV_ENABLED)) \
 		{ \
 			int loggerWritten = std::snprintf(Logger::buffer, Logger::bufferSize, "D" _MS_LOG_STR_DESC desc, _MS_LOG_ARG, ##__VA_ARGS__); \
-		//	Logger::channel->SendLog(Logger::buffer, loggerWritten); \
+			Logger::channel->SendLog(Logger::buffer, loggerWritten); \
 		} \
 	} \
 	while (false)

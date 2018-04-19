@@ -14,7 +14,7 @@
 extern "C" {
 //#include <netstring.h>
 }
-uv_callback_t from_cpp,stop_w;
+uv_callback_t from_cpp;//stop_w;
 namespace Channel
 {
 	/* Static. */
@@ -36,11 +36,11 @@ namespace Channel
 		uv_loop_set_data(mloop,(void*)this);
 		
 int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT);
-		std::printf("rc to cpp init: %d\n",rc);
+		std::printf("uv_callback_t &to_cpp init: %d\n",rc);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
-		std::printf("rc from_cpp init: %d\n",rc);
-		rc=uv_callback_init(mloop,&stop_w,UnixStreamSocket::close_work,UV_DEFAULT);
-		std::printf("rc stop_w init: %d\n",rc);
+		std::printf("uv_callback_t &from_cpp init: %d\n",rc);
+		//rc=uv_callback_init(mloop,&stop_w,UnixStreamSocket::close_work,UV_DEFAULT);
+		//std::printf("dummy uv_callback_t stop_w init: %d\n",rc);
 		
 		// Create the JSON reader.
 		{
@@ -73,71 +73,53 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
 
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-		//usleep(100000);
-//uv_stop(deplibuv::getloop());
-		//int r=uv_callback_fire(&stop_w,nullptr,nullptr);
-		//std::printf("rc fire stop_worker: %d\n",r);
 		int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
-		std::printf("rc fire from_cpp: %d\n",r);
-		//usleep(20000);
+		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
 MS_TRACE_STD();
-std::printf("What the fuck in destractor in unixstreamsocket?jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj\n");
+std::printf("Look ma, ~UnixStreamSocket() destructor!\n");
 		delete this->jsonReader;
 		delete this->jsonWriter;
-		//usleep(100000);
-//uv_stop(deplibuv::getloop());
-		
 	}
+/*
 void * UnixStreamSocket::close_work(uv_callback_t*callback,void*data){
 	std::printf("on stop work occured\n");
 uv_stop(((uv_handle_t*)callback)->loop);
 	return nullptr;
 }
+*/
 	
 void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
 {
 	
-std::printf("HERE AND HERE ON_TO_CPP occured: %s\n",(char*)data);
+std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
 	//char * gu=(char*)((uv_handle_t*)callback)->loop->data;
-//void*lu=uv_loop_get_data(deplibuv::getloop());
-//std::printf("some data came: %s\n",(char*)lu);
-//static_cast<UnixStreamSocket*>
 void*bu=uv_loop_get_data(deplibuv::getloop());
-	static_cast<UnixStreamSocket*>(bu)->listener->mfuck();
+	//static_cast<UnixStreamSocket*>(bu)->listener->mfuck();
 	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
 	static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead((char*)data);
-	
-	/*
-	Channel::UnixStreamSocket m(4);
-//	new Channel::UnixStreamSocket(channelFd);
-	m.UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
-	//UnixStreamSocket::UserOnUnixStreamRead("mama\0");
-	//UserOnUnixStreamRead("m");
-	*/
 return nullptr;
 }
-//Listener  li=this->listener;
 
-	void UnixStreamSocket::SetListener(Listener* listener)
+void UnixStreamSocket::SetListener(Listener* listener)
 	{
 		MS_TRACE_STD();
-		std::printf("unixstreamsocket::setlistener()\n");
-
-		this->listener = listener;
-		this->listener->mfuck();
+		std::printf("Entering UnixStreamSocket::SetListener(listener)\n");
+this->listener = listener;
+//this->listener->mfuck();
 	}
 
 	void UnixStreamSocket::Send(Json::Value& msg)
 	{
-		std::printf("UnixStreamSocket::Send(Json) occured\n");
+		std::printf("Entering UnixStreamSocket::Send(Json)\n");
 		std::cout << msg << std::endl;
 		
-		int r=uv_callback_fire(&from_cpp,(void*)"HALLO from cpp!!!",NULL);
-		std::printf("rc fire from_cpp: %d\n",r);
+		//int r=uv_callback_fire(&from_cpp,(void*)"HALLO from cpp!!!",NULL);
+	//	int r=uv_callback_fire(&from_cpp,(void*)"msg",NULL);
+	//	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
 		//if (this->closed)return;
 
-		// MS_TRACE_STD();
-/*
+		 MS_TRACE_STD();
+
 		std::ostringstream stream;
 		std::string nsPayload;
 		size_t nsPayloadLen;
@@ -147,7 +129,10 @@ return nullptr;
 		this->jsonWriter->write(msg, &stream);
 		nsPayload    = stream.str();
 		nsPayloadLen = nsPayload.length();
-
+		
+		int r=uv_callback_fire(&from_cpp,(void*)nsPayload.c_str(),NULL);
+		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+/*
 		if (nsPayloadLen > MessageMaxSize)
 		{
 			MS_ERROR_STD("mesage too big");
@@ -177,7 +162,7 @@ return nullptr;
 
 	void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
-		std::printf("unixstreamsocket::sendlog() occured.\n");
+		std::printf("Entering UnixStreamSocket::SendLog(char, size_t).\n");
 	/*
 		if (this->closed){std::printf("send log is closed.\n");
 			//return;
@@ -219,7 +204,7 @@ return nullptr;
 
 	void UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen)
 	{
-		std::printf("UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen) occured\n");
+std::printf("Entering UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen).\n");
 		//if (this->closed)return;
 		if(this->closed){std::printf("SendBinary() occured, but this-closed is closed.\n");}
 /*
@@ -256,23 +241,10 @@ return nullptr;
 
 void UnixStreamSocket::UserOnUnixStreamRead(char* k)
 	{
-//MS_TRACE_STD();
-std::printf("unixstreamsocket::useronunixstreamread() %s\n",k);
-		//mChannel::UnixStreamSocket * Channel::Listener;//=new Channel::UnixStreamSocket::Listener();
-		//Channel::UnixStreamSocket Listener(4);//{ nullptr };
-		//UnixStreamSocket m(4);
-		//channel->listener->mfuck();
-		//Listener.listener->mfuck();
-		
-		//this->listener = listener;
-		
-		//li->mfuck();
-		this->listener->mfuck();
-		//this->listener->mfuck();
-	//Loop::OnChannelRequest(Channel::UnixStreamSocket* channel, Channel::Request* request)
-		//Loop::mfuck();
-		//return;
-		// Be ready to parse more than a single message in a single TCP chunk.
+MS_TRACE_STD();
+std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",k);
+//this->listener->mfuck();
+// Be ready to parse more than a single message in a single TCP chunk.
 std::string text="{\"mama\":\"papa\"}";
 std::string text2=k;
 		
@@ -294,15 +266,14 @@ size_t jsonLen;
 			//if (this->jsonReader->parse((const char*)0, (const char*)10, (Json::Value*)"k", &jsonParseError))
 			if(this->jsonReader->parse(text2.c_str(),text2.c_str()+text2.size(),&json,&jsonParseError))
 			{
-				std::printf("Here inner parse\n");
+				std::printf("After json parsing.\n");
 				std::cout << json << std::endl;
 				Channel::Request* request = nullptr;
 
 				try
 				{
-					std::printf("request 1\n");
+					std::printf("Creating ::Request.\n");
 					request = new Channel::Request(this, json);
-					std::printf("request2\n");
 				}
 				catch (const MediaSoupError& error)
 				{
@@ -311,15 +282,12 @@ size_t jsonLen;
 
 				if (request != nullptr)
 				{
-					std::printf("request is not nullptr\n");
-					//request->Reject("Room already exists");
+					std::printf("Request is not nullptr\n");
 					// Notify the listener.
-					//->mfuck();
-					//li->OnChannelRequest(this,request);
 					this->listener->OnChannelRequest(this, request);
-					this->listener->mfuck();
+					//this->listener->mfuck();
 
-					std::printf("Delete the Request.\n");
+					std::printf("Deleting the Request.\n");
 					delete request;
 				}
 			}
@@ -360,7 +328,7 @@ size_t jsonLen;
 	void UnixStreamSocket::UserOnUnixStreamSocketClosed(bool isClosedByPeer)
 	{
 		MS_TRACE_STD();
-
+std::printf("Entering ::UserOnUnixStreamSocketClosed(bool).\n");
 		this->closed = true;
 
 		if (isClosedByPeer)
@@ -373,6 +341,7 @@ size_t jsonLen;
 
 // C wrapper
 void*set_channel(){
+// dummy integer 3 as a parameter, just for fun
 auto* chl = new Channel::UnixStreamSocket(3);
 return chl;
 }
@@ -423,6 +392,3 @@ libuv loop ended
 destroy()
 Loop was destroyd?
 */
-
-
-

@@ -53,7 +53,7 @@ namespace Channel
 	Request::Request(Channel::UnixStreamSocket* channel, Json::Value& json) : channel(channel)
 	{
 		MS_TRACE();
-	std::printf("here must be within request::request\n");
+	std::printf("Entering Request::Request(channel, json)\n");
 std::cout << json << std::endl;
 		static const Json::StaticString JsonStringId{ "id" };
 		static const Json::StaticString JsonStringMethod{ "method" };
@@ -80,10 +80,10 @@ std::cout << json << std::endl;
 		}
 		else
 		{
-			std::printf("method not ALLOWED\n");
+			std::printf("Method not ALLOWED! : %s\n", this->method.c_str());
 			Reject("method not allowed");
 
-			//MS_THROW_ERROR("unknown .method '%s'", this->method.c_str());
+			MS_THROW_ERROR("unknown .method '%s'", this->method.c_str());
 		}
 
 		if (json[JsonStringInternal].isObject())
@@ -99,14 +99,14 @@ std::cout << json << std::endl;
 
 	Request::~Request()
 	{
-		std::printf("request destructure?\n");
-		//MS_TRACE();
+		std::printf("Look ma, ~Request() destructor!\n");
+		MS_TRACE();
 	}
 
 	void Request::Accept()
 	{
-		//MS_TRACE();
-std::printf("request::accept()\n");
+	MS_TRACE();
+std::printf("Entering Request::Accept()\n");
 		static Json::Value emptyData(Json::objectValue);
 
 		Accept(emptyData);
@@ -115,7 +115,7 @@ std::printf("request::accept()\n");
 	void Request::Accept(Json::Value& data)
 	{
 		MS_TRACE();
-std::printf("request accept 2\n");
+std::printf("Entering Request::Accept(json)\n");
 		static Json::Value emptyData(Json::objectValue);
 		static const Json::StaticString JsonStringId{ "id" };
 		static const Json::StaticString JsonStringAccepted{ "accepted" };
@@ -140,6 +140,7 @@ std::printf("request accept 2\n");
 
 	void Request::Reject(std::string& reason)
 	{
+		std::printf("Entering Request::Reject(str reason)\n");
 		MS_TRACE();
 
 		Reject(reason.c_str());
@@ -152,13 +153,13 @@ std::printf("request accept 2\n");
 	void Request::Reject(const char* reason)
 	{
 		MS_TRACE();
-std::printf("KKKKKKKKKKKKKKKKKKKKKKKKu!!!\n");
+std::printf("Entering Request::Reject(char*reason)\n");
 		static const Json::StaticString JsonStringId{ "id" };
 		static const Json::StaticString JsonStringRejected{ "rejected" };
 		static const Json::StaticString JsonStringReason{ "reason" };
 std::cout << this->replied << std::endl;
 //MS_ASSERT(!this->replied, "Request already replied");
-std::printf("KUKU: %d\n",this->a);
+std::printf("Some dummy 'a' value: %d\n",this->a);
 //if(this->replied) return;
 		this->a=40;
 		this->replied = true;

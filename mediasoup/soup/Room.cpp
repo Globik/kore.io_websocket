@@ -27,7 +27,7 @@ namespace RTC
 	{
 		MS_TRACE();
 
-		std::printf("Parse all RTP capabilities.\n");
+		std::printf("Entering Room::ClassInit().\n");
 		{
 			// NOTE: These lines are auto-generated from data/supportedCapabilities.js.
 			const std::string supportedRtpCapabilities =
@@ -75,14 +75,13 @@ namespace RTC
 	    : roomId(roomId), listener(listener), notifier(notifier)
 	{
 		MS_TRACE();
-		std::printf("from ROOM::Room\n");
-//cout << " from Room::Room" << endl;
+		std::printf("Entering Room::Room(listener, notifier, roomId, json\n");
 		static const Json::StaticString JsonStringMediaCodecs{ "mediaCodecs" };
 	}
 
 	Room::~Room()
 	{
-		std::printf("Room() destructed?\n");
+		std::printf("Look ma, ~Room() destructor!\n");
 		MS_TRACE();
 	
 	}
@@ -94,7 +93,7 @@ namespace RTC
 		static const Json::StaticString JsonStringClass{ "class" };
 
 Json::Value eventData(Json::objectValue);
-std::printf("room::destroy()\n");
+std::printf("Entering Room::Destroy().\n");
 		// Close all the Peers.
 		// NOTE: Upon Peer closure the onPeerClosed() method is called which
 		// removes it from the map, so this is the safe way to iterate the map
@@ -125,7 +124,7 @@ std::printf("room::destroy()\n");
 	Json::Value Room::ToJson() const
 	{
 		MS_TRACE();
-std::printf("room::tojson().\n");
+std::printf("Entering Room::ToJson().\n");
 		static const Json::StaticString JsonStringRoomId{ "roomId" };
 		static const Json::StaticString JsonStringCapabilities{ "capabilities" };
 		static const Json::StaticString JsonStringPeers{ "peers" };
@@ -188,7 +187,7 @@ std::printf("room::tojson().\n");
 	void Room::HandleRequest(Channel::Request* request)
 	{
 		MS_TRACE();
-		std::printf("room::handlerequest()*********************************************************************\n");
+		std::printf("Entering Room::HandleRequest(request).\n");
 
 		switch (request->methodId)
 		{
@@ -201,7 +200,7 @@ std::printf("room::tojson().\n");
 				Destroy();
 
 				MS_DEBUG_DEV("Room closed [roomId:%" PRIu32 "]", roomId);
-
+std::printf("Room closed [roomId:%" PRIu32 "]", roomId);
 				request->Accept();
 
 				break;
