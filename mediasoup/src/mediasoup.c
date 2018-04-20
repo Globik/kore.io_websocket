@@ -97,16 +97,46 @@ uv_stop(((uv_handle_t*)handle)->loop);
 return NULL;
 }
 void*on_from_cpp(uv_callback_t*handle,void*data){
-	if(data==NULL)return NULL;
+if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
+	//struct pupkin vasja=(struct pupkin)data;
+
+struct pupkin*vasja=(struct pupkin*)data;
+kore_log(LOG_INFO,"ON_FROM_CPP data came: vasja->mu: %s int vasja->n: %d",vasja->suka,vasja->n);
+kore_log(LOG_INFO,"kor memm: %p",vasja);
+	//kore_log(LOG_INFO,"ADDITIES: %s and Size: %d",vasja->out,vasja->size);
+//kore_log(LOG_INFO,"FUKA: %s",vasja->fuka);
+//free(vasja->fuka);
+	//free(data);
 // should be came from libuv.cpp class. As a "notification" mechanism from libuv's world to the kore's world.
 // TODO: check if two way(bidirectional) communication callbacks are blocking each other in the libuv loop thread
-kore_log(LOG_NOTICE,"ON_FROM_CPP data came. %s\n",(char*)data);
-char*s=(char*)data;
+	
+//kore_log(LOG_NOTICE,"ON_FROM_CPP data came. %s\n",(char*)data);
+char*s=vasja->suka;
+	
+//char*s=(char*)vasja->suka;
+kore_log(LOG_INFO,"SUUUKA!: %s and: %zu",s,sizeof(vasja));
 if(!strcmp(s,"exit")){
+//if(!strcmp(s,"exit")){	
 printf("EXIT!!!\n");
-uv_stop(get_loopi());				 
+uv_stop(get_loopi());	
+	//free(vasja);
 }
+	//free((void*)vasja->suka);
+	//free(s);
+	//s=0;
+	//if(vasja->n !=0){vasja->n=0;free(vasja->suka);vasja->suka=NULL;}
+	//free(vasja->out);
+	free(vasja);
+	//free(data);
+	
+	//kore_log(LOG_INFO,"After kor memm: %p %zu",vasja,sizeof(struct pupkin));
+	
+	kore_log(LOG_INFO,"After SUKA: %s",vasja->suka);
+	
 
+	//free((void*)vasja->mu);
+
+/*
 json_auto_t*reply=json_object();
 json_object_set_new(reply,"type",json_string("on_result"));
 json_object_set_new(reply,"msg",json_string(s));
@@ -114,7 +144,14 @@ size_t size=json_dumpb(reply,NULL,0,0);
 if(size==0) {return NULL;}
 char *buf=alloca(size);
 size=json_dumpb(reply,buf,size,0);
-kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
+kore_log(LOG_INFO,"SIZE: %d",size);
+
+kore_log(LOG_INFO,"BUFFER JSON: %s",buf);
+kore_log(LOG_INFO,"Here must be kore_websocket_send();");
+//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
+kore_log(LOG_INFO,"ADRESS OF VOID*DATA: %p OF (CHAR*)DATA: %p",data,(char*)data);
+//free(data);
+*/
 return NULL;
 }
 int page_ws_connect(struct http_request*req){
@@ -190,10 +227,10 @@ void*chl=set_channel();
 m_init();
 
 //char*s="{\"mama\":\"papa\"}";
-//char*s1="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
+char*s1="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 
-//int rc=uv_callback_fire(&to_cpp,(void*)s1, NULL);
-//kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
+int rc=uv_callback_fire(&to_cpp,(void*)s1, NULL);
+kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 suka(chl);// it's a Loop loop(channel)
 m_destroy();
 kore_task_channel_write(t,"mama\0",5);

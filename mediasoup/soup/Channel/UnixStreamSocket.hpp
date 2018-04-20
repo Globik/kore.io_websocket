@@ -68,6 +68,12 @@ namespace Channel
 extern "C"
 {
 #endif
+struct pupkin{
+size_t n;
+char * suka;
+};
+//char*out;
+//size_t size;
 
 void * on_from_cpp(uv_callback_t*,void*);
 void*set_channel(void);

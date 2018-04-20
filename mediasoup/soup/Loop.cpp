@@ -20,7 +20,7 @@ Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
 
 	std::printf("Channel's listener starting.\n");
 	this->channel->SetListener(this);
-	Loop::mfuck();
+	//Loop::mfuck();
 
 	// Create the Notifier instance.
 	this->notifier = new Channel::Notifier(this->channel);

@@ -11,10 +11,12 @@
 #include <sstream> // std::ostringstream
 #include <string>
 #include <unistd.h> //usleep
+#include <memory.h>
 extern "C" {
 //#include <netstring.h>
 }
 uv_callback_t from_cpp;//stop_w;
+//struct pupkin*mili={nullptr};
 namespace Channel
 {
 	/* Static. */
@@ -30,12 +32,12 @@ namespace Channel
 	UnixStreamSocket::UnixStreamSocket(int fd) //: ::UnixStreamSocket::UnixStreamSocket(fd, MaxSize)
 	{
 		MS_TRACE_STD();
-	
+	//mili=new pupkin;
 		uv_loop_t*mloop=deplibuv::getloop();
 		//uv_loop_set_data(mloop,(void*)"some_data");
 		uv_loop_set_data(mloop,(void*)this);
 		
-int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT);
+int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT/*COALESCE*/);
 		std::printf("uv_callback_t &to_cpp init: %d\n",rc);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
 		std::printf("uv_callback_t &from_cpp init: %d\n",rc);
@@ -73,12 +75,24 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
 
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-		int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
+		//const 
+		//char*exi="exit";
+		//mili->suka=(void*)exi;
+		struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
+		if(mili==NULL){std::printf("mili is nULL\n");}
+		mili->n=0;
+		mili->suka=(char*)"exit";
+		//int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
+		int r=uv_callback_fire(&from_cpp,mili,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+		//std::printf("MEMM of in destructor: %p\n",mili);
 MS_TRACE_STD();
+	
 std::printf("Look ma, ~UnixStreamSocket() destructor!\n");
+		//delete mili;
 		delete this->jsonReader;
 		delete this->jsonWriter;
+		//delete mili;
 	}
 /*
 void * UnixStreamSocket::close_work(uv_callback_t*callback,void*data){
@@ -112,7 +126,8 @@ this->listener = listener;
 	{
 		std::printf("Entering UnixStreamSocket::Send(Json)\n");
 		std::cout << msg << std::endl;
-		
+		//struct pupkin * mili=new pupkin;
+		//mili->n=4;
 		//int r=uv_callback_fire(&from_cpp,(void*)"HALLO from cpp!!!",NULL);
 	//	int r=uv_callback_fire(&from_cpp,(void*)"msg",NULL);
 	//	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
@@ -129,17 +144,54 @@ this->listener = listener;
 		this->jsonWriter->write(msg, &stream);
 		nsPayload    = stream.str();
 		nsPayloadLen = nsPayload.length();
+		/*
+		std::cout << "nsPayload: " << nsPayload << std::endl;
+		std::cout << "nsPayloadLen: " << nsPayloadLen << std::endl;
 		
-		int r=uv_callback_fire(&from_cpp,(void*)nsPayload.c_str(),NULL);
+		std::printf("char  nsPayload: %s\n",nsPayload.c_str());
+		std::printf("len nsPayloadLen %d\n",nsPayloadLen);
+		*/
+		//char*d=reinterpret_cast<char*>nsPayload.c_str();
+		//const char *er=nsPayload.c_str();
+		//char * d=strdup(er);
+		
+		struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
+		//mili->n=0;
+		//mili->suka=(void*)nsPayload.c_str();
+		//std::printf("INTEGER: %d and memm: %p\n",mili->n,mili);
+		mili->suka=NULL;
+		//mili->suka=(char*)malloc(sizeof(mili->suka)*nsPayloadLen);
+		//memcpy(mili->suka,nsPayload.c_str(),nsPayloadLen);
+		mili->n=nsPayloadLen;
+		mili->suka=const_cast<char*>(nsPayload.c_str());
+		//mili->size=nsPayloadLen;
+		
+		/*
+		struct pupkin mili;
+		mili.suka=(void*)nsPayload.c_str();
+		mili.n=20;
+		mili.fuka[nsPayloadLen]='0';//(char*)nsPayload.c_str();
+		//memcpy(mili.fuka,nsPayload.c_str(),nsPayloadLen);
+		*/
+		//int r=uv_callback_fire(&from_cpp,(void*)nsPayload.c_str(),NULL);
+		int r=uv_callback_fire(&from_cpp,mili,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+		std::printf("INTEGER_2: %d and memm_2: %p\n",mili->n,mili);
+		//free(mili);
+		//r=uv_callback_fire(&from_cpp,mili,NULL);
+		//std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+		//free(mili.fuka);
+		//free((void*)d);
+		//free(mili);
 /*
 		if (nsPayloadLen > MessageMaxSize)
 		{
-			MS_ERROR_STD("mesage too big");
+			std::printf("mesage too big*************************************************************************************\n");
 
 			return;
 		}
-
+		*/
+/*
 		if (nsPayloadLen == 0)
 		{
 			nsNumLen       = 1;
