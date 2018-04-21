@@ -196,7 +196,7 @@ std::printf("Entering Room::ToJson().\n");
 #ifdef MS_LOG_DEV
 				uint32_t roomId = this->roomId;
 #endif
-
+std::printf("CLOSING THE ROOM\n");
 				Destroy();
 
 				MS_DEBUG_DEV("Room closed [roomId:%" PRIu32 "]", roomId);

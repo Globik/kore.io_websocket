@@ -12,6 +12,7 @@
 #include <string>
 #include <unistd.h> //usleep
 #include <memory.h>
+#include <string.h>
 extern "C" {
 //#include <netstring.h>
 }
@@ -33,11 +34,12 @@ namespace Channel
 	{
 		MS_TRACE_STD();
 	//mili=new pupkin;
+		//this->closed=0;
 		uv_loop_t*mloop=deplibuv::getloop();
 		//uv_loop_set_data(mloop,(void*)"some_data");
 		uv_loop_set_data(mloop,(void*)this);
 		
-int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT/*COALESCE*/);
+int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_COALESCE);
 		std::printf("uv_callback_t &to_cpp init: %d\n",rc);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
 		std::printf("uv_callback_t &from_cpp init: %d\n",rc);
@@ -78,12 +80,13 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
 		//const 
 		//char*exi="exit";
 		//mili->suka=(void*)exi;
-		struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
+		/*struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
 		if(mili==NULL){std::printf("mili is nULL\n");}
 		mili->n=0;
 		mili->suka=(char*)"exit";
-		//int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
-		int r=uv_callback_fire(&from_cpp,mili,NULL);
+		*/
+		int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
+		//int r=uv_callback_fire(&from_cpp,mili,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
 		//std::printf("MEMM of in destructor: %p\n",mili);
 MS_TRACE_STD();
@@ -136,14 +139,32 @@ this->listener = listener;
 		 MS_TRACE_STD();
 
 		std::ostringstream stream;
-		std::string nsPayload;
+		// std::string nsPayload;
 		size_t nsPayloadLen;
 		size_t nsNumLen;
 		size_t nsLen;
 
 		this->jsonWriter->write(msg, &stream);
-		nsPayload    = stream.str();
-		nsPayloadLen = nsPayload.length();
+		//nsPayload    = stream.str();
+		//nsPayloadLen = nsPayload.length();
+		//static 
+		const std::string tmp=stream.str();
+		char*wl=strdup(tmp.c_str());
+		//const char*ws=tmp.c_str();
+		
+		//delete [] ws;
+	//	ws=new char[stream.str().size()+1];
+		//ws[stream.str().size()+1];
+		//ws=(char*)malloc(sizeof(char)*stream.str().size()+1);
+		/*
+		this->me=(char*)malloc(sizeof(char)*stream.str().size()+1);
+		memcpy(this->me,stream.str().c_str(),stream.str().size()+1);
+		*/
+		//ws=(char*)malloc(sizeof(char)*stream.str().size()+1);
+		//ws=(char*)malloc(((stream.str().size())+1)*sizeof(char));
+		//memcpy(ws,stream.str().c_str(),stream.str().size()+1);
+		
+		//strcpy(ws,stream.str().c_str());
 		/*
 		std::cout << "nsPayload: " << nsPayload << std::endl;
 		std::cout << "nsPayloadLen: " << nsPayloadLen << std::endl;
@@ -154,7 +175,7 @@ this->listener = listener;
 		//char*d=reinterpret_cast<char*>nsPayload.c_str();
 		//const char *er=nsPayload.c_str();
 		//char * d=strdup(er);
-		
+		/*
 		struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
 		//mili->n=0;
 		//mili->suka=(void*)nsPayload.c_str();
@@ -164,6 +185,7 @@ this->listener = listener;
 		//memcpy(mili->suka,nsPayload.c_str(),nsPayloadLen);
 		mili->n=nsPayloadLen;
 		mili->suka=const_cast<char*>(nsPayload.c_str());
+		*/
 		//mili->size=nsPayloadLen;
 		
 		/*
@@ -174,9 +196,16 @@ this->listener = listener;
 		//memcpy(mili.fuka,nsPayload.c_str(),nsPayloadLen);
 		*/
 		//int r=uv_callback_fire(&from_cpp,(void*)nsPayload.c_str(),NULL);
-		int r=uv_callback_fire(&from_cpp,mili,NULL);
+		//int r=uv_callback_fire(&from_cpp,(void*)ws,NULL);
+		//int r=uv_callback_fire(&from_cpp,mili,NULL);
+		
+		int r=uv_callback_fire(&from_cpp,wl,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-		std::printf("INTEGER_2: %d and memm_2: %p\n",mili->n,mili);
+		//free(wl);
+		//std::printf(" and memm_2: %p\n",ws);
+		//free(ws);
+		//std::printf("WSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS %s\n",ws);
+		//free(this->me);
 		//free(mili);
 		//r=uv_callback_fire(&from_cpp,mili,NULL);
 		//std::printf("uv_callback_t &from_cpp fire: %d\n",r);
@@ -211,15 +240,21 @@ this->listener = listener;
 */
 		//Write((const uint8_t*)"mama\0", 5);
 	}
-
+	
 	void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
 		std::printf("Entering UnixStreamSocket::SendLog(char, size_t).\n");
-	/*
-		if (this->closed){std::printf("send log is closed.\n");
+		std::printf("SENDLOG: %s\n",nsPayload);
+		int r=uv_callback_fire(&from_cpp,(void*)nsPayload,NULL);
+		//int r=uv_callback_fire(&from_cpp,mili,NULL);
+		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+	//this->closed=true;
+		/*if (this->closed){
+		std::printf("send log is closed.\n");
 			//return;
 		}
 		*/
+		
 
 		// MS_TRACE_STD();
 /*
@@ -258,7 +293,7 @@ this->listener = listener;
 	{
 std::printf("Entering UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen).\n");
 		//if (this->closed)return;
-		if(this->closed){std::printf("SendBinary() occured, but this-closed is closed.\n");}
+		//if(this->closed){std::printf("SendBinary() occured, but this-closed is closed.\n");}
 /*
 		size_t nsNumLen;
 		size_t nsLen;

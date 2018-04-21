@@ -27,7 +27,7 @@ Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
 
 	// Set the signals handler.
 	this->signalsHandler = new SignalsHandler(this);
-
+//this->closed=0;
 	// Add signals to handle.
 	this->signalsHandler->AddSignal(SIGINT, "INT");
 	this->signalsHandler->AddSignal(SIGTERM, "TERM");

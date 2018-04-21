@@ -10,6 +10,7 @@
 	<button onclick="send_message();">send message</button>
 <hr>
 	<button onclick="create_room();">create a room</button> | <button onclick="delete_room();">delete a room</button>
+	<button onclick="room_dump();">room_dump</button>
 <hr>
 <output id="mout"></output>
 
@@ -88,6 +89,11 @@ if(socket)socket.send(JSON.stringify(d));
 function delete_room(){
 var d={};
 	d.type="delete_room";
+	if(socket)socket.send(JSON.stringify(d));
+}
+function room_dump(){
+var d={};
+	d.type="room_dump";
 	if(socket)socket.send(JSON.stringify(d));
 }
 function fuser(){

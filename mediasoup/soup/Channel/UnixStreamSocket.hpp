@@ -49,7 +49,8 @@ namespace Channel
 	public:
 		void UserOnUnixStreamRead(char*k);// override;
 		void UserOnUnixStreamSocketClosed(bool isClosedByPeer);//override;
-
+char * me{nullptr};
+		void bfree();
 	private:
 		// Passed by argument.
 		Listener* listener{ nullptr };
@@ -77,7 +78,7 @@ char * suka;
 
 void * on_from_cpp(uv_callback_t*,void*);
 void*set_channel(void);
-	
+
 #ifdef __cplusplus
 }
 #endif
