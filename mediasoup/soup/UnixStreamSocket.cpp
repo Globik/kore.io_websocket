@@ -1,3 +1,4 @@
+// kore.io_websocket soup
 #define MS_CLASS "Channel::UnixStreamSocket"
 // #define MS_LOG_DEV
 

@@ -1,5 +1,6 @@
-#ifndef MS_LOOP_HPP
-#define MS_LOOP_HPP
+//#ifndef MS_LOOP_HPP
+//#define MS_LOOP_HPP
+
 #ifdef __cplusplus
 #include "common.hpp"
 #include "Channel/Notifier.hpp"
@@ -9,7 +10,7 @@
 #include "Room.hpp"
 #include "handles/SignalsHandler.hpp"
 #include <unordered_map>
-
+// from kore.io_websocket/mediasoup
 class Loop : public SignalsHandler::Listener,
              public Channel::UnixStreamSocket::Listener,
              public RTC::Room::Listener
@@ -17,7 +18,7 @@ class Loop : public SignalsHandler::Listener,
 public:
 	explicit Loop(Channel::UnixStreamSocket* channel);
 	~Loop();// override;
-	//Channel::~UnixStreamSocket() override;
+	
 
 private:
 	void Close();
@@ -63,11 +64,4 @@ void suka(void*);
 #ifdef __cplusplus
 }
 #endif
-
-
-
-
-
-
-
 #endif

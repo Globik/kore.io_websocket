@@ -1,0 +1,71 @@
+uv_callback_t &to_cpp init: 0
+uv_callback_t &from_cpp init: 0
+it's without strdup() so:
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() | <configuration>
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   logLevel            : "debug"
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   logTags             : "info"
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   rtcIPv4             : "127.0.0.1"
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   rtcIPv6             : (unavailable)
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   rtcAnnouncedIPv4    : (unset)
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   rtcAnnouncedIPv6    : (unset)
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   rtcMinPort          : 40000
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() |   rtcMaxPort          : 49999
+uv_callback_t &from_cpp fire: 0 //8
+sendlog()
+Out in: D[id:345678] Settings::PrintConfiguration() | </configuration>
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] main::main() | starting mediasoup-worker [pid:2911]
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] main::main() | Little-Endian CPU detected
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] main::main() | 32 bits architecture detected
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] DepLibUV::PrintVersion() | loaded libuv version: "1.19.3-dev"
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] DepOpenSSL::ClassInit() | loaded openssl version: "OpenSSL 1.0.1f 6 Jan 2014"
+uv_callback_t &from_cpp fire: 0
+sendlog()
+Out in: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0" //16
+uv_callback_t &from_cpp fire: 0
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+ON_FROM_CPP: D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0"
+^Cuv_callback_t &from_cpp fire: 0
+ON_FROM_CPP: exit
+^C
+ON_FROM_CPP: 78:D[id:345678] DepLibSRTP::ClassInit() | loaded libsrtp version: "libsrtp 2.0.0",6 Jan 2014"

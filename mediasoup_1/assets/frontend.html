@@ -1,0 +1,106 @@
+<!DOCTYPE>
+<html>
+<body>
+	User: <b id="vuser"></b><br>
+
+<form action="/" onsubmit="connect(); return false;">
+<input type="submit" value="connect">
+</form>
+	<input type="text" id="f" value="alice"/>
+	<button onclick="send_message();">send message</button>
+<hr>
+	<button onclick="create_room();">create a room</button> | <button onclick="delete_room();">delete a room</button>
+	<button onclick="room_dump();">room_dump</button>
+<hr>
+<output id="mout"></output>
+
+	<script>
+var socket = null;
+
+var id=fuser();
+function gid(i){return document.getElementById(i);}
+//var mout=document.getElementById("mout");
+	//mout.innerHTML="";
+function open(evt) {
+/*
+vuser.textContent=id;
+var m = {};
+mout.innerHTML+="websocket opened<br>";
+m.name=id;
+m.type="login";
+var lu=JSON.stringify(m);
+//socket.send(lu+'\0');
+if(socket)socket.send(lu);
+*/
+}
+
+
+function on_message(evt) {
+var mout=gid("mout");
+try{
+var mi=JSON.parse(evt.data);
+}catch(e){
+console.error("json parser failed.");
+mout.innerHTML+="<b style=\"background:red;\">err parser: </b>"+e.type+"<br>";
+mout.innerHTML+="<b style=\"background:green;\">raw data: </b> "+evt.data+"<br>";
+return;
+}
+
+	if(mi.type=="ack"){
+	mout.innerHTML+="<b>ack: </b>"+mi.msg+"<br>";
+	}else if(mi.type=="message"){
+	mout.innerHTML+="<b>message: </b>"+mi.msg+"<br>";
+	}else if(mi.type=="on_result"){
+	mout.innerHTML+="<b>on_result:</b> "+evt.data+"<br>";
+	}else if(mi.type=="soup_error"){
+	mout.innerHTML+="<b>soup_error: </b>"+evt.data+"<br>";
+	}else{
+	mout.innerHTML+="uknown type: "+mi.type+" raw data: "+msg+"<br>";
+	}
+	}
+
+
+
+
+
+function connect() {
+	socket = new WebSocket("ws://127.0.0.1:8888/connect");///"+id);
+
+	socket.onopen = function(evt) { open(evt) };
+	socket.onclose = function(evt) { mout.innerHTML+="closed<br>"; };
+	socket.onmessage = function(evt) { on_message(evt) };
+	socket.onerror = function(evt) { mout.innerHTML+="onerror<br>"; };
+}
+	//var f=document.getElementById("f");
+	function send_message(){
+	var d={};
+		d.type="message";
+		d.id=id;
+		d.msg=f.value;
+		var su=JSON.stringify(d);
+		//alert(su);
+	if(socket)socket.send(su);
+	}
+function create_room(){
+var d={};
+d.type="create_room";
+if(socket)socket.send(JSON.stringify(d));
+}
+function delete_room(){
+var d={};
+	d.type="delete_room";
+	if(socket)socket.send(JSON.stringify(d));
+}
+function room_dump(){
+var d={};
+	d.type="room_dump";
+	if(socket)socket.send(JSON.stringify(d));
+}
+function fuser(){
+var users=["alice","bob","john","willy"];	
+return users[Math.floor(Math.random()*users.length)];
+}
+	</script>
+
+</body>
+</html>

@@ -1,3 +1,4 @@
+// from /KORE.IO_WEBSOCKET/MEDIASOUP proto
 #define MS_CLASS "Loop"
 // #define MS_LOG_DEV
 
