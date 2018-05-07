@@ -16,7 +16,11 @@
 #include "assets.h"
 //#include "uv_callback.h"
 #include "libuv.hpp"
+
+
+
 int init(int);
+int run_curl(struct kore_task*);
 int page(struct http_request*);
 int page2(struct http_request*);
 int pipe_reader(struct kore_task*);
@@ -30,6 +34,9 @@ void han(void);
 
 
 struct kore_task pipe_task;
+struct rstate{
+	struct kore_task task;
+};
 
 uv_callback_t bus, stop_worker, to_cpp;
 
@@ -66,13 +73,55 @@ return (KORE_RESULT_OK);
 
 int page2(struct http_request*req){
 // open front2[html] in a new browser's tab to check if the uv_loop blocks the frontend_html
+	char result[64];
+	u_int32_t len;
+struct rstate * state;
+	if(req->hdlr_extra==NULL){
+	state=kore_malloc(sizeof(*state));
+		req->hdlr_extra=state;
+		kore_task_create(&state->task,run_curl);
+		kore_task_bind_request(&state->task,req);
+		kore_task_run(&state->task);
+		kore_task_channel_write(&state->task,"Lama\0",5);
+		return (KORE_RESULT_RETRY);
+	}else{
+	state=req->hdlr_extra;
+	}
+	if(kore_task_state(&state->task) !=KORE_TASK_STATE_FINISHED){
+	http_request_sleep(req);
+		return (KORE_RESULT_RETRY);
+	}
+	if(kore_task_result(&state->task) !=KORE_RESULT_OK){
+		kore_task_destroy(&state->task);
+		http_response(req,500,NULL,0);
+		return (KORE_RESULT_OK);
+	}
+	len=kore_task_channel_read(&state->task,result,sizeof(result));
+	if(len>sizeof(result)){
+		kore_log(LOG_INFO,"len > sizeof(result) in page2");
+	http_response(req,500,NULL,0);
+	}else{
+		kore_log(LOG_INFO,"Result came: %s",result);
 http_response_header(req,"content-type","text/html");
 http_response(req,200,asset_front2_html,asset_len_front2_html);
 kore_log(LOG_NOTICE,"front2.html");
+	}
+	kore_task_destroy(&state->task);
 return (KORE_RESULT_OK);
 }
 
-
+int run_curl(struct kore_task*t){
+size_t len;
+char user[64];
+	len=kore_task_channel_read(t,user,sizeof(user));
+	if(len>sizeof(user)){
+	kore_log(LOG_INFO,"len > sizeof(user)");
+		return (KORE_RESULT_ERROR);
+	}
+	kore_log(LOG_INFO,"data in run_curl read: %s",user);
+	kore_task_channel_write(t,"Puma\0",5);
+	return (KORE_RESULT_OK);
+}
 
 
 
