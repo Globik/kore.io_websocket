@@ -35,7 +35,7 @@ void han(void);
 
 struct kore_task pipe_task;
 struct rstate{
-	struct kore_task task;
+struct kore_task task;
 };
 
 uv_callback_t bus, stop_worker, to_cpp;
@@ -47,25 +47,28 @@ usleep(20000);
 kore_log(LOG_NOTICE,"at exit han()");
 }
 void kore_worker_configure(){
-kore_log(LOG_NOTICE,"worker configure");
+kore_log(LOG_NOTICE,"worker configure+++");
+//kore_debug("DEBUG?");
 atexit(han);
 }
 int init(int state){
+	
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
-	
+	printf("BBBBBBBBBBBBBBBBBBB\n");
 	kore_task_create(&pipe_task,pipe_reader);
 	kore_task_bind_callback(&pipe_task,pipe_data_available);
 	kore_task_run(&pipe_task);
+	
 	return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
 http_response_header(req,"content-type","text/html");
 // Fire callback to trans a message to libuv.cpp class and check if it blocks kore workflow
 // as a "request" mechanism from the kore's world to the libuv.cpp class.
-int rc=uv_callback_fire(&to_cpp,(void*)"CPP IS OK?", NULL);
+//int rc=uv_callback_fire(&to_cpp,(void*)"CPP IS OK?", NULL);
 // if 0 then OK
-kore_log(LOG_NOTICE,"rc to_cpp fire: %d\n",rc);
+//kore_log(LOG_NOTICE,"rc to_cpp fire: %d\n",rc);
 http_response(req,200,asset_frontend_html,asset_len_frontend_html);
 kore_log(LOG_NOTICE,"http request should be sent");
 return (KORE_RESULT_OK);
@@ -89,9 +92,11 @@ struct rstate * state;
 	}
 	if(kore_task_state(&state->task) !=KORE_TASK_STATE_FINISHED){
 	http_request_sleep(req);
-		return (KORE_RESULT_RETRY);
+		//kore_log(LOG_INFO,"returning kore_result_retry,not finished jet");
+	return (KORE_RESULT_RETRY);
 	}
 	if(kore_task_result(&state->task) !=KORE_RESULT_OK){
+		kore_log(LOG_INFO,"not kore result ok, destroy state task");
 		kore_task_destroy(&state->task);
 		http_response(req,500,NULL,0);
 		return (KORE_RESULT_OK);
@@ -169,13 +174,15 @@ kore_log(LOG_NOTICE, "rc to_cpp init: %d\n",rc);
 rc=uv_callback_init(get_loopi(),&stop_worker,stop_worker_cb,UV_COALESCE);
 kore_log(LOG_NOTICE,"rc init stop_worker: %d\n",rc);
 runi();
-kore_task_channel_write(t,"FUCK\0",5);
+//kore_task_channel_write(t,"FUCK\0",5);
 kore_log(LOG_NOTICE,"END?");
 destri();
 kore_log(LOG_NOTICE,"Bye. *******\n");
 return (KORE_RESULT_OK);
 }
+
 void pipe_data_available(struct kore_task*t){
+	
 if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");return;}
    u_int8_t buf[BUFSIZ];
    size_t len=kore_task_channel_read(t,buf,sizeof(buf));

@@ -1,0 +1,70 @@
+kore_task_bind_request: 0xb710e420 bound to 0xb7236d08
+task_thread_spawn() will lock tt->lock for us.
+idx 1
+insert tail
+kore_task_channel_write: 0xb7236d08 <- 0xb7573980 5
+task_thread: #1 starting
+task_thread#1: woke up
+task_thread#1: executing 0xb7236d08
+kore_task_channel_read: 0xb7236d08 -> 0xb65ff2cc 64
+[wrk 0]: data in run_curl read: Lama
+kore_task_channel_write: 0xb7236d08 <- 0xb75739ed 5
+kore_task_finished: 0xb7236d08 (1)
+kore_task_channel_read: 0xb7236d08 -> 0xbfe8da1c 64
+[wrk 0]: Result came: Puma
+[wrk 0]: front2.html
+kore_task_destroy: 0xb7236d08
+t->req is NOT NULL in rlist
+closing t->fds[0]
+-------
+============
+here blocks
+kore_task_bind_request: 0xb710e420 bound to 0xb7236da4 Cycle task around. 
+insert tail
+kore_task_channel_write: 0xb7236da4 <- 0xb7573980 5
+=============
+then releases,after  browser aborted timeout
+
+kore_task_bind_request: 0xb710e370 bound to 0xb7236b34 Cycle task around. 
+insert tail
+task_thread#1: woke up
+task_thread#1: executing 0xb7236b34
+kore_task_channel_read: 0xb7236b34 -> 0xb65ff2cc 64
+kore_task_channel_write: 0xb7236b34 <- 0xb7573980 5
+[wrk 0]: data in run_curl read: Lama
+kore_task_channel_write: 0xb7236b34 <- 0xb75739ed 5
+kore_task_finished: 0xb7236b34 (1)
+kore_task_channel_read: 0xb7236b34 -> 0xbfe8da1c 64
+[wrk 0]: Result came: Puma
+[wrk 0]: front2.html
+kore_task_destroy: 0xb7236b34
+t->req is NOT NULL in rlist
+closing t->fds[0]
+
+======================
+ctrl + C:
+[wrk 0]: parent gone, shutting down
+[parent]: server shutting down
+[parent]: waiting for workers to drain and shutdown
+[wrk 0]: 
+ on stop worker cb
+
+kore_task_channel_write: 0xb7576240 <- 0xb7573a9d 5
+[wrk 0]: END?
+Loop was destroyd?
+[wrk 0]: Bye. *******
+
+kore_task_finished: 0xb7576240 (1)
+task_thread#0: woke up
+task_thread#0: executing 0xb7236da4
+kore_task_channel_read: 0xb7236da4 -> 0xb6f352cc 64
+[wrk 0]: data in run_curl read: Lama
+kore_task_channel_write: 0xb7236da4 <- 0xb75739ed 5
+kore_task_finished: 0xb7236da4 (1)
+[wrk 0]: rc stop_worker fire 0
+[wrk 0]: at exit han()
+[parent]: worker 0 (9362)-> status 0
+[parent]: goodbye
+
+
+
