@@ -55,7 +55,7 @@ int init(int state){
 	
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
-	printf("BBBBBBBBBBBBBBBBBBB\n");
+	
 	kore_task_create(&pipe_task,pipe_reader);
 	kore_task_bind_callback(&pipe_task,pipe_data_available);
 	kore_task_run(&pipe_task);

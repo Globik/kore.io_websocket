@@ -17,6 +17,8 @@
 #include "uv_callback.h"
 #include <uv.h>
 #include <jansson.h>
+#include <ee.h>
+#include "kore_media.h"
 
 //#include "common.hpp"
 #include "DepLibSRTP.hpp"
@@ -33,6 +35,9 @@
 #include "RTC/TcpServer.hpp"
 #include "RTC/UdpSocket.hpp"
 #include "RTC/Room.hpp"
+struct media*medias=NULL;
+//ee_t*ee=NULL;
+//const char*event_hello="hello";
 
 int init(int);
 int page(struct http_request*);
@@ -78,12 +83,20 @@ void kore_worker_configure(){
 kore_log(LOG_NOTICE,"worker configure");
 atexit(han);
 }
+void notify(struct media*m, char*s){}
+void on_new_Room(struct media*m, char*s){kore_log(LOG_INFO,"On new room event");}
 int init(int state){
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
+	
 	//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
 kore_task_create(&pipe_task,libuv_task);
 kore_task_bind_callback(&pipe_task, pipe_data_available);
 kore_task_run(&pipe_task);
+medias=media_new(notify,on_new_Room);
+if(medias==NULL){
+kore_log(LOG_INFO,"Media is NULL");	
+	//exit(1);
+}
 return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
@@ -220,6 +233,7 @@ kore_log(LOG_INFO,"type 'create_room'");
 	/*
 	//char*s1="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 */
+	/*
 json_auto_t*repli=json_object();
 json_object_set_new(repli,"id",json_integer(3444444333));
 json_object_set_new(repli,"method",json_string("worker.createRoom"));
@@ -239,6 +253,13 @@ size_t size=json_dumpb(repli,NULL,0,0);
 	size=json_dumpb(repli,buf,size,0);
 int rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
+*/
+if(medias !=NULL){
+int j=medias->create_room(medias,"create_room");
+kore_log(LOG_INFO,"create room resp j: %d",j);
+}else{
+kore_log(LOG_INFO,"media is null");
+}
 send_to_clients=1;
 }else if(!strcmp(type_str,"delete_room")){
 kore_log(LOG_INFO,"type 'delete_room'");
@@ -334,6 +355,7 @@ depopenssl_class_destroy();
 
 
 deplibsrtp_class_destroy();
+if(medias !=NULL)j_refcount_dec(&medias->ref);
 }
 
 json_t *load_json(const char*text,size_t buflen){
