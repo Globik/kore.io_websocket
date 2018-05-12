@@ -78,21 +78,62 @@ std::printf("uv_callback_t &cb_result init: %d\n",rc);
 			this->jsonWriter = builder.newStreamWriter();
 		}
 	}
-
+void on_walk(uv_handle_t*handle,void*arg){
+	std::printf("ON_WALK\n");
+//uv_close(handle,NULL);
+	uv_stop(DepLibUV::GetLoop());
+	//void*mother=uv_loop_get_data(DepLibUV::GetLoop());
+	//free(mother);
+	//uv_run(DepLibUV::GetLoop(),UV_RUN_DEFAULT);
+}
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-		MS_TRACE_STD();
-int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
-std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+		//usleep(1000000);
+		//MS_TRACE_STD();
+	//	uv_stop(DepLibUV::GetLoop());
+		
+//int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
+//std::printf("uv_callback_t &from_cpp fire ON EXIT IN ~UnixStreamSocket: %d\n",r);
+	//usleep(100000);
+		//uv_stop(DepLibUV::GetLoop());
+		uv_walk(DepLibUV::GetLoop(),on_walk,NULL);
+		//uv_run(DepLibUV::GetLoop(),UV_RUN_DEFAULT);
+		void*mother=uv_loop_get_data(DepLibUV::GetLoop());
+	free(mother);
 		delete this->jsonReader;
 		delete this->jsonWriter;
+	//	delete this->channel;
+		//delete this;
+		//uv_stop(DepLibUV::GetLoop());
+		//usleep(1000000);
 	}
 
 void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
 {
-std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
+//std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
+	if(data==NULL) return nullptr;
 void*bu=uv_loop_get_data(DepLibUV::GetLoop());
-static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead((char*)data);
+//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead((char*)data);
+	//struct json_buffer mjs=(struct json_buffer)&data;
+	//static_cast<struct json_buff>(data);
+	//struct json_buffer*ml=reinterpret_cast<json_buffer*>(data);
+	//if(ml==NULL)return nullptr;
+	//std::printf("JSON FUCKER LEN: %d\n",ml->json_len);
+	//std::printf("JSON MESSAGE: %s\n",ml->json_buf);
+	//size_t len=ml->json_len;
+	//char * buf=ml->json_buf;
+	/*free(ml->json_buf);
+	ml->json_buf=NULL;
+	ml->json_len=0;
+	
+	free(ml);
+	ml=NULL;
+	*/
+	//std::sprintf(reinterpret_cast<char*>(WriteBuffer), "%zu:", nsPayloadLen);
+	//std::printf("json size: %d\n",(struct json_buff)data.json_len);// char ,size_t
+	std::printf("in DATA %s\n",(char*)data);
+	static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead(data);
+	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead(len,buf);
 return nullptr;
 }
 	
@@ -250,11 +291,14 @@ return nullptr;
 		*/
 	}
 
-	void UnixStreamSocket::UserOnUnixStreamRead(char*k)
+	void UnixStreamSocket::UserOnUnixStreamRead(void*data)
 	{
 		std::printf("useronunixstreamread()\n");
+		std::printf(", BUFFER: %s\n",(char*)data);
 		MS_TRACE_STD();
-std::string text2=k;
+std::string text2=(char*)data;
+		free(data);
+		data=NULL;
 		// Be ready to parse more than a single message in a single TCP chunk.
 		
 		//while (true){
@@ -336,7 +380,7 @@ std::string text2=k;
 			Json::Value json;
 			std::string jsonParseError;
 
-			//if (this->jsonReader->parse((const char*)jsonStart, (const char*)jsonStart + jsonLen, &json, &jsonParseError))
+			//if (this->jsonReader->parse((const char*)data, (const char*)data + sizeof(data), &json, &jsonParseError))
 			if(this->jsonReader->parse(text2.c_str(),text2.c_str()+text2.size(),&json,&jsonParseError))
 			{
 				Channel::Request* request = nullptr;
@@ -363,7 +407,7 @@ std::string text2=k;
 			{
 				MS_ERROR_STD("JSON parsing error: %s", jsonParseError.c_str());
 			}
-
+//if(buf)free(buf);
 			// If there is no more space available in the buffer and that is because
 			// the latest parsed message filled it, then empty the full buffer.
 		/*

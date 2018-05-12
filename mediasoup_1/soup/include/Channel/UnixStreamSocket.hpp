@@ -41,7 +41,9 @@ namespace Channel
 
 		/* Pure virtual methods inherited from ::UnixStreamSocket. */
 	public:
-		void UserOnUnixStreamRead(char*k);// override;
+		void UserOnUnixStreamRead(void*data);// override;
+		//void UserOnUnixStreamRead(size_t len,char*buf);
+		//void UserOnUnixStreamRead(struct json_buffer*ml);
 		void UserOnUnixStreamSocketClosed(bool isClosedByPeer);// override;
 
 	private:
@@ -60,6 +62,10 @@ namespace Channel
 extern "C"
 {
 #endif
+	struct json_buffer{
+	size_t json_len;
+	char * json_buf;
+	};
 void * on_from_cpp(uv_callback_t*, void*);
 void*on_result(uv_callback_t*,void*);
 void * set_channel(void);

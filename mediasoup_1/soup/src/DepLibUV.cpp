@@ -29,9 +29,10 @@ void DepLibUV::ClassDestroy()
 	MS_TRACE();
 
 	// This should never happen.
-	if (DepLibUV::loop == nullptr)
-		MS_ABORT("DepLibUV::loop was not allocated");
-
+	if (DepLibUV::loop == nullptr){MS_ABORT("DepLibUV::loop was not allocated");}
+std::printf("cCCCCCCCCCCCCCCCCCCCCClosing loop\n");
+	//uv_stop(DepLibUV::GetLoop());
+	//uv_run(DepLibUV::GetLoop(),UV_RUN_DEFAULT);
 	uv_loop_close(DepLibUV::loop);
 	delete DepLibUV::loop;
 }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <glib.h>
-int refdebug;
+extern int refdebug;
 #define j_refcount(refptr,type,member) \
 ((type*)((char*)(refptr) - offsetof(type,member)))
 

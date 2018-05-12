@@ -63,7 +63,7 @@ void websocket_message(struct connection*, u_int8_t,void*,size_t);
 json_t *load_json(const char*,size_t);
 json_t *load_json_str(const char*);
 
-
+int pidor=0;
 struct kore_task pipe_task;
 
 struct pizda{
@@ -76,8 +76,12 @@ const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",
 void han(){
 //int rc=uv_callback_fire(&stop_worker,NULL,NULL);
 //kore_log(LOG_NOTICE,"rc stop_worker fire %d",rc);
-//usleep(20000);
-kore_log(LOG_NOTICE,"at exit han()");
+	if(atexit(han) !=0){
+printf("UNAIBLE SET THE ATEXIT33333333333333333333!!!!!!!!!!!\n");
+}
+usleep(20000);
+kore_log(LOG_NOTICE,"at exit han() ************************** 888888888888888888888888888885\n");
+kore_log(LOG_INFO,"AT EXIT ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 }
 void kore_worker_configure(){
 kore_log(LOG_NOTICE,"worker configure");
@@ -96,6 +100,9 @@ medias=media_new(notify,on_new_Room);
 if(medias==NULL){
 kore_log(LOG_INFO,"Media is NULL");	
 	//exit(1);
+}
+if(atexit(han) !=0){
+printf("UNAIBLE SET THE ATEXIT!!!!!!!!!!!\n");
 }
 return (KORE_RESULT_OK);
 }
@@ -142,15 +149,21 @@ kore_log(LOG_INFO,"ON_FROM_CPP data came: %s",(char*)data);
 //kore_log(LOG_NOTICE,"ON_FROM_CPP data came. %s\n",(char*)data);
 //char*s=vasja->suka;
 	char*s=(char*)data;
+	printf("S: %s\n",s);
 //	kore_log(LOG_INFO,"MEMM of DATA: %p",(char*)data);
 //char*s=(char*)vasja->suka;
 //kore_log(LOG_INFO,"SUUUKA!: %s and: %zu",s,sizeof(vasja));
 if(!strcmp(s,"exit")){
 //if(!strcmp(s,"exit")){
 //free(s);
+pidor=1;
 printf("EXIT!!!\n");
+//usleep(100000);
 uv_stop(get_loop());	
 	//free(vasja);
+	printf("should be here\n");
+	usleep(500000);
+	printf("should be after\n");
 	return NULL;
 }
 	//delete[] data;
@@ -194,11 +207,12 @@ size=json_dumpb(reply,buf,size,0);
 kore_log(LOG_INFO,"SIZE: %d",size);
 
 //kore_log(LOG_INFO,"BUFFER JSON: %s",buf);
-kore_log(LOG_INFO,"Here must be kore_websocket_send();");
-kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
+kore_log(LOG_INFO,"Here must be kore_websocket_send();%d",size);
+kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,/*WEBSOCKET_BROADCAST_GLOBAL*/56);
 //kore_log(LOG_INFO,"ADRESS OF VOID*DATA: %p OF (CHAR*)DATA: %p",data,(char*)data);
 if(duri)free(data);
 data=NULL;
+printf("what a f: %p\n",data);
 
 return NULL;
 }
@@ -287,6 +301,9 @@ kore_log(LOG_INFO,"websocket disconnected: %p",c);
 
 int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
+if(atexit(han) !=0){
+printf("UNAIBLE SET THE ATEXIT!!!!!!!!!!!\n");
+}
 kore_task_channel_write(t,"mama\0",5);
 char*l_id = "345678";
 class_init();
@@ -309,13 +326,13 @@ usleep(1000);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 	*/
 set_loop_channel(channel);
+	//uv_run_loop(g
 m_destroy();
-kore_task_channel_write(t,"mama\0",5);
-kore_log(LOG_NOTICE,"Bye. *******\n");
-m_exit();
-kore_task_channel_write(t,"papa\0",5);
-
+	//uv_stop(get_loop());
 //kore_log(LOG_NOTICE,"Bye. *******\n");
+m_exit();
+
+
 return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
@@ -341,21 +358,28 @@ rtc_srtp_session_class_init();
 rtc_room_class_init();
 }
 void m_exit(){
-usleep(100000);
+	
+	 //atexit(han);
+//usleep(100000);
 kore_log(LOG_INFO,"SUCCESS: And exit with success status.");
 _exit(0);
 }
 void m_destroy(){
+	usleep(100000);
 kore_log(LOG_INFO,"Destroy m_destroy().");
 rtc_dtls_transport_class_destroy();
+	kore_log(LOG_INFO,"De111111111111111111111");
 utils_crypto_class_destroy();
+	kore_log(LOG_INFO,"De2222222222222");
 class_destroy();
-
-depopenssl_class_destroy();
-
-
+	kore_log(LOG_INFO,"De3333333333333333333");
+	
+depopenssl_class_destroy();//??
+	kore_log(LOG_INFO,"De4444444444444444444444");
 deplibsrtp_class_destroy();
-if(medias !=NULL)j_refcount_dec(&medias->ref);
+	kore_log(LOG_INFO,"Destroy m_destroy().555555555555555555555555555555555555");
+if(medias !=NULL){j_refcount_dec(&medias->ref);}else{printf("MEDIAS IS NULL\n");}
+	kore_log(LOG_INFO,"Destroy m_destroy().6666666666666666666666666666666666");
 }
 
 json_t *load_json(const char*text,size_t buflen){
@@ -385,3 +409,19 @@ void*on_result(uv_callback_t*cb,void*data){
 kore_log(LOG_INFO,"on result occured.");
 return NULL;
 }
+
+/*
+^Clibuv loop ended.
+The loop should be ending now!
+look ma, ~Loop() destructor.
+[parent]: server shutting down
+[parent]: waiting for workers to drain and shutdown
+[parent]: worker 0 (17986)-> status 2
+
+	^C[parent]: server shutting down
+libuv loop ended.
+[parent]: waiting for workers to drain and shutdown
+The loop should be ending now!
+look ma, ~Loop() destructor.
+[wrk 0]: Destroy m_destroy().
+*/

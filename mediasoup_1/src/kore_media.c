@@ -6,9 +6,53 @@
 #include <jansson.h>
 #include "uv_callback.h"
 #include "kore_media.h"
+#include "soup_utils.h" //uint32_t random_u32();
+#include "Channel/UnixStreamSocket.hpp"
+#include <kore/kore.h>
+/*
+const char*room_mediaCodecs :
+		[
+			{
+				kind        : 'audio',
+				name        : 'audio/opus',
+				clockRate   : 48000,
+				payloadType : 100,
+				numChannels : 2
+			},
+			{
+				kind        : 'audio',
+				name        : 'audio/PCMU',
+				payloadType : 0,
+				clockRate   : 8000
+			},
+			{
+				kind        : 'video',
+				name        : 'video/vp8',
+				payloadType : 110,
+				clockRate   : 90000
+			},
+			{
+				kind       : 'video',
+				name       : 'video/h264',
+				clockRate  : 90000,
+				payloadType : 112,
+				parameters :
+				{
+					packetizationMode : 1
+				}
+			},
+			{
+				kind        : 'depth',
+				name        : 'video/vp8',
+				payloadType : 120,
+				clockRate   : 90000
+			}
+		]
+*/
 
 static gint vid = 0;
 uv_callback_t to_cpp;
+int refdebug=1;
 static void on_room_remove(gpointer);
 static void add_room_to_media(struct media*, struct room*);
 static int create_room(struct media*,char*);
@@ -46,28 +90,66 @@ if(m==NULL){printf("is null\n");return -1;}
 printf("creating a room. : %s\n",s);
 //notify(m,"room_created - success");
 //ee_emit(ee, event_hello,"room_create");
-	
-json_auto_t*repli=json_object();
-json_object_set_new(repli,"id",json_integer(3444444333));
-json_object_set_new(repli,"method",json_string("worker.createRoom"));
+uint32_t req_id=random_u32();
+uint32_t room_id=random_u32();
+
+json_auto_t * repli=json_object();
+json_object_set_new(repli,"id",json_integer(req_id));
+json_object_set_new(repli, "method", json_string("worker.createRoom"));
 	
 json_t*repli_internal=json_object();
-json_object_set_new(repli_internal,"roomId",json_integer(35));
+json_object_set_new(repli_internal,"roomId",json_integer(room_id));
 json_object_set_new(repli_internal,"sister",json_string("sister_1"));
 	
 json_auto_t*repli_data=json_object();
 json_object_set_new(repli_data,"a",json_integer(1));
 	
-json_object_set_new(repli,"internal",repli_internal);
+json_object_set_new(repli,"internal", repli_internal);
 json_object_set_new(repli,"data",repli_data);
+	/*
 size_t size=json_dumpb(repli,NULL,0,0);
 	if(size==0)return 0;
 	char*buf=alloca(size);
+	
 	size=json_dumpb(repli,buf,size,0);
-int rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
+	*/
+	char*mbuf=NULL;
+	mbuf=json_dumps(repli,12);
+	
+	//struct json_buffer *jsi=NULL;
+	//jsi=malloc(sizeof(struct json_buffer*));//kore_malloc(sizeof(*jsi));
+	//jsi->json_buf=alloca(size);
+	//memset(jsi->json_buf,0,size);
+	//size=json_dumpb(repli,jsi->json_buf,size,0);
+	/*jsi->json_len=0;
+	jsi->json_buf=NULL;
+	jsi->json_len=size;
+	//char *dop;
+	//dop=buf;
+	//memset(jsi->json_buf,0,size);
+	//jsi->json_buf=buf;
+	jsi->json_buf=malloc(sizeof(jsi->json_buf)*size);
+	if(jsi->json_buf==NULL)return -1;
+	memcpy(jsi->json_buf,buf,size);
+	
+	//char*wl=strdup(tmp.c_str());
+	//jsi->json_buf=strdup(buf);
+	//memset(jsi.json_buf,0, size);
+	//using memcpy to copy sructure memcpy(&person_copy,&person,sizeof(person))
+	//memcpy(jsi.json_buf,buf,size);
+	printf("json_size :%d \n",jsi->json_len);
+	printf("json buf: %s\n",jsi->json_buf);
+	*/
+int rc=uv_callback_fire(&to_cpp,mbuf, NULL);
+//	int rc=uv_callback_fire(&to_cpp,jsi, NULL);
+printf("TO_CPP buffer: %s\n",mbuf);
 printf("uv_callback_t &to_cpp fire %d",rc);
-	
-	
+	//free(jsi->json_buf);
+	//free(jsi->json_buf);
+	//kore_free(jsi->json_buf);
+	//free(mbuf);
+	//mbuf=NULL;
+	//json_decref(repli);
 return 0;
 }
 

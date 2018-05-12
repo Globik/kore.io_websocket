@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <iostream> // std::cout, std::cerr
 #include <string>
+#include <unistd.h> //usleep
 #include <utility> // std::pair()
 
 /* Instance methods. */
@@ -34,6 +35,7 @@ Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
 
 	MS_DEBUG_DEV("starting libuv loop");
 	DepLibUV::RunLoop();
+	//uv_stop(DepLibUV::GetLoop());
 	std::printf("libuv loop ended.\n");
 	MS_DEBUG_DEV("libuv loop ended");
 }
@@ -47,11 +49,11 @@ Loop::~Loop()
 void Loop::Close()
 {
 	MS_TRACE();
-
+//uv_stop(DepLibUV::GetLoop());
 	if (this->closed)
 	{
 		MS_ERROR("already closed");
-
+std::printf("ALREADY CLOSED\n");
 		return;
 	}
 
@@ -77,9 +79,12 @@ void Loop::Close()
 	delete this->notifier;
 
 	// Close the Channel socket.
+	//uv_stop(DepLibUV::GetLoop());
 	if (this->channel != nullptr){
 	//this->channel->Destroy();
-	// by me. the f knows why I do it explicitly. 
+	std::printf("by me. the f knows why I do it explicitly.\n"); 
+		//this->channel->UserOnUnixStreamSocketClosed(false);
+		//usleep(1000000);
 	this->channel->~UnixStreamSocket();
 	}
 }
@@ -118,11 +123,16 @@ void Loop::OnSignal(SignalsHandler* /*signalsHandler*/, int signum)
 	{
 		case SIGINT:
 			MS_DEBUG_DEV("signal INT received, exiting");
+			std::printf("signal INT received, exiting.\n");
+		//	usleep(1000000);
+			usleep(100000);
 			Close();
 			break;
 
 		case SIGTERM:
 			MS_DEBUG_DEV("signal TERM received, exiting");
+			std::printf("signal TERM received, exiting.\n");
+			usleep(100);
 			Close();
 			break;
 
