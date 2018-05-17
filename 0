@@ -1,10 +1,9 @@
-    ./configure SRTP15X_CFLAGS='/usr/include/srtp' SRTP15X_LIBS='/usr/lib'  --enable-libsrtp2=no --disable-plugin-sip --disable-plugin-videocall --disable-unix-sockets --disable-plugin-sipre  --disable-plugin-nosip  --disable-plugin-recordplay  --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge
+    ./configure SRTP15X_CFLAGS='/usr/include/srtp' SRTP15X_LIBS='/usr/lib'  --enable-libsrtp2=no --disable-plugin-sip --disable-plugin-videocall --disable-plugin-sipre  --disable-plugin-nosip  --disable-plugin-recordplay  --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge
 
-  ./configure --disable-turn-rest-api --disable-plugin-sip --disable-rest --disable-plugin-videocall --disable-unix-sockets --disable-plugin-sipre
-  --disable-plugin-nosip --disable-plugin-recordplay --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge 
-JANUS_CFLAGS="-v -Wall -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" 
-JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
+# this configuration I am using:
+  ./configure --disable-turn-rest-api --disable-plugin-sip --disable-rest --disable-plugin-videocall --disable-plugin-sipre --disable-plugin-nosip --disable-plugin-recordplay --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge JANUS_CFLAGS="-v -Wall -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
 
+# sudo leafpad /usr/local/etc/janus/janus.transport.pfunix.cfg
 
 
 
@@ -65,6 +64,27 @@ COLLECT_GCC=gcc
 Target: i686-linux-gnu
 Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.8.4-2ubuntu1~14.04.3' --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs --enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.8 --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.8 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin --enable-java-awt=gtk --enable-gtk-cairo --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-i386/jre --enable-java-home --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-i386 --with-jvm-jar-dir=/usr/lib/jvm-exports/java-1.5.0-gcj-4.8-i386 --with-arch-directory=i386 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --enable-objc-gc --enable-targets=all --enable-multiarch --disable-werror --with-arch-32=i686 --with-multilib-list=m32,m64,mx32 --with-tune=generic --enable-checking=release --build=i686-linux-gnu --host=i686-linux-gnu --target=i686-linux-gnu
 Thread model: posix
+
+	linux-gate.so.1 =>  (0xb76ed000)
+	libssl.so.1.0.0 => /usr/local/ssl/lib/libssl.so.1.0.0 (0xb7683000)
+	libcrypto.so.1.0.0 => /usr/local/ssl/lib/libcrypto.so.1.0.0 (0xb749a000)
+	libnice.so.10 => /usr/local/lib/libnice.so.10 (0xb7452000)
+	libgobject-2.0.so.0 => /usr/lib/i386-linux-gnu/libgobject-2.0.so.0 (0xb73e3000)
+	libglib-2.0.so.0 => /lib/i386-linux-gnu/libglib-2.0.so.0 (0xb72d6000)
+	libdl.so.2 => /lib/i386-linux-gnu/libdl.so.2 (0xb72d1000)
+	libsrtp2.so.1 => /usr/local/lib/libsrtp2.so.1 (0xb72bc000)
+	libusrsctp.so.1 => /usr/local/lib/libusrsctp.so.1 (0xb7201000)
+	libpthread.so.0 => /lib/i386-linux-gnu/libpthread.so.0 (0xb71e5000)
+	libc.so.6 => /lib/i386-linux-gnu/libc.so.6 (0xb7033000)
+	librt.so.1 => /lib/i386-linux-gnu/librt.so.1 (0xb702a000)
+	libgio-2.0.so.0 => /usr/lib/i386-linux-gnu/libgio-2.0.so.0 (0xb6ea9000)
+	libffi.so.6 => /usr/lib/i386-linux-gnu/libffi.so.6 (0xb6ea1000)
+	libpcre.so.3 => /lib/i386-linux-gnu/libpcre.so.3 (0xb6e63000)
+	/lib/ld-linux.so.2 (0xb76ee000)
+	libgmodule-2.0.so.0 => /usr/lib/i386-linux-gnu/libgmodule-2.0.so.0 (0xb6e5d000)
+	libz.so.1 => /lib/i386-linux-gnu/libz.so.1 (0xb6e43000)
+	libselinux.so.1 => /lib/i386-linux-gnu/libselinux.so.1 (0xb6e20000)
+	libresolv.so.2 => /lib/i386-linux-gnu/libresolv.so.2 (0xb6e08000)
 
 
 {

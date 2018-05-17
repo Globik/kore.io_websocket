@@ -198,8 +198,8 @@ return nullptr;
 
 	void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
-		std::printf("sendlog()\n");
-		std::printf("Out in: %s :: %d\n", nsPayload,nsPayloadLen);
+		// std::printf("sendlog()\n");
+	//	std::printf("Out in: %s :: %d\n", nsPayload,nsPayloadLen);
 		
 		if (this->closed){std::printf("it looks like this->closed is true\n");return;}
 		/*
