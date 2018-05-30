@@ -1,42 +1,84 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/select.h>
+// source from https://gist.github.com/Alexey-N-Chernyshov/4634731
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include "seq/message.h"
-#define socket_name "/home/globik/fuck"
-#define buffer_size 512
- char* client_name="alikon";
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <netinet/in.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "message.h"
+
 peer_t server;
+
+void shutdown_properly(int code);
+
+void handle_signal_action(int sig_number)
+{
+  if (sig_number == SIGINT) {
+    printf("SIGINT was catched!\n");
+    shutdown_properly(EXIT_SUCCESS);
+  }
+  else if (sig_number == SIGPIPE) {
+    printf("SIGPIPE was catched!\n");
+    shutdown_properly(EXIT_SUCCESS);
+  }
+}
+
+int setup_signals()
+{
+  struct sigaction sa;
+  sa.sa_handler = handle_signal_action;
+  if (sigaction(SIGINT, &sa, 0) != 0) {
+    perror("sigaction()");
+    return -1;
+  }
+  if (sigaction(SIGPIPE, &sa, 0) != 0) {
+    perror("sigaction()");
+    return -1;
+  }
+  
+  return 0;
+}
+
+int get_client_name(int argc, char **argv, char *client_name)
+{
+  if (argc > 1)
+    strcpy(client_name, argv[1]);
+  else
+    strcpy(client_name, "no name");
+  
+  return 0;
+}
 
 int connect_server(peer_t *server)
 {
-struct sockaddr_un addr;
-  int ret;
-server->socket=socket(AF_UNIX, SOCK_SEQPACKET/* | O_NONBLOCK*/, 0);
-if(server->socket<0){
-perror("socket()");
-return -1;
-}
-memset(&addr,0,sizeof(struct sockaddr_un));
-addr.sun_family=AF_UNIX;
-strncpy(addr.sun_path,socket_name,sizeof(addr.sun_path)-1);
-server->addres = addr;
-ret=connect(server->socket,(const struct sockaddr*)&addr,sizeof(struct sockaddr_un));
-if(ret !=0){perror("err connect");return -1;}
-printf("Connected to unix socket : %s\n", socket_name);
-	/*
-	int flag=fcntl(server->socket, F_GETFL,0);
-	if(flag<0){printf("some flag1 err\n");}
-	flag |=O_NONBLOCK;
-	if(fcntl(server->socket, F_SETFL, flag)<0){printf("some flag2 err\n");}
-	if(ret==EINPROGRESS){printf("ret einprogress\n");}else{printf("kuku : %d\n",ret);}
-	*/
-return 0;
+  // create socket
+  server->socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (server->socket < 0) {
+    perror("socket()");
+    return -1;
+  }
+  
+  // set up addres
+  struct sockaddr_in server_addr;
+  memset(&server_addr, 0, sizeof(server_addr));
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_addr.s_addr = inet_addr(SERVER_IPV4_ADDR);
+  server_addr.sin_port = htons(SERVER_LISTEN_PORT);
+  
+  server->addres = server_addr;
+  
+  if (connect(server->socket, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) != 0) {
+    perror("connect()");
+    return -1;
+  }
+  
+  printf("Connected to %s:%d.\n", SERVER_IPV4_ADDR, SERVER_LISTEN_PORT);
+  
+  return 0;
 }
 
 int build_fd_sets(peer_t *server, fd_set *read_fds, fd_set *write_fds, fd_set *except_fds)
@@ -79,6 +121,9 @@ int handle_read_from_stdin(peer_t *server, char *client_name)
   
   return 0;
 }
+
+/* You should be careful when using this function in multythread program. 
+ * Ensure that server is thread-safe. */
 void shutdown_properly(int code)
 {
   delete_peer(&server);
@@ -93,9 +138,17 @@ int handle_received_message(message_t *message)
   return 0;
 }
 
- 
-int main(){
-	 create_peer(&server);
+int main(int argc, char **argv)
+{
+	
+  if (setup_signals() != 0)
+    exit(EXIT_FAILURE);
+  
+  char client_name[256];
+  get_client_name(argc, argv, client_name);
+  printf("Client '%s' start.\n", client_name);
+  
+  create_peer(&server);
   if (connect_server(&server) != 0)
     shutdown_properly(EXIT_FAILURE);
   
@@ -113,17 +166,15 @@ int main(){
   // server socket always will be greater then STDIN_FILENO
   int maxfd = server.socket;
   
-	while(1){
-		printf("entering while\n");
-		// Select() updates fd_set's, so we need to build fd_set's before each select()call.
+  while (1) {
+    // Select() updates fd_set's, so we need to build fd_set's before each select()call.
     build_fd_sets(&server, &read_fds, &write_fds, &except_fds);
     printf("BEFORE ACTIVITY\n");
     int activity = select(maxfd + 1, &read_fds, &write_fds, &except_fds, NULL);
 	  
     printf("ACTIVITY: %d\n",activity);
-		
-	
-	switch (activity) {
+	  
+    switch (activity) {
       case -1:
         perror("select()");
         shutdown_properly(EXIT_FAILURE);
@@ -164,8 +215,8 @@ int main(){
         }
     }
     
-    printf("And we are \n");
-		}
+    printf("And we are still waiting for server or stdin activity. You can type something to send:\n");
+  }
   
   return 0;
 }

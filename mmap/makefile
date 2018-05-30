@@ -1,2 +1,4 @@
+IL = -I ./seq
+DEF = -DUM
 a: um.c
-	gcc -o um um.c
+	gcc $(DEF) $(IL) -o um um.c
