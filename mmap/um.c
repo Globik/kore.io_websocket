@@ -10,7 +10,7 @@
 #include "seq/message.h"
 #define socket_name "/home/globik/fuck"
 #define buffer_size 512
- char* client_name="alikon";
+ char* client_name="alikon_chelikon";
 peer_t server;
 
 int connect_server(peer_t *server)
@@ -24,7 +24,7 @@ return -1;
 }
 memset(&addr,0,sizeof(struct sockaddr_un));
 addr.sun_family=AF_UNIX;
-strncpy(addr.sun_path,socket_name,sizeof(addr.sun_path)-1);
+strncpy(addr.sun_path, socket_name,sizeof(addr.sun_path)-1);
 server->addres = addr;
 ret=connect(server->socket,(const struct sockaddr*)&addr,sizeof(struct sockaddr_un));
 if(ret !=0){perror("err connect");return -1;}

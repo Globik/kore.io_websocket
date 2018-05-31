@@ -33,8 +33,8 @@ fprintf(stderr,"the server is down\n");
 break;
 		}
 	}
-	strcpy(buffer,"end");
-	ret=write(data_socket,buffer,strlen(buffer)+1);
+	strcpy(buffer,"MAMA_MIA");
+	ret=write(data_socket,buffer, strlen(buffer)+1);
 	if(ret==-1){
 	perror("write2");
 		exit(EXIT_FAILURE);
@@ -44,7 +44,8 @@ break;
 	perror("read");
 		exit(EXIT_FAILURE);
 	}
-	buffer[buffer_size-1]=0;
+	//buffer[buffer_size-1]=0;
+	buffer[ret]=0;
 	printf("result=%s\n",buffer);
 	close(data_socket);
 	exit(EXIT_SUCCESS);
