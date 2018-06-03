@@ -18,43 +18,6 @@
 int abba=0;
 fd_set write_fds;
 int data_socket;
-typedef struct child_task{
-struct async_task prepare_string;
-	timestamp_t timeout;
-} child_task_t;
-struct application{
-struct async_process proc1;
-	child_task_t child_task;
-	timestamp_t timeout1;
-};
-struct application app;
-/*
-AYNC_TASK(const char*, child_task_t, prepare_string, const char*from){
-ASYNC_BEGIN();
-AWAIT_DELAY(__self->timeout,10);
-ASYNC_END(from);
-}
-*/
-ASYNC_TASK(const char *, child_task_t, prepare_string, const char *from){
-	ASYNC_BEGIN(); 
-	AWAIT_DELAY(__self->timeout, 3); 
-	//sleep(10);
-	ASYNC_END(from); 
-}
-
-ASYNC_PROCESS_PROC(process_one){
-struct application*app=container_of(__self,struct application,proc1);
-	ASYNC_BEGIN();
-	while(1){
-	printf("process 1:preparing..\n");
-		const char*result=AWAIT_TASK(const char*,child_task_t, prepare_string, &app->child_task,"hello world!");
-		printf("process 1: %s\n",result);
-		//abba=0;
-		app->timeout1=timestamp_from_now_us(10);
-		AWAIT(timestamp_expired(app->timeout1));
-	}
-	ASYNC_END(0);
-}
 
 void shutdown_properly(int b){
 
@@ -116,21 +79,9 @@ fprintf(stderr,"the server is down\n");
 }
 	
 	fd_set read_fds;
-  //fd_set write_fds;
   fd_set except_fds;
 	signal(SIGUSR1,HANI);
-	//struct async_process _test_proc;
-	//ASYNC_PROCESS_INIT(&app.proc1,process_one);
-	//ASYNC_QUEUE_WORK(&ASYNC_GLOBAL_QUEUE, &app.proc1);
-	/*ASYNC_RUN_SERIES(&ASYNC_GLOBAL_QUEUE);
-	//while(ASYNC_RUN_PARALLEL(&ASYNC_GLOBAL_QUEUE)){
-	printf("."); 
-	fflush(stdout); 
-		usleep(100000); 
-	}
-	*/
-	//ASYNC_RUN_SERIES(&ASYNC_GLOBAL_QUEUE);
-	//fflush(stdout); 
+	
 	while(1){
 		br++;
 		printf("BR_BR: %d\n",br);
@@ -182,11 +133,6 @@ FD_ZERO(&read_fds);
           if (handle_read_from_stdin(&server, client_name) != 0)
             shutdown_properly(EXIT_FAILURE);
         }
-
-        if (FD_ISSET(STDIN_FILENO, &except_fds)) {
-          printf("except_fds for stdin.\n");
-          shutdown_properly(EXIT_FAILURE);
-        }
 */
         if (FD_ISSET(data_socket, &read_fds)) {
 			 printf("SERVER READ_FDS!!!!!!!!!!!\n");
@@ -223,16 +169,7 @@ FD_ZERO(&read_fds);
 			printf("I$$$$$$$$$$= %d\n",i);
 			
 			dow(data_socket,suka);
-			/*strcpy(buffer,"Hallo world!");
-			int leni=strlen(buffer)+1;
-	        ret=write(data_socket,buffer, leni);
-	       if(ret==-1){
-	        perror("write2");
-		    exit(EXIT_FAILURE);
-	        }
-			printf("leni: %d, ret: %d\n",leni,ret);
-			abba=1;
-			*/
+			
            }
 
         if (FD_ISSET(data_socket, &except_fds)) {
@@ -244,21 +181,5 @@ FD_ZERO(&read_fds);
     
 	printf("end of while\n");
 }
-	/*
-	strcpy(buffer,"end");
-	ret=write(data_socket,buffer,strlen(buffer)+1);
-	if(ret==-1){
-	perror("write2");
-		exit(EXIT_FAILURE);
-	}
-	ret=read(data_socket,buffer,buffer_size);
-	if(ret==-1){
-	perror("read");
-		exit(EXIT_FAILURE);
-	}
-	buffer[buffer_size-1]=0;
-	printf("result=%s\n",buffer);
-	close(data_socket);
-	*/
-	exit(EXIT_SUCCESS);
+exit(EXIT_SUCCESS);
 }
