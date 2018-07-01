@@ -499,6 +499,8 @@ int rtc_loop(struct kore_task*t){
 	
 	kore_task_channel_write(t,"mama\0",5);
 	kore_task_channel_write(t,"mama\0",5);
+	
+	
 	struct dirent *pluginent = NULL;
 	const char *path=NULL;
 	DIR *dir=NULL;
