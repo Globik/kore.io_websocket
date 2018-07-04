@@ -15,3 +15,7 @@ exit 0
 # select*from users; [dummy command
 # \q [quit
 # pg_ctl stop
+# .bash_aliases
+#alias dab="ls"
+#alias pgstart="sudo chmod a+w /var/run/postgresql && /usr/lib/postgresql/9.6/bin/pg_ctl start -D $HOME/data"
+#alias pgstop="/usr/lib/postgresql/9.6/bin/pg_ctl stop -D $HOME/data"
