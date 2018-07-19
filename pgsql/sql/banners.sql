@@ -1,3 +1,4 @@
+-- psql postgres
 -- \i /home/globik/kore.io_websocket/pgsql/sql/banners.sql
 -- create table banners(id serial primary key,alt text);
 	-- listen revents

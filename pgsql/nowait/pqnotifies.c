@@ -6,6 +6,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
 const char*listenchannel="revents";
 void mainloop(PGconn*conn);
 void exitclean(PGconn*conn);
@@ -17,10 +21,10 @@ int main(){
 	PGconn*conn=PQconnectStartParams(conninfokeys,conninfovalues,0);
 	ConnStatusType status=PQstatus(conn);
 	if(status==CONNECTION_BAD){
-		fprintf(stderr,"connection database failed %s\n", PQerrorMessage(conn));
-		exitclean(conn);
-		}
-		if(status==CONNECTION_STARTED){printf("connection started!\n");}
+	fprintf(stderr, red "connection database failed %s\n" rst, PQerrorMessage(conn));
+	exitclean(conn);
+	}else{printf("Connection started?\n");}
+	if(status==CONNECTION_STARTED){printf("connection started!\n");}
 mainloop(conn);
 PQfinish(conn);
 	}
@@ -35,9 +39,10 @@ PQfinish(conn);
 			int sock;
 			int done=0;
 			int connected=0;
-			int sentlisten=0;
+			//int sentlisten=0;
 			PostgresPollingStatusType connstatus;
 			while(!done){
+				printf("*WHILE_LOOP*\n");
 				sock=PQsocket(conn);
 				if(sock<0){
 					printf("postgres socket is gone\n");
@@ -54,19 +59,29 @@ PQfinish(conn);
 							fprintf(stderr,"pgconn failed %s\n",PQerrorMessage(conn));
 							return;
 							case PGRES_POLLING_WRITING:
+							printf("PGRES_POLLING_WRITING\n");
 							FD_SET(sock,&wfds);
 							break;
 							case PGRES_POLLING_READING:
+							printf("PGRES_POLLING_READING\n");
 							FD_SET(sock,&rfds);
 							break;
 							case PGRES_POLLING_OK:
+							printf("PGRES_POLLING_OK\n");
 							connected=1;
 							initlisten(conn);
 							break;
 							}
 						
+						}else{
+							if(connstatus==PGRES_POLLING_FAILED){printf("failed\n");}else if(connstatus==PGRES_POLLING_OK){
+								printf("ok\n");}else if(connstatus==PGRES_POLLING_WRITING){
+									printf("write\n");}else if(connstatus==PGRES_POLLING_READING){
+										printf("read\n");}else{printf("unknown\n");}
+							}
+						if(connected){
+						printf("CONNECTED=true\n");FD_ZERO(&wfds);FD_SET(sock,&rfds);
 						}
-						if(connected){FD_SET(sock,&rfds);}
 						retval=select(sock+1,&rfds,&wfds,NULL,&tv);
 						switch(retval){
 							case -1:
@@ -74,35 +89,41 @@ PQfinish(conn);
 							done=1;
 							break;
 							case 0:
-							break;
+							printf("CASE 0\n");
+							//break;
+							
 							default:
-							if(!connected)
+							if(!connected){
+							printf("Not connected.\n");
 							break;
-							if(FD_ISSET(sock,&rfds)){handlepgread(conn);}
-							break;
+						}
+							if(FD_ISSET(sock,&rfds)){printf("DO HANDLE PG READ\n");handlepgread(conn);}
+							//break;
 							}
+							printf("end of while\n");
 				}
 			}
-			void initlisten(PGconn*conn){
-				char*quotedchannel=PQescapeIdentifier(conn,listenchannel,strlen(listenchannel));
-				char*query;
-				asprintf(&query,"LISTEN %s",quotedchannel);
-				int qs=PQsendQuery(conn,query);
-				PQfreemem(quotedchannel);
-				free(query);
-				if(!qs){
-					fprintf(stderr,"failed to send query: %s\n",PQerrorMessage(conn));
-					return;
-					}
-				}
+void initlisten(PGconn*conn){
+printf("Entering initlisten()\n");
+char*quotedchannel=PQescapeIdentifier(conn,listenchannel,strlen(listenchannel));
+char*query;
+asprintf(&query,"LISTEN %s",quotedchannel);
+int qs=PQsendQuery(conn,query);
+PQfreemem(quotedchannel);
+free(query);
+if(!qs){
+fprintf(stderr,"failed to send query: %s\n",PQerrorMessage(conn));
+return;
+}
+}
 void handlepgread(PGconn*conn){
 	PGnotify*notify;
 	PGresult*res;
 	PQprintOpt opt;
 	if(!PQconsumeInput(conn)){
-		fprintf(stderr,"failed to consume input: %s\n",PQerrorMessage(conn));
-		return;
-		}
+	fprintf(stderr,"failed to consume input: %s\n",PQerrorMessage(conn));
+	return;
+	}
 		
 	while(res=PQgetResult(conn)){
 		if(PQresultStatus(res) !=PGRES_COMMAND_OK){
@@ -115,7 +136,7 @@ void handlepgread(PGconn*conn){
 			printf("got result\n");
 		}
 		while(notify=PQnotifies(conn)){
-			fprintf(stderr,"notify of %s received from backend pid %d\n",notify->relname,notify->be_pid);
+			fprintf(stderr,"notify of %s received from backend pid %d ,extra: %s\n",notify->relname,notify->be_pid,notify->extra);
 			PQfreemem(notify);
 			}
 	}

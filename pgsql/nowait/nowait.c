@@ -10,6 +10,7 @@ int main(){
 	char*dbinfo;
 	int flag;
 	fd_set fdset;
+	fd_set rdset;
 	int fd;
 	connection=PQconnectStart("dbname=postgres");
 	if(connection==NULL){printf("pqconnect start failed\n");exit(EXIT_FAILURE);}
@@ -50,18 +51,19 @@ int main(){
 		}
 		while(flag){
 			printf("flag: %d\n",flag);
+			usleep(1000000);
 			switch(PQconnectPoll(connection)){
 				case PGRES_POLLING_ACTIVE:
 				printf("pgres polling active\n");
 				break;
 				case PGRES_POLLING_READING:
 				printf("pgres polling reading\n");
-				FD_ZERO(&fdset);
+				FD_ZERO(&rdset);
 				fd=PQsocket(connection);
-				FD_SET(fd,&fdset);
-				int a=select(fd+1,&fdset,NULL,NULL,NULL);
+				FD_SET(fd,&rdset);
+				int a=select(fd+1,&rdset,NULL,NULL,NULL);
 				printf("a: %d\n",a);
-				if(FD_ISSET(fd,&fdset)){printf("fd %d\n",fd);}
+				if(FD_ISSET(fd,&rdset)){printf("fd %d\n",fd);}
 				break;
 				case PGRES_POLLING_WRITING:
 				printf("pgres polling writing\n");
@@ -73,11 +75,18 @@ int main(){
 				break;
 				case PGRES_POLLING_OK:
 				printf("pgres polling ok\n");
-				flag=0;
+				flag=1;
+				FD_ZERO(&rdset);
+				FD_SET(fd,&rdset);
+				int ab=select(fd+1,&rdset,NULL,NULL,NULL);
+				printf("ab: %d\n",ab);
 				break;
 				case PGRES_POLLING_FAILED:
 				printf("pgres polling failed\n");
-				if((dbinfo=PQerrorMessage(connection)) !=NULL){printf("err msg %s\n",dbinfo);exit(EXIT_FAILURE);}
+				if((dbinfo=PQerrorMessage(connection)) !=NULL){
+				printf("err msg %s\n",dbinfo);
+					exit(EXIT_FAILURE);
+					}
 				
 				}
 				
