@@ -14,6 +14,7 @@
 #define rst "\x1b[0m"
 int fuck=0;
 int done=0;
+
 const char*listenchannel="revents";
 void mainloop(PGconn*conn);
 void exitclean(PGconn*conn);
@@ -40,6 +41,7 @@ printf(green "***bye!***\n" rst);
 void exitclean(PGconn*conn){
 printf(yellow "exitclean(conn) occured.\n");
 PQfinish(conn);
+done=1;
 exit(1);
 }
 static void han_sig(int n){
@@ -57,6 +59,7 @@ int sock;
 signal(SIGINT,han_sig);	
 signal(SIGHUP,foo);
 int connected=0;
+int connected2=0;
 	
 int u=PQsetnonblocking(conn,1);
 printf("non blocking: %d\n",u);
@@ -99,29 +102,45 @@ initlisten(conn);
 break;
 }
 }else{
-	if(connstatus==PGRES_POLLING_OK){printf(red "poll OK\n" rst);}else if(connstatus==PGRES_POLLING_FAILED){
+	if(connstatus==PGRES_POLLING_OK){printf(red "poll OK\n" rst);
+		printf(green " done: %d\n" rst,done);
+		}else if(connstatus==PGRES_POLLING_FAILED){
 		printf(red "pgres_polling_failed\n" rst);
 		}else{printf(green "DEFALTI\n" rst);}
 	}
 
+
+
+
+//end resetting
+
+
 if(connected){
 printf("CONNECTED=true\n");
-FD_ZERO(&rfds);
-FD_SET(sock,&rfds);
-if(fuck==1){printf(green "FUCK?: %d\n" rst,fuck);}
-if(FD_ISSET(sock,&rfds)){
+
+if(fuck==1){
+//FD_ZERO(&rfds);
+//FD_SET(sock,&rfds);
+printf(green "FUCK?: %d\n" rst,fuck);
+}
+/*if(FD_ISSET(sock,&rfds)){
 printf(yellow "DO HANDLE PG READ: retval: %d socket: %d\n" rst,retval,sock);
 //if(retval==-1){done=1;exitclean(conn);}
 handlepgread(conn);
 }
+*/ 
 }
+printf("BEFORE SELECT\n");
 retval=select(sock+1,&rfds,NULL,NULL,NULL);
+printf("after select\n");
 switch(retval){
 case -1:
 //perror("select failed\n");
 if(errno==EINTR){
 printf(red "EINTR occurred.\n");
 }
+printf(red "done??\n" rst);
+
 done=1;
 break;
 case 0:
@@ -132,9 +151,10 @@ if(!connected){
 printf("Not connected.\n");
 break;
 }
-//if(FD_ISSET(sock,&rfds)){printf(yellow "DO HANDLE PG READ: retval: %d\n" rst,retval);handlepgread(conn);}
+if(FD_ISSET(sock,&rfds)){printf(yellow "DO HANDLE PG READ: retval: %d %d\n" rst,retval,sock);handlepgread(conn);}
 printf("default\n");
 }
+//break;
 printf("end of while\n");
 }
 }
@@ -156,23 +176,23 @@ void handlepgread(PGconn*conn){
 printf("entering handlepgread(conn)\n");
 PGnotify*notify;
 PGresult*res;
-PQprintOpt opt;
+//PQprintOpt opt={0};
 if(!PQconsumeInput(conn)){
 	printf("hhhh\n");
 fprintf(stderr,"failed to consume input: %s\n",PQerrorMessage(conn));
-done=1;
-exitclean(conn);
+//done=1;
+//exitclean(conn);
 return;
 }
 printf("before result\n");
-
+/*
 if(NULL==PQgetResult(conn)){
 printf("result NULL: %s\n",PQerrorMessage(conn));
 ConnStatusType status=PQstatus(conn);
 if(status==CONNECTION_BAD){printf("BAAAAAAAD\n");}else{printf("status unknown\n");}
 	
 	}else{printf("result is not null.\n");}
-	
+	*/
 	/*
 switch(PQresultStatus(PQgetResult(conn))){
 	case PGRES_FATAL_ERROR:
@@ -184,16 +204,17 @@ switch(PQresultStatus(PQgetResult(conn))){
 	*/ 
 
 while((res=PQgetResult(conn)) !=NULL){
-	printf("in LOOP\n");
-if(PQresultStatus(res) !=PGRES_COMMAND_OK){printf("pgres command not ok\n");}else{printf("fuck knows\n");}
 if(PQresultStatus(res) !=PGRES_COMMAND_OK){
 fprintf(stderr,"result err: %s\n",PQerrorMessage(conn));
 PQclear(res);
 return;
 }
-memset(&opt,'\0',sizeof(opt));
-PQprint(stdout,res,&opt);
-printf("got result\n");
+//memset(&opt,'\0',sizeof(opt));
+//PQprint(stdout,res, &opt);
+printf("got result: %s\n",PQresStatus(PQresultStatus(res)));
+printf("returns rows: %d\n",PQntuples(res));
+printf("cols: %d\n",PQnfields(res));
+printf("cmd status: %s\n",PQcmdStatus(res));
 fuck=1;
 PQclear(res);
 }
