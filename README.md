@@ -13,5 +13,10 @@ Some basic samples in websocket_x folders.
 An implemintation of [janus-gateway](https://github.com/meetecho/janus-gateway) - WebRTC gateway into the kore webframework written in C.
 Hardcoded to echotest plugin and WebRTC DataChannel API.
 
+## Some experiments with PostgresQL libpq
+
+[websocket_11](https://github.com/Globik/kore.io_websocket/tree/master/websocket_11) - asynchronous LISTEN interface of libpq in a dedicated
+thread. Using select for the time being. 
+
 
 

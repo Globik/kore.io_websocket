@@ -46,6 +46,7 @@
 #include <kore/http.h>
 #include <kore/pgsql.h>
 #include <kore/tasks.h>
+#include "assets.h"
 
 #define REQ_STATE_INIT			0
 #define REQ_STATE_QUERY			1
@@ -58,6 +59,7 @@
 #define yellow "\x1b[33m"
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
+int konnikov=0;
 int init(int);
 void foo(int);
 int		page(struct http_request *);
@@ -70,60 +72,69 @@ static int	request_db_wait(struct http_request *);
 static int	request_db_read(struct http_request *);
 static int	request_error(struct http_request *);
 static int	request_done(struct http_request *);
-//char*suka;
+
 int fuck=0;
-static int done;//=0;
+static int done=0;
 const char*listenchannel="revents";
 void kore_worker_configure(void);
-//void kore_parent_configure(void);
+
 void handler(void);
 void han(int);
-void mainloop(PGconn*conn);
+void mainloop(PGconn*conn, struct kore_task*);
 void exitclean(PGconn*conn);
-void handlepgread(PGconn*conn);
+void handlepgread(PGconn*conn, struct kore_task*);
 void initlisten(PGconn*conn);
 static void han_sig(int);
+
+void sse_ping(void *, u_int64_t);
+int ranger(struct http_request *);
+int	dpage(struct http_request *);
+int	subscribe(struct http_request *);
+void sse_disconnect(struct connection *);
+void sse_send(struct connection *, void *, size_t);
+void sse_broadcast(struct connection *, void *, size_t);
+int	check_header(struct http_request *, const char *, const char *);
+struct sse_state {
+struct kore_timer*timer;
+};
+
+
 PGconn*conn=NULL;
 struct kore_task pipe_task;
 struct http_state	mystates[] = {
-	{ "REQ_STATE_INIT",		request_perform_init },
-	{ "REQ_STATE_QUERY",		request_perform_query },
-	{ "REQ_STATE_DB_WAIT",		request_db_wait },
-	{ "REQ_STATE_DB_READ",		request_db_read },
-	{ "REQ_STATE_ERROR",		request_error },
-	{ "REQ_STATE_DONE",		request_done },
+	{ "REQ_STATE_INIT",	request_perform_init },
+	{ "REQ_STATE_QUERY", request_perform_query },
+	{ "REQ_STATE_DB_WAIT", request_db_wait },
+	{ "REQ_STATE_DB_READ", request_db_read },
+	{ "REQ_STATE_ERROR", request_error },
+	{ "REQ_STATE_DONE", request_done },
 };
 
 #define mystates_size		(sizeof(mystates) / sizeof(mystates[0]))
 
 struct rstate {
-	int			cnt;
-	char*name;
-	struct kore_pgsql	sql;
+int			cnt;
+char*name;
+struct kore_pgsql	sql;
 };
-int
-init(int state)
-{
+int init(int state){
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
-	//if(worker->id !=1) return (KORE_RESULT_OK);
-	printf("after state.\n");
-
-	kore_task_create(&pipe_task,do_loop);
-	kore_task_bind_callback(&pipe_task, pipe_data_available);
-	kore_task_run(&pipe_task);
-	/* Register our database. */
-	//kore_pgsql_register("db", "host=/tmp dbname=test");
-	kore_pgsql_register("db","dbname=postgres");
-	done=0;
-	return (KORE_RESULT_OK);
+//if(worker->id !=1) return (KORE_RESULT_OK);
+kore_task_create(&pipe_task,do_loop);
+kore_task_bind_callback(&pipe_task, pipe_data_available);
+kore_task_run(&pipe_task);
+// Register our database.
+//kore_pgsql_register("db", "host=/tmp dbname=test");
+kore_pgsql_register("db","dbname=postgres");
+return (KORE_RESULT_OK);
 }
 void handler(){
 	printf("at exit[worker] handler occured.\n");
 	done=1;
 	raise(SIGUSR1);
-	if(conn !=NULL){printf("conn is not null\n");PQfinish(conn);}else{printf("conn is null\n");}
-	conn=NULL;
-	usleep(100000);
+	//if(conn !=NULL){printf("conn is not null\n");PQfinish(conn);}else{printf("conn is null\n");}
+	//conn=NULL;
+	//usleep(100000);
 	//exit(0);
 	}
 	int ba=0;
@@ -134,26 +145,22 @@ void handler(){
 		if(ba==3)exit(0);
 		}
 void kore_worker_configure(){
-	printf("worker configure\n");
-	//signal(SIGINT,han);
+	kore_log(LOG_NOTICE, "worker configure\n");
 	atexit(handler);
 	}
-void kore_parent_configure(int a,char**j){
-	//atexit(handler);
-	}
+
 /* Page handler entry point (see config) */
-int
-page(struct http_request *req)
+int page(struct http_request *req)
 {
 	kore_log(LOG_NOTICE,"%p: page start",(void*)req);
 	return (http_state_run(mystates,mystates_size,req));
 }
 
 /* Initialize our PGSQL data structure and prepare for an async query. */
-int
-request_perform_init(struct http_request *req)
+int request_perform_init(struct http_request *req)
 {
-printf(yellow "perform init\n" rst);
+//kore_log(LOG_INFO, yellow "***perform init: %s ****\n" rst, (char*)req->hdlr_extra);
+kore_log(LOG_INFO, yellow "***perform init: %s ****\n" rst, req->path);
 struct rstate	*state;
 /* Setup our state context (if not yet set). */
 if (!http_state_exists(req)) {
@@ -306,9 +313,9 @@ return (HTTP_STATE_COMPLETE);
 int
 request_done(struct http_request *req)
 {
-printf(yellow "request done()\n" rst);
+printf(yellow "***REQUEST_DONE(): %s****\n" rst, req->path);
 struct rstate	*state = http_state_get(req);
-printf("DATA: %d\n",state->cnt);
+printf("DATA: %d\n", state->cnt);
 printf(green "DATA NAME: %s\n" rst, state->name);
 printf("before cleanup state ->sql\n");
 kore_pgsql_cleanup(&state->sql);
@@ -318,6 +325,11 @@ printf(red "before response HANDLER EXTRA.\n");
 http_response(req, 200, NULL,0);
 //kore_free(state->name);
 //state->name=NULL;
+char*sid;
+http_populate_get(req);
+if (http_argument_get_string(req, "id", &sid)){
+		kore_log(LOG_INFO,red "***SID ENDLICH? !!!*** %s" rst,sid);
+	}
 printf("is complete?\n");
 return (HTTP_STATE_COMPLETE);
 }
@@ -351,12 +363,13 @@ ConnStatusType status=PQstatus(conn);
 if(status==CONNECTION_BAD){
 fprintf(stderr, red "connection database failed %s\n" rst, PQerrorMessage(conn));
 exitclean(conn);
+return (KORE_RESULT_OK);
 }else if(status==CONNECTION_STARTED){
 printf("connection started!\n");
 }else if(status==CONNECTION_MADE){
 printf(green "Connection made.\n" rst);	
 }else{printf(yellow "connecting...\n");}
-mainloop(conn);
+mainloop(conn,t);
 PQfinish(conn);
 conn=NULL;
 printf(green "***bye!***\n" rst);
@@ -365,19 +378,18 @@ return (KORE_RESULT_OK);
 void exitclean(PGconn*conn){
 printf(yellow "exitclean(conn) occured.\n");
 
-PQfinish(conn);
+if(done==0){if(conn !=NULL) PQfinish(conn);}
 done=1;
 conn=NULL;
-//exit(1);
-//return (KORE_RESULT_OK)
 }
 int i=0;
 static void han_sig(int n){
-//atexit(mumu)
+
 i++;
 printf("n: %d\n",n);
 printf(yellow "han_sig SIGINT occured.\n" rst);
-done=1;	
+done=1;
+if(konnikov==0){printf(green "not connected, return.\n" rst);return;}
 if(conn !=NULL)PQfinish(conn);
 conn=NULL;
 //muka()
@@ -386,12 +398,17 @@ if(i==3)exit(0);
 }
 void foo(int n){
 printf(yellow "FOO occured.\n" rst);
+if(konnikov==0){printf(green "not connected, return.\n" rst);return;}
 if(conn !=NULL){
-printf("conn is not null in foo\n");done=1;PQfinish(conn);conn=NULL;
+printf("conn is not null in foo\n");done=1;
+PQfinish(conn);
+conn=NULL;
+
 }else{printf("conn is null in foo\n");done=1;}
+konnikov=0;
 //usleep(10000000);
 }
-void mainloop(PGconn*conn){
+void mainloop(PGconn*conn,struct kore_task*t){
 fd_set rfds,wfds;
 int retval;
 int sock;
@@ -407,28 +424,19 @@ sock=PQsocket(conn);
 if(sock<0){
 printf("postgres socket is gone\n");
 exitclean(conn);
+//return (KORE_RESULT_OK);
 }
 					
 PostgresPollingStatusType connstatus;
-//struct sigaction *s;
-//s.sa_handler=sigterm;
-sigset_t blo,unblo;
-sigemptyset(&blo);
-sigaddset(&blo,SIGUSR1);
-sigfillset(&unblo);
-sigdelset(&unblo,SIGUSR1);
-sigprocmask(SIG_BLOCK,&blo,NULL);
-//signal(SIGUSR1,foo);
+
 while(!done){
-printf("*WHILE_LOOP*\n");
+//printf("*WHILE_LOOP*\n");
 //usleep(20000);
-//FD_ZERO(&rfds);
-//FD_ZERO(&wfds);
 if(!connected){
 connstatus=PQconnectPoll(conn);
 switch(connstatus){
 case PGRES_POLLING_FAILED:
-fprintf(stderr,"pgconn failed %s\n",PQerrorMessage(conn));
+kore_log(LOG_NOTICE, red "pgconn failed: %s" rst,PQerrorMessage(conn));
 done=1;
 exitclean(conn);
 break;
@@ -443,6 +451,7 @@ break;
 case PGRES_POLLING_OK:
 printf(green "PGRES_POLLING_OK\n" rst);
 connected=1;
+konnikov=1;
 initlisten(conn);
 break;
 }
@@ -463,22 +472,16 @@ if(fuck==1){
 //FD_SET(sock,&rfds);
 printf(green "FUCK?: %d\n" rst,fuck);
 }
-/*if(FD_ISSET(sock,&rfds)){
-printf(yellow "DO HANDLE PG READ: retval: %d socket: %d\n" rst,retval,sock);
-//if(retval==-1){done=1;exitclean(conn);}
-handlepgread(conn);
+
 }
-*/ 
-}
-printf("BEFORE SELECT\n");
-//retval=pselect(sock+1,&rfds,NULL,NULL,NULL,&blo);
+
 retval=select(sock+1,&rfds,NULL,NULL,NULL);
-//signal(SIGUSR1,foo);
-printf("after select\n");
+//printf("after select\n");
 switch(retval){
 case -1:
 //perror("select failed\n");
 if(errno==EINTR){
+	// the fuck it is in a dedicated thread like this, it does not work like in a main thread or process.
 printf(red "EINTR occurred.\n");
 }
 printf(red "done??\n" rst);
@@ -494,7 +497,7 @@ if(!connected){
 printf("Not connected.\n");
 break;
 }
-if(FD_ISSET(sock,&rfds)){printf(yellow "DO HANDLE PG READ: retval: %d %d\n" rst,retval,sock);handlepgread(conn);}
+if(FD_ISSET(sock,&rfds)){printf(yellow "DO HANDLE PG READ: retval: %d %d\n" rst,retval,sock);handlepgread(conn,t);}
 printf("default\n");
 }
 //break;
@@ -515,7 +518,7 @@ fprintf(stderr,"failed to send query: %s\n",PQerrorMessage(conn));
 return;
 }
 }
-void handlepgread(PGconn*conn){
+void handlepgread(PGconn*conn,struct kore_task*t){
 printf("entering handlepgread(conn)\n");
 PGnotify*notify;
 PGresult*res;
@@ -547,7 +550,190 @@ PQclear(res);
 printf("before notify\n");
 while(notify=PQnotifies(conn)){
 fprintf(stderr,yellow "notify of %s received from backend pid %d ,extra: %s\n" rst, notify->relname, notify->be_pid, notify->extra);
+//kore_task_channel_write(t,"DAMA\0",5);
+int fs=strlen(notify->extra);
+kore_log(LOG_INFO, green "fs len: %d" rst, fs);
+kore_task_channel_write(t, notify->extra, fs+1);
 PQfreemem(notify);
 }
 printf("END\n");
+}
+//end of async listen - notify
+int
+dpage(struct http_request *req)
+{
+	if (req->method != HTTP_METHOD_GET) {
+		http_response_header(req, "allow", "get");
+		http_response(req, 405, NULL, 0);
+		return (KORE_RESULT_OK);
+	}
+
+	http_response_header(req, "content-type", "text/html");
+	http_response(req, 200, asset_index_html, asset_len_index_html);
+	return (KORE_RESULT_OK);
+}
+
+int
+subscribe(struct http_request *req)
+{
+	struct sse_state	*state;
+	char			*hello = "event:join\ndata: client\n\n";
+
+	/* Preventive paranoia. */
+	if (req->hdlr_extra != NULL) {
+		kore_log(LOG_ERR, "%p: already subscribed", req->owner);
+		http_response(req, 500, NULL, 0);
+		return (KORE_RESULT_OK);
+	}
+
+	/* Only allow GET methods. */
+	if (req->method != HTTP_METHOD_GET) {
+		http_response_header(req, "allow", "get");
+		http_response(req, 405, NULL, 0);
+		return (KORE_RESULT_OK);
+	}
+
+	/* Only do SSE if the client told us it wanted too. */
+	if (!check_header(req, "accept", "text/event-stream"))
+		return (KORE_RESULT_OK);
+
+	/* Do not include content-length in our response. */
+	req->flags |= HTTP_REQUEST_NO_CONTENT_LENGTH;
+
+	/* Notify existing clients of our new client now. */
+	sse_broadcast(req->owner, hello, strlen(hello));
+
+	/* Set a disconnection method so we know when this client goes away. */
+	req->owner->disconnect = sse_disconnect;
+
+	/* We do not expect any more data to arrive. */
+	req->owner->flags |= CONN_READ_BLOCK;
+
+	/* Allocate a state to be carried by our connection. */
+	state = kore_malloc(sizeof(*state));
+	req->owner->hdlr_extra = state;
+
+	/* Now start a timer to send a ping back every 10 second. */
+	state->timer = kore_timer_add(sse_ping, 10000, req->owner, 0);
+
+	/* Respond that the SSE channel is now open. */
+	kore_log(LOG_NOTICE, "%p: connected for SSE", req->owner);
+	http_response_header(req, "content-type", "text/event-stream");
+	http_response(req, 200, NULL, 0);
+
+	return (KORE_RESULT_OK);
+}
+void
+sse_broadcast(struct connection *src, void *data, size_t len)
+{
+	struct connection	*c;
+
+	/* Broadcast the message to all other clients. */
+	TAILQ_FOREACH(c, &connections, list) {
+		if (c == src)
+			continue;
+		sse_send(c, data, len);
+	}
+}
+
+void
+sse_send(struct connection *c, void *data, size_t len)
+{
+	struct sse_state	*state = c->hdlr_extra;
+
+	/* Do not send to clients that do not have a state. */
+	if (state == NULL)
+		return;
+
+	/* Queue outgoing data now. */
+	net_send_queue(c, data, len);
+	net_send_flush(c);
+}
+
+void
+sse_ping(void *arg, u_int64_t now)
+{
+	struct connection		*c = arg;
+	char				*ping = "event:ping\ndata:\n\n";
+
+	/* Send our ping to the client. */
+	sse_send(c, ping, strlen(ping));
+}
+
+void
+sse_disconnect(struct connection *c)
+{
+	struct sse_state	*state = c->hdlr_extra;
+	char			*leaving = "event: leave\ndata: client\n\n";
+
+	kore_log(LOG_NOTICE, "%p: disconnecting for SSE", c);
+
+	/* Tell others we are leaving. */
+	sse_broadcast(c, leaving, strlen(leaving));
+
+	/* Kill our timer and free/remove the state. */
+	kore_timer_remove(state->timer);
+	kore_free(state);
+
+	/* Prevent us to be called again. */
+	c->hdlr_extra = NULL;
+	c->disconnect = NULL;
+}
+
+int
+check_header(struct http_request *req, const char *name, const char *value)
+{
+	const char		*hdr;
+
+	if (!http_request_header(req, name, &hdr)) {
+		http_response(req, 400, NULL, 0);
+		return (KORE_RESULT_ERROR);
+	}
+
+	if (strcmp(hdr, value)) {
+		http_response(req, 400, NULL, 0);
+		return (KORE_RESULT_ERROR);
+	}
+
+	return (KORE_RESULT_OK);
+}
+
+int
+ranger(struct http_request *req)
+{
+	kore_log(LOG_NOTICE,"some req.params occured");
+	char			*hello = "event:join\ndata: client\n\n";
+	u_int16_t		id;
+	char			*sid;
+	struct kore_buf		*buf;
+	kore_log(LOG_NOTICE,yellow "PATH %s" rst, req->path);
+//if (!check_header(req, "accept", "text/event-stream")) return (KORE_RESULT_OK);
+
+	/* Do not include content-length in our response. */
+	//req->flags |= HTTP_REQUEST_NO_CONTENT_LENGTH;
+
+	/* Notify existing clients of our new client now. */
+	//sse_broadcast(req->owner, hello, strlen(hello));//works
+	//sse_send(req->owner,hello,strlen(hello));// not work
+	
+	http_populate_get(req);
+	
+	buf = kore_buf_alloc(128);
+
+	/* Grab it as a string, we shouldn't free the result in sid. */
+	if (http_argument_get_string(req, "id", &sid)){
+		kore_log(LOG_INFO,red "***SID!!!*** %s" rst,sid);
+		kore_buf_appendf(buf, "id as a string: '%s'\n", sid);
+}
+	/* Grab it as an actual u_int16_t. */
+	if (http_argument_get_uint16(req, "id", &id))
+		kore_buf_appendf(buf, "id as an u_int16_t: %d\n", id);
+
+	/* Now return the result to the client with a 200 status code. */
+	//http_response(req, 200, buf->data, buf->offset);
+	kore_buf_free(buf);
+	//req->hdlr_extra="ABBA";
+return (http_state_run(mystates,mystates_size,req));
+	//return (KORE_RESULT_OK);
+	
 }
