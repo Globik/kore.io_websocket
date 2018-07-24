@@ -59,7 +59,7 @@ int sock;
 signal(SIGINT,han_sig);	
 signal(SIGHUP,foo);
 int connected=0;
-int connected2=0;
+//int connected2=0;
 	
 int u=PQsetnonblocking(conn,1);
 printf("non blocking: %d\n",u);
