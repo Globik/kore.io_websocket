@@ -1,35 +1,3 @@
-/*
- * Copyright (c) 2014-2018 Joris Vink <joris@coders.se>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
-/*
- * This example demonstrates on how to use state machines and
- * asynchronous pgsql queries. For a synchronous query example
- * see the pgsql-sync/ example under the examples/ directory.
- *
- * While this example might seem overly complex for a simple pgsql
- * query, there is a reason behind its complexity:
- *	Asynchronous pgsql queries mean that Kore will not block while
- *	executing the queries, giving a worker time to continue handling
- *	other events such as I/O or other http requests.
- *
- * The state machine framework present in Kore makes it trivial
- * to get going into dropping from your page handler into the right
- * state that you are currently in.
- */
-
 #include <signal.h>
 #include <errno.h>
 
@@ -65,13 +33,20 @@ void foo(int);
 int		page(struct http_request *);
 int do_loop(struct kore_task*);
 void pipe_data_available(struct kore_task *);
-
+//for ranger
 static int	request_perform_init(struct http_request *);
 static int	request_perform_query(struct http_request *);
 static int	request_db_wait(struct http_request *);
 static int	request_db_read(struct http_request *);
 static int	request_error(struct http_request *);
 static int	request_done(struct http_request *);
+//for page
+static int	request_perform_init2(struct http_request *);
+static int	request_perform_query2(struct http_request *);
+static int	request_db_wait(struct http_request *);
+static int	request_db_read2(struct http_request *);
+static int	request_error2(struct http_request *);
+static int	request_done2(struct http_request *);
 
 int fuck=0;
 static int done=0;
@@ -104,6 +79,7 @@ struct kore_timer*timer;
 
 PGconn*conn=NULL;
 struct kore_task pipe_task;
+//for ranger
 struct http_state	mystates[] = {
 	{ "REQ_STATE_INIT",	request_perform_init },
 	{ "REQ_STATE_QUERY", request_perform_query },
@@ -112,8 +88,19 @@ struct http_state	mystates[] = {
 	{ "REQ_STATE_ERROR", request_error },
 	{ "REQ_STATE_DONE", request_done },
 };
-
+//for page
+struct http_state	mystates2[] = {
+	{ "REQ_STATE_INIT",	request_perform_init2 },
+	{ "REQ_STATE_QUERY", request_perform_query2 },
+	{ "REQ_STATE_DB_WAIT", request_db_wait },
+	{ "REQ_STATE_DB_READ", request_db_read2 },
+	{ "REQ_STATE_ERROR", request_error2 },
+	{ "REQ_STATE_DONE", request_done2 },
+};
+//ranger
 #define mystates_size		(sizeof(mystates) / sizeof(mystates[0]))
+//page
+#define mystates_size2		(sizeof(mystates2) / sizeof(mystates2[0]))
 
 struct rstate {
 int cnt;
@@ -135,10 +122,6 @@ void handler(){
 kore_log(LOG_INFO, "at exit[worker] handler occured.\n");
 done=1;
 raise(SIGUSR1);
-	//if(conn !=NULL){printf("conn is not null\n");PQfinish(conn);}else{printf("conn is null\n");}
-	//conn=NULL;
-	//usleep(100000);
-	//exit(0);
 }
 int ba=0;
 void han(int a){
@@ -152,35 +135,64 @@ kore_log(LOG_NOTICE, "worker configure\n");
 atexit(handler);
 }
 
-// Page handler entry point (see config)
+
 int page(struct http_request *req)
 {
+	const char*custom;
+	const char*custom2;
+	char*body;
+	ssize_t ret;
+	struct kore_buf*buf;
+	u_int8_t data[BUFSIZ];
 kore_log(LOG_NOTICE,"%p: page start",(void*)req);
-return (http_state_run(mystates,mystates_size,req));
+if(req->method !=HTTP_METHOD_POST){
+	http_response(req,HTTP_STATUS_METHOD_NOT_ALLOWED,"ono",3);
+	return (KORE_RESULT_OK);
+	}
+//xhr.setRequestHeader('Content-Type','application/json','utf-8');
+//xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+if(http_request_header(req,"X-Requested-With",&custom)){
+	kore_log(LOG_INFO,green "it is a: %s" rst,custom);
+	}
+if(http_request_header(req,"Content-Type",&custom2)){
+	kore_log(LOG_INFO,green "it is a: %s" rst,custom2);
+	}
+	
+	buf=kore_buf_alloc(128);
+	for(;;){
+		ret=http_body_read(req,data,sizeof(data));
+		if(ret==-1){
+			kore_buf_free(buf);
+			kore_log(LOG_INFO,red "error reading body" rst);
+			http_response(req,500,"nob",3);
+			return (KORE_RESULT_OK);
+			}
+			if(ret==0)break;
+			kore_buf_append(buf,data,ret);
+		}
+		body=kore_buf_stringify(buf,NULL);
+		kore_log(LOG_INFO, yellow "data buffer: %s" rst, body);
+		kore_buf_free(buf);
+
+	//http_response(req,200,"ok\n",3);
+	//return (KORE_RESULT_OK);
+return (http_state_run(mystates2, mystates_size2, req));
 }
 
-// Initialize our PGSQL data structure and prepare for an async query.
 int request_perform_init(struct http_request *req)
 {
 kore_log(LOG_INFO, yellow "***perform init: %s ****\n" rst, req->path);
 struct rstate	*state;
-// Setup our state context (if not yet set). 
 if (!http_state_exists(req)) {
 state = http_state_create(req, sizeof(*state));
-// Initialize the kore_pgsql data structure and bind it
-// to this request so we can be put to sleep / woken up
-// by the pgsql layer when required.
+state->cnt=20;
 kore_pgsql_init(&state->sql);
 kore_pgsql_bind_request(&state->sql, req);
 } else {
 state = http_state_get(req);
 }
-// Setup the query to be asynchronous in nature, aka just fire it
-// off and return back to us.
 if (!kore_pgsql_setup(&state->sql, "db", KORE_PGSQL_ASYNC)) {
-//If the state was still in INIT we need to go to sleep and
-// wait until the pgsql layer wakes us up again when there
-// an available connection to the database.
+
 if (state->sql.state == KORE_PGSQL_STATE_INIT) {
 req->fsm_state = REQ_STATE_INIT;
 kore_log(LOG_INFO, yellow "kore_pgsql_state_init\n" rst);
@@ -195,39 +207,70 @@ req->fsm_state = REQ_STATE_QUERY;
 return (HTTP_STATE_CONTINUE);
 }
 
-// After setting everything up we will execute our async query.
+int request_perform_init2(struct http_request *req)
+{
+kore_log(LOG_INFO, yellow "***perform init: %s ****\n" rst, req->path);
+struct rstate	*state;
+if (!http_state_exists(req)) {
+state = http_state_create(req, sizeof(*state));
+state->cnt=20;
+kore_pgsql_init(&state->sql);
+kore_pgsql_bind_request(&state->sql, req);
+} else {
+state = http_state_get(req);
+}
+
+if (!kore_pgsql_setup(&state->sql, "db", KORE_PGSQL_ASYNC)) {
+if (state->sql.state == KORE_PGSQL_STATE_INIT) {
+req->fsm_state = REQ_STATE_INIT;
+kore_log(LOG_INFO, yellow "kore_pgsql_state_init\n" rst);
+return (HTTP_STATE_RETRY);
+}
+kore_pgsql_logerror(&state->sql);
+req->fsm_state = REQ_STATE_ERROR;
+} else {
+kore_log(LOG_INFO, yellow "The initial setup was complete, go for query.\n" rst);
+req->fsm_state = REQ_STATE_QUERY;
+}
+return (HTTP_STATE_CONTINUE);
+}
+
+// ranger
 int request_perform_query(struct http_request *req){
 struct rstate	*state = http_state_get(req);
-//printf(yellow "We want to move to read result after this.\n" rst); 
+kore_log(LOG_INFO, yellow "request_perform_query(). state->cnt: %d" rst,state->cnt); 
 req->fsm_state = REQ_STATE_DB_WAIT;
-/* Fire off the query. */
-//if (!kore_pgsql_query(&state->sql,"SELECT * FROM coders, pg_sleep(5)")) {
-//if (!kore_pgsql_query(&state->sql,"SELECT * FROM coders")) {
 if (!kore_pgsql_query(&state->sql,"update banners set alt='feodor'")) {
 kore_log(LOG_INFO, red "Let the state machine continue immediately since we have an error anyway.\n" rst);
 return (HTTP_STATE_CONTINUE);
 }
-//printf(yellow "Resume state machine later when the query results start coming in.\n" rst);
 return (HTTP_STATE_RETRY);
 }
-// After firing off the query, we returned HTTP_STATE_RETRY (see above).
- // When request_db_wait() finally is called by Kore we will have results
- // from pgsql so we'll process them.
+// page
+int request_perform_query2(struct http_request *req){
+struct rstate	*state = http_state_get(req);
+kore_log(LOG_INFO, yellow "request_perform_query2(). state->cnt: %d" rst,state->cnt); 
+req->fsm_state = REQ_STATE_DB_WAIT;
+if (!kore_pgsql_query(&state->sql,"update coders set name='Linux'")) {
+kore_log(LOG_INFO, red "Let the state machine continue immediately since we have an error anyway." rst);
+return (HTTP_STATE_CONTINUE);
+}
+return (HTTP_STATE_RETRY);
+}
+
 int request_db_wait(struct http_request *req){
 struct rstate	*state = http_state_get(req);
 kore_log(LOG_NOTICE, "request_db_wait(): %d", state->sql.state);
-//When we get here, our asynchronous pgsql query has
-//given us something, check the state to figure out what.
 switch (state->sql.state) {
 case KORE_PGSQL_STATE_WAIT:
-kore_log(LOG_INFO, yellow "http_state_retry\n" rst);
+kore_log(LOG_INFO, yellow "http_state_retry" rst);
 return (HTTP_STATE_RETRY);
 case KORE_PGSQL_STATE_COMPLETE:
-kore_log(LOG_INFO, yellow "req_state_done\n" rst);
+kore_log(LOG_INFO, yellow "req_state_done" rst);
 req->fsm_state = REQ_STATE_DONE;
 break;
 case KORE_PGSQL_STATE_ERROR:
-kore_log(LOG_INFO, red "state_error\n" rst);
+kore_log(LOG_INFO, red "state_error" rst);
 req->fsm_state = REQ_STATE_ERROR;
 kore_pgsql_logerror(&state->sql);
 break;
@@ -236,7 +279,6 @@ kore_log(LOG_INFO, yellow "req_state_db_read\n" rst);
 req->fsm_state = REQ_STATE_DB_READ;
 break;
 default:
-// This MUST be present in order to advance the pgsql state
 kore_log(LOG_INFO, yellow "kore_pgsql_continue\n" rst);
 kore_pgsql_continue(&state->sql);
 break;
@@ -244,14 +286,12 @@ break;
 kore_log(LOG_INFO, yellow "returning continue\n" rst);
 return (HTTP_STATE_CONTINUE);
 }
-//Called when there's an actual result to be gotten. After we handle the
-//entire result, we'll drop back into REQ_STATE_DB_WAIT (above) in order
-//to continue until the pgsql API returns KORE_PGSQL_STATE_COMPLETE.
+//ranger
 int request_db_read(struct http_request *req){
-char		*name;
-int		i, rows;
+//char		*name;
+//int		i, rows;
 struct rstate	*state = http_state_get(req);
-kore_log(LOG_INFO, yellow "We have sql data to read!\n" rst);
+kore_log(LOG_INFO, yellow "We have sql data to read!" rst);
 
 /*
 	rows = kore_pgsql_ntuples(&state->sql);
@@ -272,18 +312,37 @@ req->fsm_state = REQ_STATE_DB_WAIT;
 return (HTTP_STATE_CONTINUE);
 }
 
-//An error occurred.
+//page:
+int request_db_read2(struct http_request *req){
+
+struct rstate	*state = http_state_get(req);
+kore_log(LOG_INFO, yellow "We have sql data to read! db_read2. state->cnt: %d" rst,state->cnt);
+kore_pgsql_continue(&state->sql);
+req->fsm_state = REQ_STATE_DB_WAIT;
+return (HTTP_STATE_CONTINUE);
+}
+
+//An error occurred. ranger:
 int request_error(struct http_request *req)
 {
-kore_log(LOG_INFO, red "an error occured\n" rst);
+kore_log(LOG_INFO, red "an error occured in db request." rst);
 struct rstate	*state = http_state_get(req);
 kore_pgsql_cleanup(&state->sql);
 http_state_cleanup(req);
 http_response(req, 500, NULL, 0);
 return (HTTP_STATE_COMPLETE);
 }
-
-//Request was completed successfully.
+//page:
+int request_error2(struct http_request *req)
+{
+kore_log(LOG_INFO, red "an error occured in dberror 2" rst);
+struct rstate	*state = http_state_get(req);
+kore_pgsql_cleanup(&state->sql);
+http_state_cleanup(req);
+http_response(req, 500, NULL, 0);
+return (HTTP_STATE_COMPLETE);
+}
+//Request was completed successfully. ranger:
 int request_done(struct http_request *req){
 u_int16_t id;
 struct kore_buf*buf;
@@ -308,14 +367,38 @@ kore_pgsql_cleanup(&state->sql);
 http_state_cleanup(req);
 return (HTTP_STATE_COMPLETE);
 }
+
+//page:
+int request_done2(struct http_request *req){
+//u_int16_t id;
+//struct kore_buf*buf;
+//char*sid;
+printf(yellow "***REQUEST_DONE_2(): %s****\n" rst, req->path);
+struct rstate	*state = http_state_get(req);
+
+//http_populate_get(req);
+//buf = kore_buf_alloc(128);
+//Grab it as a string, we shouldn't free the result in sid. 
+//if (http_argument_get_string(req, "id", &sid)){
+//kore_log(LOG_INFO,red "***SID!!!*** %s" rst,sid);
+//kore_buf_appendf(buf, "id as a string: '%s'\n", sid);
+//}
+//Grab it as an actual u_int16_t.
+//if (http_argument_get_uint16(req, "id", &id))
+//kore_buf_appendf(buf, "id as an u_int16_t: %d\n", id);
+//Now return the result to the client with a 200 status code. 
+http_response(req, 200, "pagedone", 8);
+//kore_buf_free(buf);
+kore_pgsql_cleanup(&state->sql);
+http_state_cleanup(req);
+return (HTTP_STATE_COMPLETE);
+}
 void pipe_data_available(struct kore_task *t){
 struct connection*c;
 size_t len;
 u_int8_t buf[BUFSIZ];
 if(kore_task_finished(t)){
 kore_log(LOG_NOTICE,"Task finished.");
-//kore_msg_send(KORE_MSG_PARENT,KORE_MSG_SHUTDOWN,"1",1);
-//if(done==1)exit(0);
 return;
 }
 len=kore_task_channel_read(t,buf,sizeof(buf));

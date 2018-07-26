@@ -47,7 +47,8 @@ function prepend(txt) {
 </script>
 	</head>
 <body>
-<button onclick="getax();">getax</button><br>
+<button onclick="getax();">get ajax</button><br>
+<button onclick="postax();">post ajax</button><br>
 <h3>events</h3>
 <div id="events">
 </div>
@@ -65,6 +66,26 @@ function prepend(txt) {
 			}
 			xhr.onerror=function(s){console.error('error: ',s);}
 			xhr.send();
+		}
+		function postax(){
+		var xhr=new XMLHttpRequest();
+		
+			xhr.open("post","/mafia");
+			xhr.setRequestHeader('Content-Type','application/json','utf-8');
+			xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+			xhr.onload=function(s){
+				
+			if(xhr.status==200){
+			console.log("response: ",this.response);
+			}else{
+			console.warn(this.status,' ',this.response);
+			}
+			}
+			xhr.onerror=function(s){console.error('error: ',s);}
+			var data={};
+			data.hello="world";
+			var m=JSON.stringify(data);
+			xhr.send(m);
 		}
 	</script>
 </body>
