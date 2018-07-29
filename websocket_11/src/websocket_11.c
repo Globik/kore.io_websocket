@@ -54,7 +54,7 @@ static int	request_done2(struct http_request *);
 void connection_del(struct connection*);
 void connection_new(struct connection*);
 void db_state_change(struct kore_pgsql*,void*);
-void db_init(struct connection*,struct kore_pgsql*);
+void db_init(struct connection*,struct kore_pgsql*,int);
 void db_results(struct kore_pgsql*,struct connection*);
 
 
@@ -123,25 +123,23 @@ int cnt;
 char*name;
 struct kore_pgsql sql;
 };
-
+struct dura{
+int fuck;
+struct kore_pgsql*pgsql;
+};
 void websocket_connect(struct connection*c){
-kore_log(LOG_INFO,yellow "ws client connected." rst);
-//connection_new(c);k
+kore_log(LOG_INFO,yellow "ws client connected. %p" rst,(void*)c);
+connection_new(c);
 }
 void websocket_disconnect(struct connection*c){
-kore_log(LOG_INFO, yellow "ws client disconnected." rst);	
+kore_log(LOG_INFO, yellow "ws client disconnected.%p" rst,(void*)c);	
+connection_del(c);
 }
 void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
 kore_log(LOG_INFO, yellow "on ws message." rst);
-connection_new(c);
-/*
-struct kore_pgsql*pgsql=kore_calloc(1,sizeof(*pgsql));
-kore_pgsql_init(pgsql);
-kore_pgsql_bind_callback(pgsql,db_state_change,c);
-//c->hdlr_extra=pgsql;
-kore_log(LOG_INFO, yellow "new calback db connection: %p" rst,(void*)c);
-db_init(c,pgsql);
-*/ 	
+
+db_init(c,c->hdlr_extra,1);
+
 kore_websocket_send(c,op,data,len);	
 }
 int page_ws_connect(struct http_request*req){
@@ -389,7 +387,7 @@ int request_done(struct http_request *req){
 u_int16_t id;
 struct kore_buf*buf;
 char*sid;
-printf(yellow "***REQUEST_DONE(): %s****\n" rst, req->path);
+printf(yellow "***REQUEST_DONE(): %s****" rst, req->path);
 struct rstate	*state = http_state_get(req);
 
 http_populate_get(req);
@@ -472,11 +470,11 @@ const char*conninfovalues[]={"postgres",NULL};
 conn=PQconnectStartParams(conninfokeys,conninfovalues,0);
 ConnStatusType status=PQstatus(conn);
 if(status==CONNECTION_BAD){
-kore_log(LOG_INFO, red "connection database failed %s\n" rst, PQerrorMessage(conn));
+kore_log(LOG_INFO, red "connection database failed %s" rst, PQerrorMessage(conn));
 exitclean(conn);
 return (KORE_RESULT_OK);
 }else if(status==CONNECTION_STARTED){
-kore_log(LOG_INFO, "connection started!\n");
+kore_log(LOG_INFO, "connection started!");
 }else if(status==CONNECTION_MADE){
 kore_log(LOG_INFO, green "Connection made." rst);	
 }else{kore_log(LOG_INFO, yellow "Connecting..." rst);}
@@ -500,20 +498,20 @@ i++;
 printf("n: %d\n",n);
 printf(yellow "han_sig SIGINT occured.\n" rst);
 done=1;
-if(konnikov==0){printf(green "not connected, return.\n" rst);return;}
+if(konnikov==0){printf(green "not connected, return." rst);return;}
 if(conn !=NULL)PQfinish(conn);
 conn=NULL;
 if(i==3)exit(0);
 }
 void foo(int n){
-kore_log(LOG_INFO, yellow "FOO occured.\n" rst);
-if(konnikov==0){printf(green "not connected, return.\n" rst);return;}
+kore_log(LOG_INFO, yellow "FOO occured." rst);
+if(konnikov==0){printf(green "not connected, return." rst);return;}
 if(conn !=NULL){
-kore_log(LOG_INFO, "conn is not null in foo\n");done=1;
+kore_log(LOG_INFO, "conn is not null in foo");done=1;
 PQfinish(conn);
 conn=NULL;
 
-}else{kore_log(LOG_INFO, "conn is null in foo\n");done=1;}
+}else{kore_log(LOG_INFO, "conn is null in foo");done=1;}
 konnikov=0;
 }
 void mainloop(PGconn*conn,struct kore_task*t){
@@ -523,19 +521,19 @@ int sock;
 int connected=0;
 	
 int u=PQsetnonblocking(conn,1);
-kore_log(LOG_INFO, "non blocking: %d\n",u);
+kore_log(LOG_INFO, "non blocking: %d",u);
 int ud=PQisnonblocking(conn);
 // 1 nonbl, 0 bl
-kore_log(LOG_INFO, "is non blocking? :%d\n",ud);
+kore_log(LOG_INFO, "is non blocking? :%d",ud);
 
 sock=PQsocket(conn);	
 if(sock<0){
-kore_log(LOG_INFO,red "postgres socket is gone\n" rst);
+kore_log(LOG_INFO,red "postgres socket is gone" rst);
 exitclean(conn);
 }
 int mt=fcntl(sock,F_DUPFD_CLOEXEC,0);
 if(mt<0){
-kore_log(LOG_INFO, red "failed dupfd_cloexec: %s\n" rst,strerror(errno));
+kore_log(LOG_INFO, red "failed dupfd_cloexec: %s" rst,strerror(errno));
 }				
 PostgresPollingStatusType connstatus;
 
@@ -551,15 +549,15 @@ done=1;
 exitclean(conn);
 break;
 case PGRES_POLLING_WRITING:
-kore_log(LOG_INFO, "PGRES_POLLING_WRITING\n");
+kore_log(LOG_INFO, "PGRES_POLLING_WRITING");
 //	FD_SET(sock,&wfds);
 break;
 case PGRES_POLLING_READING:
-kore_log(LOG_INFO, "PGRES_POLLING_READING\n");
+kore_log(LOG_INFO, "PGRES_POLLING_READING");
 FD_SET(sock,&rfds);
 break;
 case PGRES_POLLING_OK:
-kore_log(LOG_INFO, green "PGRES_POLLING_OK\n" rst);
+kore_log(LOG_INFO, green "PGRES_POLLING_OK" rst);
 connected=1;
 konnikov=1;
 initlisten(conn);
@@ -574,9 +572,9 @@ case -1:
 //perror("select failed\n");
 if(errno==EINTR){
 // the fuck it is in a dedicated thread like this, it does not work like in a main thread or process.
-kore_log(LOG_INFO, red "EINTR occurred.\n");
+kore_log(LOG_INFO, red "EINTR occurred.");
 }
-kore_log(LOG_INFO, red "done??\n" rst);
+kore_log(LOG_INFO, red "done??" rst);
 connected=0;
 done=1;
 break;
@@ -603,38 +601,38 @@ int qs=PQsendQuery(conn,"LISTEN revents;LISTEN on_coders"/*query*/);
 PQfreemem(quotedchannel);
 free(query);
 if(!qs){
-kore_log(LOG_INFO,red "Failed to send query: %s\n" rst,PQerrorMessage(conn));
+kore_log(LOG_INFO,red "Failed to send query: %s" rst,PQerrorMessage(conn));
 return;
 }
 }
 void handlepgread(PGconn*conn,struct kore_task*t){
-kore_log(LOG_INFO, "entering handlepgread(conn)\n");
+kore_log(LOG_INFO, "entering handlepgread(conn)");
 PGnotify*notify;
 PGresult*res;
 if(!PQconsumeInput(conn)){
-kore_log(LOG_INFO,red "failed to consume input: %s\n" rst, PQerrorMessage(conn));
+kore_log(LOG_INFO,red "failed to consume input: %s" rst, PQerrorMessage(conn));
 //done=1;
 //exitclean(conn);
 return;
 }
 while((res=PQgetResult(conn)) !=NULL){
 if(PQresultStatus(res) !=PGRES_COMMAND_OK){
-kore_log(LOG_INFO,red "result err: %s\n" rst, PQerrorMessage(conn));
+kore_log(LOG_INFO,red "result err: %s" rst, PQerrorMessage(conn));
 PQclear(res);
 return;
 }
 
-kore_log(LOG_INFO, "PQresultStatus: %s\n",PQresStatus(PQresultStatus(res)));
+kore_log(LOG_INFO, "PQresultStatus: %s",PQresStatus(PQresultStatus(res)));
 //printf("returns rows: %d\n",PQntuples(res));
 //printf("cols: %d\n",PQnfields(res));
-kore_log(LOG_INFO, "cmd status: %s\n",PQcmdStatus(res));
+kore_log(LOG_INFO, "cmd status: %s",PQcmdStatus(res));
 fuck=1;
 PQclear(res);
 }
 
 //printf("before notify\n");
 while(notify=PQnotifies(conn)){
-kore_log(LOG_INFO,yellow "notify of %s received from backend pid %d ,extra: %s\n" rst, notify->relname, notify->be_pid, notify->extra);
+kore_log(LOG_INFO,yellow "notify of %s received from backend pid %d ,extra: %s" rst, notify->relname, notify->be_pid, notify->extra);
 //kore_task_channel_write(t,"DAMA\0",5);
 int fs=strlen(notify->extra);
 kore_log(LOG_INFO, green "fs len: %d" rst, fs);
@@ -771,17 +769,26 @@ return (http_state_run(mystates, mystates_size, req));
 
 void connection_new(struct connection*c){
 struct kore_pgsql*pgsql;
-c->disconnect=connection_del;
+struct dura*g=kore_calloc(1,sizeof(*g));
+g->fuck=999;
+//c->disconnect=connection_del;
 //c->proto=CONN_PROTO_UNKNOWN;
 c->state=CONN_STATE_ESTABLISHED;
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
-kore_pgsql_bind_callback(pgsql,db_state_change,c);
+kore_pgsql_bind_callback(pgsql,db_state_change, c);
+
 //c->hdlr_extra=pgsql;
+g->pgsql=pgsql;
+c->hdlr_extra=g;
 kore_log(LOG_INFO, yellow "new calback db connection: %p" rst,(void*)c);
-db_init(c,pgsql);	
+//printf("fuck: %d\n",c->fuck);
+//db_init(c,pgsql);	
 }
-void db_init(struct connection*c,struct kore_pgsql*pgsql){
+
+void db_init(struct connection*c,struct kore_pgsql*pgsql,int a){
+kore_log(LOG_INFO,"a: %d",a);
+
 if(!kore_pgsql_setup(pgsql,"db",KORE_PGSQL_ASYNC)){
 if(pgsql->state==KORE_PGSQL_STATE_INIT){
 kore_log(LOG_INFO,"waiting for available pgsql connection");
@@ -789,38 +796,49 @@ return;
 }
 kore_log(LOG_INFO, red "err here" rst);
 kore_pgsql_logerror(pgsql);
-kore_connection_disconnect(c);
+//kore_connection_disconnect(c);
 return;	
 }
 kore_log(LOG_INFO,green "got pgsql connection" rst);
 if(!kore_pgsql_query(pgsql,"select * from coders")){
 kore_log(LOG_INFO,red "err here2" rst);
 kore_pgsql_logerror(pgsql);
-kore_connection_disconnect(c);
+//kore_connection_disconnect(c);
 return;	
 }
 kore_log(LOG_INFO,yellow "query fired off!" rst);	
 }
+
 void connection_del(struct connection*c){
+//kore_connection_disconnect(c);
 kore_log(LOG_INFO, yellow "connection db cb disconnecting..: %p" rst,(void*)c);
 if(c->hdlr_extra !=NULL)kore_pgsql_cleanup(c->hdlr_extra);
 kore_free(c->hdlr_extra);
 c->hdlr_extra=NULL;	
+//kore_connection_disconnect(c);
 }
 void db_state_change(struct kore_pgsql*pgsql,void*arg){
 struct connection*c=arg;
 kore_log(LOG_INFO,"%p state change on pgsql cb %d",arg,pgsql->state);
 switch(pgsql->state){
 case KORE_PGSQL_STATE_INIT:
-kore_log(LOG_INFO, yellow "cb state init" rst);
-db_init(c,pgsql);
+kore_log(LOG_INFO, yellow "***cb state db_init***" rst);
+db_init(c,pgsql,1);
 break;
 case KORE_PGSQL_STATE_WAIT:
 kore_log(LOG_INFO, yellow "cb state wait" rst);
 break;
 case KORE_PGSQL_STATE_COMPLETE:
 kore_log(LOG_INFO, yellow "cb state complete" rst);
+//connection_del(c);
 //kore_connection_disconnect(c);
+//kore_pgsql_cleanup(c->hdlr_extra);
+kore_log(LOG_INFO, yellow "c->hdlr_extra = pgsql, %p = %p" rst,(void*)c->hdlr_extra,(void*)pgsql);
+kore_pgsql_cleanup(pgsql);
+//kore_connection_disconnect(c);// is a need for a websocket?
+// a bug? after ctrl + C =>
+//(index):94 WebSocket connection to 'ws://127.0.0.1:8888/connect' failed: 
+//One or more reserved bits are on: reserved1 = 1, reserved2 = 1, reserved3 = 0
 break;
 case KORE_PGSQL_STATE_ERROR:
 kore_log(LOG_INFO, red "cb state error" rst);
@@ -845,7 +863,8 @@ name=kore_pgsql_getvalue(pgsql,i,0);
 //net_send_queue(c,name,strlen(name));	
 }
 kore_log(LOG_INFO,green "result name: %s" rst,name);
-//kore_websocket_send(
+kore_websocket_send(c,WEBSOCKET_OP_TEXT,name,strlen(name));
 //net_send_flush(c);
+//kore_pgsql_cleanup(pgsql);//???
 kore_pgsql_continue(pgsql);	
 }

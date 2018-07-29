@@ -29,7 +29,8 @@ source.addEventListener("open", function(evt) {
 
 source.addEventListener("error", function(evt) {
 	console.log("error");
-	prepend("error");
+	prepend("error from sse");
+	console.log(evt);
 	source.close();
 });
 
@@ -49,7 +50,7 @@ function prepend(txt) {
 <body>
 <button onclick="getax();">get ajax</button><br>
 <button onclick="postax();">post ajax</button><br><br>
-<button onclick="websock();">websock</button> | <button onclick="wsend();">send</button><br><br>
+<button onclick="websock();">websock</button> | <button onclick="wsend();">send</button> | <button onclick="clo();">close</button><br><br>
 <b>websocket:</b><span id="soki"></span>
 <h3>events</h3>
 <div id="events">
@@ -93,12 +94,18 @@ function prepend(txt) {
 function websock(){
 ws=new WebSocket("ws://127.0.0.1:8888/connect");
 ws.onopen=function(e){soki.textContent="opened";}
-ws.onerror=function(e){soki.textContent="error";}
+ws.onerror=function(e){soki.textContent="error fuck";
+	console.log(e);
+	}
 ws.onmessage=function(e){soki.textContent+=e.data;}
+ws.onclose=function(e){soki.textContent+="closed.";}
 }
 function wsend(){
 if(ws)ws.send("Hi from Africa!");
 }
+function clo(){
+if(ws)ws.close();
+	}
 	</script>
 </body>
 
