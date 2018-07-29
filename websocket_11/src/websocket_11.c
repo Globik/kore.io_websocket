@@ -14,6 +14,7 @@
 #include <kore/http.h>
 #include <kore/pgsql.h>
 #include <kore/tasks.h>
+
 #include "assets.h"
 
 #define REQ_STATE_INIT			0
@@ -48,10 +49,25 @@ static int	request_db_read2(struct http_request *);
 static int	request_error2(struct http_request *);
 static int	request_done2(struct http_request *);
 
+//callback binding pgsql interface
+
+void connection_del(struct connection*);
+void connection_new(struct connection*);
+void db_state_change(struct kore_pgsql*,void*);
+void db_init(struct connection*,struct kore_pgsql*);
+void db_results(struct kore_pgsql*,struct connection*);
+
+
 int fuck=0;
 static int done=0;
 const char*listenchannel="revents";
 void kore_worker_configure(void);
+
+int page_ws_connect(struct http_request*);
+void websocket_connect(struct connection*);
+void websocket_disconnect(struct connection*);
+void websocket_message(struct connection*,u_int8_t,void*,size_t);
+
 
 void handler(void);
 void han(int);
@@ -107,6 +123,32 @@ int cnt;
 char*name;
 struct kore_pgsql sql;
 };
+
+void websocket_connect(struct connection*c){
+kore_log(LOG_INFO,yellow "ws client connected." rst);
+//connection_new(c);k
+}
+void websocket_disconnect(struct connection*c){
+kore_log(LOG_INFO, yellow "ws client disconnected." rst);	
+}
+void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
+kore_log(LOG_INFO, yellow "on ws message." rst);
+connection_new(c);
+/*
+struct kore_pgsql*pgsql=kore_calloc(1,sizeof(*pgsql));
+kore_pgsql_init(pgsql);
+kore_pgsql_bind_callback(pgsql,db_state_change,c);
+//c->hdlr_extra=pgsql;
+kore_log(LOG_INFO, yellow "new calback db connection: %p" rst,(void*)c);
+db_init(c,pgsql);
+*/ 	
+kore_websocket_send(c,op,data,len);	
+}
+int page_ws_connect(struct http_request*req){
+kore_websocket_handshake(req,"websocket_connect","websocket_message","websocket_disconnect");
+return (KORE_RESULT_OK);	
+}
+
 int init(int state){
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 //if(worker->id !=1) return (KORE_RESULT_OK);
@@ -725,4 +767,85 @@ int ranger(struct http_request *req)
 // yeah, callback hell. Like in nodejs land. But what can I do about it?
 //coroutines are also not nice, error prone, even much harder to develope than callback hell, no adecvate libs like in c++, etc...
 return (http_state_run(mystates, mystates_size, req));
+}
+
+void connection_new(struct connection*c){
+struct kore_pgsql*pgsql;
+c->disconnect=connection_del;
+//c->proto=CONN_PROTO_UNKNOWN;
+c->state=CONN_STATE_ESTABLISHED;
+pgsql=kore_calloc(1,sizeof(*pgsql));
+kore_pgsql_init(pgsql);
+kore_pgsql_bind_callback(pgsql,db_state_change,c);
+//c->hdlr_extra=pgsql;
+kore_log(LOG_INFO, yellow "new calback db connection: %p" rst,(void*)c);
+db_init(c,pgsql);	
+}
+void db_init(struct connection*c,struct kore_pgsql*pgsql){
+if(!kore_pgsql_setup(pgsql,"db",KORE_PGSQL_ASYNC)){
+if(pgsql->state==KORE_PGSQL_STATE_INIT){
+kore_log(LOG_INFO,"waiting for available pgsql connection");
+return;	
+}
+kore_log(LOG_INFO, red "err here" rst);
+kore_pgsql_logerror(pgsql);
+kore_connection_disconnect(c);
+return;	
+}
+kore_log(LOG_INFO,green "got pgsql connection" rst);
+if(!kore_pgsql_query(pgsql,"select * from coders")){
+kore_log(LOG_INFO,red "err here2" rst);
+kore_pgsql_logerror(pgsql);
+kore_connection_disconnect(c);
+return;	
+}
+kore_log(LOG_INFO,yellow "query fired off!" rst);	
+}
+void connection_del(struct connection*c){
+kore_log(LOG_INFO, yellow "connection db cb disconnecting..: %p" rst,(void*)c);
+if(c->hdlr_extra !=NULL)kore_pgsql_cleanup(c->hdlr_extra);
+kore_free(c->hdlr_extra);
+c->hdlr_extra=NULL;	
+}
+void db_state_change(struct kore_pgsql*pgsql,void*arg){
+struct connection*c=arg;
+kore_log(LOG_INFO,"%p state change on pgsql cb %d",arg,pgsql->state);
+switch(pgsql->state){
+case KORE_PGSQL_STATE_INIT:
+kore_log(LOG_INFO, yellow "cb state init" rst);
+db_init(c,pgsql);
+break;
+case KORE_PGSQL_STATE_WAIT:
+kore_log(LOG_INFO, yellow "cb state wait" rst);
+break;
+case KORE_PGSQL_STATE_COMPLETE:
+kore_log(LOG_INFO, yellow "cb state complete" rst);
+//kore_connection_disconnect(c);
+break;
+case KORE_PGSQL_STATE_ERROR:
+kore_log(LOG_INFO, red "cb state error" rst);
+kore_pgsql_logerror(pgsql);
+kore_connection_disconnect(c);
+break;
+case KORE_PGSQL_STATE_RESULT:
+kore_log(LOG_INFO, yellow "cb state result" rst);
+db_results(pgsql,c);
+break;
+default:
+kore_log(LOG_INFO, yellow "cb state default" rst);
+kore_pgsql_continue(pgsql);
+break;
+}	
+}
+void db_results(struct kore_pgsql*pgsql,struct connection*c){
+char *name;int i,rows;
+rows=kore_pgsql_ntuples(pgsql);
+for(i=0;i<rows;i++){
+name=kore_pgsql_getvalue(pgsql,i,0);
+//net_send_queue(c,name,strlen(name));	
+}
+kore_log(LOG_INFO,green "result name: %s" rst,name);
+//kore_websocket_send(
+//net_send_flush(c);
+kore_pgsql_continue(pgsql);	
 }
