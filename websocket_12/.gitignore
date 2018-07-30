@@ -1,0 +1,6 @@
+*.o
+.flavor
+.objs
+websocket_12.so
+assets.h
+cert

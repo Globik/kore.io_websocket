@@ -769,8 +769,8 @@ return (http_state_run(mystates, mystates_size, req));
 
 void connection_new(struct connection*c){
 struct kore_pgsql*pgsql;
-struct dura*g=kore_calloc(1,sizeof(*g));
-g->fuck=999;
+//struct dura*g=kore_calloc(1,sizeof(*g));
+//g->fuck=999;
 //c->disconnect=connection_del;
 //c->proto=CONN_PROTO_UNKNOWN;
 c->state=CONN_STATE_ESTABLISHED;
@@ -778,9 +778,9 @@ pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 kore_pgsql_bind_callback(pgsql,db_state_change, c);
 
-//c->hdlr_extra=pgsql;
-g->pgsql=pgsql;
-c->hdlr_extra=g;
+c->hdlr_extra=pgsql;
+//g->pgsql=pgsql;
+//c->hdlr_extra=g;
 kore_log(LOG_INFO, yellow "new calback db connection: %p" rst,(void*)c);
 //printf("fuck: %d\n",c->fuck);
 //db_init(c,pgsql);	
