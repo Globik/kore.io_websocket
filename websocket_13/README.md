@@ -12,9 +12,7 @@
 ## TODO
 
 1. Make one state machine for all asynchronous queries. May be to use pgsql->conn->name as a basis for a state managment??
-2. Maybe I should issue a LISTEN command synchronous at loaded time??? 
-   It's simpler than standalone state machine and other pgsql instance.
-   Oh, no. Synchronous notifications does not work.
+2. Maybe I should issue a LISTEN command synchronous at loaded time??? It's simpler than standalone state machine and other pgsql instance.
 
 ## What does dislike me in kore pgsql
 
