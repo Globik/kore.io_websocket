@@ -29,17 +29,19 @@ void connection_new(struct connection*);
 void connection_del(struct connection*);
 
 int init(int s){
+	
 kore_log(LOG_INFO,"init()");
 kore_pgsql_register(q_name,"dbname=postgres");
 //kore_pgsql_register("dba","dbname=postgres");
+//return (KORE_RESULT_OK);
 struct kore_pgsql*pgsql;
 
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 
 kore_pgsql_bind_callback(pgsql, db_state_change,NULL);
-//db_query(pgsql, q_name,"LISTEN revents;LISTEN on_coders");
-db_query(pgsql,q_name, "LISTEN revents");
+db_query(pgsql, q_name,"LISTEN revents;LISTEN on_coders");
+//db_query(pgsql,q_name, "LISTEN revents");
 //db_query(pgsql,q_name,"LISTEN on_coders");
 return (KORE_RESULT_OK);	
 }
@@ -65,7 +67,10 @@ kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
 printf(green "name: %s\n" rst,p->conn->name);
 kore_pgsql_continue(p);	
 break;
-
+case KORE_PGSQL_STATE_COMMANDOK:
+kore_log(LOG_INFO,yellow "COMMANDOK!" rst);
+kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
+break;
 case KORE_PGSQL_STATE_NOTIFY:
 kore_log(LOG_INFO,"notify");
 on_notify(p);
@@ -123,16 +128,24 @@ kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,p->notify.extra,strlen(p->notify
 }
 
 void db_results(struct kore_pgsql*p,struct connection*c){
-
-printf(red "db_results int extra: %d\n" rst,(int)p->arg);
-char *name;int i,rows;
+printf("entering into db_results()\n");
+printf("memo2: %p\n",(void*)c->hdlr_extra);
+printf("memo pgsql->arg: %p\n",(void*)p->arg);
+//printf(red "db_results int extra: %d\n" rst,(int)p->arg);
+char *name;int i,rows;char*dame=NULL;
 rows=kore_pgsql_ntuples(p);
+
 for(i=0;i<rows;i++){
 name=kore_pgsql_getvalue(p,i,0);
+//dame=kore_pgsql_getvalue(p,i,1);
 }
+
+printf("rows: %d\n",rows); 
 kore_log(LOG_INFO,green "result name: %s" rst,name);
-kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,name,strlen(name),/*WEBSOCKET_BROADCAST_GLOBAL*/4);	
-kore_pgsql_continue(p);	
+if(dame !=NULL)kore_log(LOG_INFO,green "result alt: %s" rst,dame);
+//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,name,strlen(name),/*WEBSOCKET_BROADCAST_GLOBAL*/4);	
+kore_websocket_send(c,WEBSOCKET_OP_TEXT,name,strlen(name));
+//kore_pgsql_continue(p);	
 }
 
 
@@ -177,7 +190,16 @@ kore_log(LOG_INFO, yellow "on ws message." rst);
 
 kore_websocket_send(c,op,data,len);	
 if(c->hdlr_extra !=NULL){
-db_query(c->hdlr_extra,q_name, "update banners set alt='Fuck me please!'");
+//db_query(c->hdlr_extra,q_name, "update banners set alt='Fuck me please!'");
+//db_query(c->hdlr_extra,q_name,"update coders set name='Linux'");
+//db_query(c->hdlr_extra,q_name,"update banners set alt='New World'");
+//db_query(c->hdlr_extra,q_name,"update banners set alt='France';update coders set name='Feoder'");
+//db_query(c->hdlr_extra,q_name,"select*from coders");
+//db_query(c->hdlr_extra,q_name,"select*from coders;select*from coders");
+printf("memo1: %p\n",(void*)c->hdlr_extra);
+//((struct pgsql*)c->hdlr_extra)->arg="s";
+//db_query(c->hdlr_extra,q_name,"select*from coders;select*from banners");
+db_query(c->hdlr_extra,q_name,"select*from coders;update banners set alt='fucky'");
 }
 }
 int page_ws_connect(struct http_request*req){
