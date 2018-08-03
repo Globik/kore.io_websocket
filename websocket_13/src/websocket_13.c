@@ -8,14 +8,17 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 const char*q_name="db";
+const char*q_fucker="fucker";
+struct kore_pgsql*for_fucker=NULL;
 
 int	page(struct http_request *);
-void kore_worker_configure(void);
+//void kore_worker_configure(void);
 int init(int);
 
 void on_notify(struct kore_pgsql*);
 
 void db_state_change(struct kore_pgsql*,void*);
+
 void db_query(struct kore_pgsql*,const char*, const char*);
 void db_results(struct kore_pgsql*,struct connection*);
 
@@ -24,31 +27,37 @@ int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
 void websocket_disconnect(struct connection*);
 void websocket_message(struct connection*,u_int8_t,void*,size_t);
-
+void han(void);
 void connection_new(struct connection*);
 void connection_del(struct connection*);
-
+void han(){
+	printf(green "at exit occured.\n" rst);
+	//if(for_fucker !=NULL)free(for_fucker);//kore_pgsql_cleanup(for_fucker);
+	//kore_pgsql_continue(for_fucker);	
+	}
+void kore_worker_configure(){
+	printf("configure worker\n");
+	atexit(han);
+	}
 int init(int s){
 	
 kore_log(LOG_INFO,"init()");
 kore_pgsql_register(q_name,"dbname=postgres");
-//kore_pgsql_register("dba","dbname=postgres");
+kore_pgsql_register("fucker","dbname=postgres");
 //return (KORE_RESULT_OK);
-struct kore_pgsql*pgsql;
+struct kore_pgsql*pgsql; 
 
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 
-kore_pgsql_bind_callback(pgsql, db_state_change,NULL);
-db_query(pgsql, q_name,"LISTEN revents;LISTEN on_coders");
+kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
+db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
 //db_query(pgsql,q_name, "LISTEN revents");
 //db_query(pgsql,q_name,"LISTEN on_coders");
 return (KORE_RESULT_OK);	
 }
 
-void kore_worker_configure(){
-kore_log(LOG_INFO,"kore_worker_configure()");
-}
+
 void db_state_change(struct kore_pgsql*p,void*d){
 kore_log(LOG_INFO,"db_state_change: %d",p->state);
 
@@ -65,14 +74,18 @@ case KORE_PGSQL_STATE_DONE:
 kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
 //printf(red "int extra : %d\n" rst,(int)p->arg);
 printf(green "name: %s\n" rst,p->conn->name);
+if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");}else{
+printf("string is not ok?\n");
 kore_pgsql_continue(p);	
+}
 break;
 case KORE_PGSQL_STATE_COMMANDOK:
 kore_log(LOG_INFO,yellow "COMMANDOK!" rst);
 kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
 break;
 case KORE_PGSQL_STATE_NOTIFY:
-kore_log(LOG_INFO,"notify");
+kore_log(LOG_INFO,"****notify_1111111111111111111***");
+if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");}else{printf("string is not ok?\n");}
 on_notify(p);
 break;
 
@@ -96,6 +109,7 @@ kore_pgsql_continue(p);
 break;
 }		
 }
+
 
 void db_query(struct kore_pgsql*p,const char*qname,const char*str_query){
 
