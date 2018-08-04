@@ -17,6 +17,17 @@ Hardcoded to echotest plugin and WebRTC DataChannel API.
 
 [websocket_11](https://github.com/Globik/kore.io_websocket/tree/master/websocket_11) - asynchronous LISTEN interface of libpq in a dedicated
 thread. Using select for the time being. 
+[websocket_12](https://github.com/Globik/kore.io_websocket/tree/master/websocket_12) 
+[websocket_13](https://github.com/Globik/kore.io_websocket/tree/master/websocket_13) - built-in LISTEN / NOTIFY interface.
+With some modifications in source code of pgsql.c Placed PGresult in a while loop. 
+This is useful for handling ok's command or results at once after performing multiple queries in a row.
+
+### Other excellent applications based on kore.c webframework:
+
+[https://github.com/stan1y/servo](https://github.com/stan1y/servo) - a session engine and storage for static websites. 
+[https://github.com/byronmejia/Pingers](https://github.com/byronmejia/Pingers) - a solution to the Tanda Work-Samples challenge.
+[https://github.com/jorisvink/kore-blog](https://github.com/jorisvink/kore-blog) - a tiny blog platform. 
+
 
 
 
