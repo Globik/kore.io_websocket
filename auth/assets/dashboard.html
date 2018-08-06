@@ -1,0 +1,13 @@
+<html><head><title>dashboard</title></head><body>
+	<a href="/">home</a> | <a href="/logout/">log out</a>
+	<h1>dashboard</h1><span>hi, user!</span>
+	<button onclick="clickme();">show cookie</button>
+	<h3>Cookie:</h3>
+	<span id="out"></span>
+	<script>
+	function clickme(){
+		console.log("cookie: ",document.cookie,window.cookie);
+		out.innerHTML+="<b>"+document.cookie+"</b>"
+	}
+	</script>
+	</body></html>
