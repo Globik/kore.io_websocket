@@ -123,7 +123,7 @@ kore_log(LOG_INFO,red "hicookie: %s" rst, value);
 
 if(sess==NULL){kore_log(LOG_INFO,"adding a session");sess="user_sess";}
 http_response_header(req,"location","/dashboard/");
-http_response_cookie(req,"hicookie","user_sess","/dashboard",0,0,&cookie);
+http_response_cookie(req,"hicookie","user_sess","/",0,0,&cookie);
 cookie->flags &= ~HTTP_COOKIE_HTTPONLY;
 cookie->flags &= ~HTTP_COOKIE_SECURE;
 kore_log(LOG_INFO,green "user session: %s" rst,sess);
@@ -149,6 +149,7 @@ http_response(req, 405, NULL, 0);
 return (KORE_RESULT_OK);
 }
 //http_response(req, 200, NULL, 0);
+if(req->hdlr_extra !=NULL){kore_log(LOG_INFO,green "any data: %s" rst,(char*)req->hdlr_extra);req->hdlr_extra=NULL;}
 http_response_header(req, "content-type", "text/html");
 http_response(req, 200, asset_dashboard_html, asset_len_dashboard_html);
 return (KORE_RESULT_OK);
@@ -164,7 +165,9 @@ return (KORE_RESULT_OK);
 }
 sess=NULL;
 //http_response_cookie(req,NULL,NULL,NULL,0,0,NULL);
-http_response(req, 200, "ok_logout", 9);
+http_response_header(req,"set-cookie","hicookie=null; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");//?
+//http_response(req, 200, "ok_logout", 9);
+redirect(req);
 return (KORE_RESULT_OK);
 }
 
@@ -176,8 +179,9 @@ kore_log(LOG_INFO,red "cookie is NULL. Return." rst);
 return (KORE_RESULT_ERROR);
 }	
 kore_log(LOG_INFO,"cookie: %s, path: %s", cookie,req->path);
-if(!strcmp("user_sess",cookie)){
+if(!strcmp("user_sess", cookie)){
 kore_log(LOG_INFO,green "Cookie compare is OK" rst);
+if(req->hdlr_extra==NULL){req->hdlr_extra="ABBA";}
 return (KORE_RESULT_OK);	
 }
 kore_log(LOG_INFO,red "Cookie compare is NOT OK" rst);
