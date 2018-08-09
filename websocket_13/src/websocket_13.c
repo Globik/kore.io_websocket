@@ -192,8 +192,10 @@ return (KORE_RESULT_OK);
 void websocket_connect(struct connection*c){
 kore_log(LOG_INFO,yellow "ws client connected. %p" rst,(void*)c);
 connection_new(c);
-if(c->hdlr_extra !=NULL)db_query(c->hdlr_extra,q_name, "update banners set alt='Chicago Bulls'");
-
+if(c->hdlr_extra !=NULL){
+db_query(c->hdlr_extra,q_name, "update banners set alt='Chicago Bulls'");
+//db_query(c->hdlr_extra,q_name, "update banners set fake='Chicago Bulls'");
+}
 }
 void websocket_disconnect(struct connection*c){
 kore_log(LOG_INFO, yellow "ws client disconnected.%p" rst,(void*)c);	
