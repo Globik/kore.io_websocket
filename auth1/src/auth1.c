@@ -66,6 +66,7 @@ struct rstate{
 };
 struct ustate{
 char*result_name;
+union{int a;int b;}mu;
 struct kore_pgsql p;	
 };
 
@@ -302,30 +303,26 @@ kore_log(LOG_INFO,green "Entering into db_results(),p->conn->name: %s" rst,p->co
 //printf("memo2: %p\n",(void*)c->hdlr_extra);
 //printf("memo pgsql->arg: %p\n",(void*)p->arg);
 //printf(red "db_results int extra: %d\n" rst,(int)p->arg);
-if(!strcmp(sessi,p->conn->name)){
+if(!strcmp(sessi, p->conn->name)){
 struct http_request*req=(struct http_request*)c;
 if(req==NULL){kore_log(LOG_INFO,red "req is NULL in db results cb" rst);}
 char *name;int i,rows;
 //char*dame=NULL;
 rows=kore_pgsql_ntuples(p);
-
+if(rows==0)return;
 for(i=0;i<rows;i++){
 name=kore_pgsql_getvalue(p,i,0);
 //dame=kore_pgsql_getvalue(p,i,1);
 }
 
-printf("rows: %d\n",rows); 
 kore_log(LOG_INFO,green "result name: %s" rst,name);
 struct ustate*state;
 state=http_state_get(req);
 if(state->result_name==NULL){
 kore_log(LOG_INFO,yellow "Aha, state->result_name is NULL" rst);
 state->result_name=kore_strdup(name);
+state->mu.a=3;
 }
-//if(dame !=NULL)kore_log(LOG_INFO,green "result alt: %s" rst,dame);
-//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,name,strlen(name),/*WEBSOCKET_BROADCAST_GLOBAL*/4);	
-//kore_websocket_send(c,WEBSOCKET_OP_TEXT,name,strlen(name));
-//kore_pgsql_continue(p);
 }
 }
 
@@ -443,13 +440,25 @@ return (KORE_RESULT_OK);
 int dashboard(struct http_request *req)
 {
 kore_log(LOG_INFO,yellow "The %s started." rst,req->path);
+struct ustate *state;
 if (req->method != HTTP_METHOD_GET) {
 http_response_header(req, "allow", "get");
 http_response(req, 405, NULL, 0);
 return (KORE_RESULT_OK);
 }
 //http_response(req, 200, NULL, 0);
-if(req->hdlr_extra !=NULL){kore_log(LOG_INFO,green "any data: %s" rst,(char*)req->hdlr_extra);req->hdlr_extra=NULL;}
+//if(req->hdlr_extra !=NULL){kore_log(LOG_INFO,green "any data: %s" rst,(char*)req->hdlr_extra);req->hdlr_extra=NULL;}
+if(http_state_exists(req)){
+state=http_state_get(req);	
+if(state->result_name && state->result_name !=NULL){
+kore_log(LOG_INFO,yellow "result name: %s" rst,state->result_name);
+kore_log(LOG_INFO,red "union int a: %d" rst,state->mu.a);
+kore_free(state->result_name);
+	
+}
+//kore_pgsql_cleanup(&state->p);
+http_state_cleanup(req);
+}
 http_response_header(req, "content-type", "text/html");
 http_response(req, 200, asset_dashboard_html, asset_len_dashboard_html);
 return (KORE_RESULT_OK);
@@ -484,97 +493,54 @@ kore_log(LOG_INFO,green "Cookie compare is OK" rst);
 if(req->hdlr_extra==NULL){req->hdlr_extra="ABBA";}
 return (KORE_RESULT_OK);	
 }
-*//*
-struct rstate *state;
-if(!http_state_exists(req)){
-kore_log(LOG_INFO,yellow "state not exist." rst);
-state=http_state_create(req,sizeof(*state));
-state->cnt=13;
-state->query=kore_strdup("select alt from banners where alt='user_sess'");
-state->q_name=kore_strdup(dbc);
-//state->us_sessi=NULL;
-kore_pgsql_init(&state->sql);
-kore_pgsql_bind_request(&state->sql, req);	
-//http_request_sleep(req);
-return (http_state_run(mystates, mystates_size, req));
-}else{
-	//http_request_sleep(req);
-//return (KORE_RESULT_RETRY);
-	}
-	*/
-	
-	
-	
-	
+*/
 struct ustate *state;
 if(!http_state_exists(req)){
 state=http_state_create(req,sizeof(*state));
 state->result_name=NULL;
 kore_pgsql_init(&state->p);
-//req->hdlr_extra=state;
 kore_pgsql_bind_callback(&state->p,db_state_change,req);
 db_query(&state->p,sessi,"select alt from banners where alt='user_sess'");
 return (KORE_RESULT_RETRY);
 }else{
 kore_log(LOG_INFO,red "extra is NOT NULL***" rst);
-//state=req->hdlr_extra;
 state=http_state_get(req);
 }	
-	kore_log(LOG_INFO,red "STATE***: %d" rst, (&state->p)->state);
+kore_log(LOG_INFO,red "STATE***: %d" rst, (&state->p)->state);
+
 if((&state->p)->state==KORE_PGSQL_STATE_COMPLETE){
 kore_log(LOG_INFO,red "das ist result***!!!" rst);
 http_request_wakeup(req);
 if(state->result_name !=NULL){
 kore_log(LOG_INFO,red "STATE->RESULT_NAME: %s" rst,state->result_name);	
+if(!strcmp(state->result_name,cookie)){
+kore_log(LOG_INFO,green "cookie compare is OK" rst);
+return (KORE_RESULT_OK);
+}else{
+kore_log(LOG_INFO,red "cookie comapare is NOT OK" rst);
 kore_free(state->result_name);
 state->result_name=NULL;
 }
-kore_log(LOG_INFO, red "Before req hdlr extra cleanup***" rst);
-kore_pgsql_cleanup(&state->p);
-kore_log(LOG_INFO,red "Before free req hdlr extra***" rst);
-http_state_cleanup(req);
-//kore_free(req->hdlr_extra);
-//req->hdlr_extra=NULL;
-return (KORE_RESULT_OK);
-}else{
-	kore_log(LOG_INFO,yellow "shon wieder retry???***" rst);
-	http_request_sleep(req);
-	return (KORE_RESULT_RETRY);
-	}
-	
-	/*
-struct kore_pgsql*pgsql;
-if(req->hdlr_extra==NULL){
-kore_log(LOG_INFO,red "extra is NULLLLLLLLLLLLLLLLLLLLLLLLL***" rst);
-pgsql=kore_calloc(1,sizeof(*pgsql));
-kore_pgsql_init(pgsql);
-req->hdlr_extra=pgsql;
-kore_pgsql_bind_callback(pgsql, db_state_change, req);
-//kore_log(LOG_INFO,red "Cookie compare is NOT OK" rst);
-//return (KORE_RESULT_ERROR);
-db_query(pgsql,sessi,"select alt from banners where alt='user_sess'");
-return (KORE_RESULT_RETRY);
-}else{
-	kore_log(LOG_INFO,red "extra is NOT NULL***" rst);
-	pgsql=req->hdlr_extra;
 }
+kore_pgsql_cleanup(&state->p);
+http_state_cleanup(req);
 
-kore_log(LOG_INFO,red "STATE***: %d" rst, pgsql->state);
-if(pgsql->state==KORE_PGSQL_STATE_COMPLETE){
-kore_log(LOG_INFO,red "das ist result***!!!" rst);
+return (KORE_RESULT_ERROR);
+}else if((&state->p)->state==KORE_PGSQL_STATE_ERROR){
+	// ??? it's not reached here, one need one more field for db error report after state complete
+kore_log(LOG_INFO, red "some err in db" rst);
 http_request_wakeup(req);
-kore_log(LOG_INFO, red "Before req hdlr extra cleanup***" rst);
-kore_pgsql_cleanup(req->hdlr_extra);
-kore_log(LOG_INFO,red "Before free req hdlr extra***" rst);
-kore_free(req->hdlr_extra);
-req->hdlr_extra=NULL;
-return (KORE_RESULT_OK);}else{
-	kore_log(LOG_INFO,yellow "shon wieder retry???***" rst);
-	http_request_sleep(req);
-	return (KORE_RESULT_RETRY);
-	}
-	*/ 
-return 10;
+
+kore_pgsql_cleanup(&state->p);
+
+http_state_cleanup(req);
+return (KORE_RESULT_ERROR);	
+}else{
+kore_log(LOG_INFO,yellow "*** schon wieder retry???***" rst);
+http_request_sleep(req);
+return (KORE_RESULT_RETRY);
+}
+return (KORE_RESULT_ERROR);
 }
 
 
