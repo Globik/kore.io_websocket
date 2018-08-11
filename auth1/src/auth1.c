@@ -36,6 +36,7 @@ const char*sessi="sess_auth";
 //void on_notify(struct kore_pgsql*);
 void db_state_change(struct kore_pgsql*,void*);
 void db_query(struct kore_pgsql*,const char*, const char*);
+void db_query_params(struct kore_pgsql*p,const char*qname,const char*str_query);
 void db_results(struct kore_pgsql*,void*);
 
 
@@ -295,6 +296,50 @@ return;
 kore_log(LOG_INFO,yellow "query fired off!" rst);	
 }
 
+void db_query_params(struct kore_pgsql*p,const char*qname,const char*str_query){
+
+
+if(!kore_pgsql_setup(p, qname, KORE_PGSQL_ASYNC)){
+if(p->state==KORE_PGSQL_STATE_INIT){
+kore_log(LOG_INFO,"waiting for available pgsql connection");
+return;	
+}
+kore_log(LOG_INFO, red "err here" rst);
+kore_pgsql_logerror(p);
+return;	
+}
+kore_log(LOG_INFO,green "got pgsql connection" rst);
+char*coder="user_sess";
+/*
+int person_id=htonl(101);
+const char*values[2]={(char*)&person_id, coder};
+int lengths[2]={sizeof(person_id), strlen(coder)};
+int formats[2]={1, 0};
+* 2, NULL, values, lengths, formats, 0
+* number of params,
+* ignore the oid field,
+* values to substitute $1 and $2,
+* the lengths, in bytes, of each of param values;
+* wether the values are binary or not
+* we want the result in text format
+*/ 
+// http://timmurphy.org/2009/11/19/pgexecparams-example-postgresql-query-execution-with-parameters/
+// select alt from banners where alt='user_sess'
+//int kore_pgsql_query_params(struct kore_pgsql *pgsql,const char *query, int result, int count, ...)
+// Joris: kore_pgsql_query_params(sql,"select foo from disco_bar where something=$1",result_format,1,value,strlen(value),value_format)
+/* where result_format = 0 for text or 1 for binary, value_format = 0 for text or 1 for binary
+ * The arguments given to the kore function are basically a set of 3 per argument for the query :
+ * value, length of value, type of value.
+ */
+if(!kore_pgsql_query_params(p,"select alt from banners where alt=$1",0,1,coder,strlen(coder),0))
+{
+kore_log(LOG_INFO,red "err here2" rst);
+kore_pgsql_logerror(p);
+return;	
+}
+kore_log(LOG_INFO,yellow "query fired off!" rst);	
+}
+
 
 
 void db_results(struct kore_pgsql*p,void*c){
@@ -321,7 +366,7 @@ state=http_state_get(req);
 if(state->result_name==NULL){
 kore_log(LOG_INFO,yellow "Aha, state->result_name is NULL" rst);
 state->result_name=kore_strdup(name);
-state->mu.a=3;
+state->mu.a=3;state->mu.b=4;
 }
 }
 }
@@ -337,7 +382,7 @@ int login(struct http_request *req)
 {
 kore_log(LOG_INFO,yellow "The login started. Path: %s" rst,req->path);
 if (req->method != HTTP_METHOD_GET) {
-	kore_log(LOG_INFO,red "method not allowed?" rst);
+kore_log(LOG_INFO,red "method not allowed?" rst);
 http_response_header(req, "allow", "get");
 http_response(req, 405, NULL, 0);
 return (KORE_RESULT_OK);
@@ -424,7 +469,7 @@ http_response_cookie(req,"hicookie","user_sess","/",0,0,&cookie);
 cookie->flags &= ~HTTP_COOKIE_HTTPONLY;
 cookie->flags &= ~HTTP_COOKIE_SECURE;
 kore_log(LOG_INFO,green "user session: %s" rst,sess);
-http_response(req, HTTP_STATUS_FOUND,NULL,0);
+http_response(req, HTTP_STATUS_FOUND,"NULL",4);
 //req->method=HTTP_METHOD_GET;
 //http_response(req,200,asset_login_html, asset_len_login_html);
 
@@ -452,7 +497,7 @@ if(http_state_exists(req)){
 state=http_state_get(req);	
 if(state->result_name && state->result_name !=NULL){
 kore_log(LOG_INFO,yellow "result name: %s" rst,state->result_name);
-kore_log(LOG_INFO,red "union int a: %d" rst,state->mu.a);
+kore_log(LOG_INFO,red "union int a: %d : b: %d" rst,state->mu.a,state->mu.b);
 kore_free(state->result_name);
 	
 }
@@ -500,7 +545,7 @@ state=http_state_create(req,sizeof(*state));
 state->result_name=NULL;
 kore_pgsql_init(&state->p);
 kore_pgsql_bind_callback(&state->p,db_state_change,req);
-db_query(&state->p,sessi,"select alt from banners where alt='user_sess'");
+db_query_params(&state->p,sessi,"select alt from banners where alt='user_sess'");
 return (KORE_RESULT_RETRY);
 }else{
 kore_log(LOG_INFO,red "extra is NOT NULL***" rst);
