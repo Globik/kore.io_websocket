@@ -1,0 +1,21 @@
+<html><head><title>login page</title></head><body>
+	<a href="/">home</a> | <a href="/logout">log out</a> | <a href="/dashboard/">any dashboard</a>
+	<h1>log in</h1>
+	<div style="text-align:center">
+	<form method="POST" action="/ulogin/">
+	<input type="text" name="user" placeholder="username" value="globi"><br><br>
+	<input type="password" name="passphrase" placeholder="password" value="globi">
+	<br><br>
+	<input type="submit" value="login">
+	</form>
+	</div>
+	<button onclick="clickme();">show cookie</button>
+	<h3>Cookie:</h3>
+	<span id="out"></span>
+	<script>
+	function clickme(){
+		console.log("cookie: ",document.cookie,window.cookie);
+		out.innerHTML+="<b>"+document.cookie+"</b>"
+	}
+	</script>
+	</body></html>

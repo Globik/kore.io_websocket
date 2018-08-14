@@ -21,6 +21,7 @@ int	auth_user_exists(struct http_request *, char *);
 //void	auth_session_add(struct kore_msg *, const void *);
 //void	auth_session_del(struct kore_msg *, const void *);
 int	auth_session(struct http_request *, const char *);
+int auth_session_user(struct http_request*,const void*);//get user's instance if any
 int init(int state);
 
 #define REQ_STATE_INIT 0
@@ -90,18 +91,23 @@ return (KORE_RESULT_OK);
 //http_response_header(req, "content-type", "text/html");
 //http_response(req, 200, asset_page_html, asset_len_page_html);
 //return (KORE_RESULT_OK);
-struct rstate *state;
-if(!http_state_exists(req)){
-state=http_state_create(req,sizeof(*state));
-state->cnt=12;
-//state->query=kore_strdup("update coders set name='feoder'");
-state->query=kore_strdup("select alt from banners where alt='user_sess'");
-state->q_name=kore_strdup(dbc);
-//state->us_sessi=NULL;
-kore_pgsql_init(&state->sql);
-kore_pgsql_bind_request(&state->sql,req);	
+struct ustate*state;
+if(http_state_exists(req)){
+state=http_state_get(req);	
+if(state->result_name && state->result_name !=NULL){
+kore_log(LOG_INFO,green "AUTHENTICATED!" rst);
+kore_log(LOG_INFO,yellow "result name: %s" rst,state->result_name);
+kore_log(LOG_INFO,red "union int a: %d : b: %d" rst,state->mu.a,state->mu.b);
+kore_free(state->result_name);
 }
-return (http_state_run(mystates,mystates_size,req));
+kore_pgsql_cleanup(&state->p);
+http_state_cleanup(req);
+
+}else{kore_log(LOG_INFO,red "NOT AUTHENTICARED!" rst);}
+http_response_header(req, "content-type", "text/html");
+http_response(req, 200, asset_page_html, asset_len_page_html);
+
+return (KORE_RESULT_OK);
 }
 
 int request_perform_init(struct http_request*req){
@@ -512,7 +518,7 @@ kore_log(LOG_INFO,red "union int a: %d : b: %d" rst,state->mu.a,state->mu.b);
 kore_free(state->result_name);
 	
 }
-//kore_pgsql_cleanup(&state->p);
+kore_pgsql_cleanup(&state->p);
 http_state_cleanup(req);
 }
 http_response_header(req, "content-type", "text/html");
@@ -599,6 +605,79 @@ return (KORE_RESULT_RETRY);
 }
 return (KORE_RESULT_ERROR);
 }
+
+
+
+
+
+
+
+int auth_session_user(struct http_request*req, const void*coo){
+kore_log(LOG_INFO,"Entering auth_session_user().");
+char*cookie;
+http_populate_cookies(req);
+
+if(http_request_cookie(req,"hicookie",&cookie)){
+kore_log(LOG_INFO,red "hicookie: %s" rst, cookie);
+kore_log(LOG_INFO,"cookie: %s, path: %s", cookie,req->path);
+//return (KORE_RESULT_OK);
+}else{
+kore_log(LOG_INFO,red "no hicookie" rst);
+return (KORE_RESULT_OK);
+}
+
+
+struct ustate *state;
+if(!http_state_exists(req)){
+state=http_state_create(req,sizeof(*state));
+state->result_name=NULL;
+kore_pgsql_init(&state->p);
+kore_pgsql_bind_callback(&state->p,db_state_change,req);
+//db_query_params(&state->p,sessi,"select alt from banners where alt='user_sess'",NULL);
+db_query_params(&state->p, sessi, "select alt from banners where alt=$1",0,1,cookie,strlen(cookie),0);
+return (KORE_RESULT_RETRY);
+}else{
+kore_log(LOG_INFO,red "extra is NOT NULL***" rst);
+state=http_state_get(req);
+}	
+kore_log(LOG_INFO,red "STATE***: %d" rst, (&state->p)->state);
+
+if((&state->p)->state==KORE_PGSQL_STATE_COMPLETE){
+kore_log(LOG_INFO,red "das ist result***!!!" rst);
+http_request_wakeup(req);
+if(state->result_name !=NULL){
+kore_log(LOG_INFO,red "STATE->RESULT_NAME: %s" rst,state->result_name);	
+if(!strcmp(state->result_name,cookie)){
+kore_log(LOG_INFO,green "cookie compare is OK" rst);
+return (KORE_RESULT_OK);
+}else{
+kore_log(LOG_INFO,red "cookie comapare is NOT OK" rst);
+kore_free(state->result_name);
+state->result_name=NULL;
+}
+}
+kore_pgsql_cleanup(&state->p);
+http_state_cleanup(req);
+
+return (KORE_RESULT_OK);
+}else if((&state->p)->state==KORE_PGSQL_STATE_ERROR){
+	// ??? it's not reached here, one need one more field for db error report after state complete
+kore_log(LOG_INFO, red "some err in db" rst);
+http_request_wakeup(req);
+
+kore_pgsql_cleanup(&state->p);
+
+http_state_cleanup(req);
+return (KORE_RESULT_OK);	
+}else{
+kore_log(LOG_INFO,yellow "*** schon wieder retry???***" rst);
+http_request_sleep(req);
+return (KORE_RESULT_RETRY);
+}
+
+return (KORE_RESULT_OK);
+}
+
 
 
 int redirect(struct http_request *req)
