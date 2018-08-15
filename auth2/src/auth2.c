@@ -8,7 +8,7 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 
-char *sess=NULL;
+//char *sess=NULL;
 
 int		page(struct http_request *);
 int		login(struct http_request*);
@@ -33,12 +33,14 @@ int init(int state);
 
 const char*dbc="db";
 const char*sessi="sess_auth";
+const char*q_fucker="fucky";
 
 //void on_notify(struct kore_pgsql*);
 void db_state_change(struct kore_pgsql*,void*);
 void db_query(struct kore_pgsql*,const char*, const char*);
 void db_query_params(struct kore_pgsql*p,const char*qname,const char*str_query,int,int,...);
 void db_results(struct kore_pgsql*,void*);
+void on_notify(struct kore_pgsql*);
 
 
 static int request_perform_init(struct http_request*);
@@ -75,6 +77,13 @@ struct kore_pgsql p;
 int init(int state){
 kore_pgsql_register(dbc, "dbname=postgres");
 kore_pgsql_register(sessi,"dbname=postgres");
+kore_pgsql_register(q_fucker,"dbname=postgres");
+struct kore_pgsql*pgsql; 
+pgsql=kore_calloc(1,sizeof(*pgsql));
+kore_pgsql_init(pgsql);
+
+kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
+db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
 return (KORE_RESULT_OK);	
 }
 
@@ -243,10 +252,10 @@ case KORE_PGSQL_STATE_DONE:
 kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
 //printf(red "int extra : %d\n" rst,(int)p->arg);
 printf(green "name: %s\n" rst,p->conn->name);
-//if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");}else{
-//printf("string is not ok?\n");
+if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");}else{
+printf("string is not ok?\n");
 kore_pgsql_continue(p);	
-//}
+}
 break;
 case KORE_PGSQL_STATE_COMMANDOK:
 kore_log(LOG_INFO,yellow "COMMANDOK!" rst);
@@ -254,8 +263,10 @@ kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
 break;
 case KORE_PGSQL_STATE_NOTIFY:
 kore_log(LOG_INFO,"****notify_1111111111111111111***");
-//if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");}else{printf("string is not ok?\n");}
-//on_notify(p);
+if(!strcmp(p->conn->name,q_fucker)){
+printf("str ok?\n");
+on_notify(p);
+}else{printf("string is not ok?\n");}
 break;
 
 case KORE_PGSQL_STATE_COMPLETE:
@@ -388,7 +399,12 @@ state->mu.a=3;state->mu.b=4;
 }
 }
 
-
+void on_notify(struct kore_pgsql*p){
+kore_log(LOG_INFO,"what came?");
+kore_log(LOG_INFO,"pgsql->notify.extra: %s",p->notify.extra);
+kore_log(LOG_INFO,"pgsql->notify.channel: %s",p->notify.channel);
+//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,p->notify.extra,strlen(p->notify.extra),/*WEBSOCKET_BROADCAST_GLOBAL*/4);
+}
 
 
 
@@ -480,12 +496,11 @@ kore_log(LOG_INFO,red "hicookie: %s" rst, value);
 }else{kore_log(LOG_INFO,red "no hicookie" rst);}
 
 
-if(sess==NULL){kore_log(LOG_INFO,"adding a session");sess="user_sess";}
 http_response_header(req,"location","/dashboard/");
 http_response_cookie(req,"hicookie","user_sess","/",0,0,&cookie);
 cookie->flags &= ~HTTP_COOKIE_HTTPONLY;
 cookie->flags &= ~HTTP_COOKIE_SECURE;
-kore_log(LOG_INFO,green "user session: %s" rst,sess);
+//kore_log(LOG_INFO,green "user session: %s" rst,sess);
 http_response(req, HTTP_STATUS_FOUND,"NULL",4);
 //req->method=HTTP_METHOD_GET;
 //http_response(req,200,asset_login_html, asset_len_login_html);
@@ -534,7 +549,7 @@ http_response_header(req, "allow", "get");
 http_response(req, 405, NULL, 0);
 return (KORE_RESULT_OK);
 }
-sess=NULL;
+
 http_response_header(req,"set-cookie","hicookie=null; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT");//?
 //http_response(req, 200, "ok_logout", 9);
 redirect(req);
