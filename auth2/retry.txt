@@ -166,3 +166,122 @@ fd before kore_platform_disable_read: 9
 *** ENTERING QUEUE REMOVE  ***
 kore_pgsql_cleanup
 
+############################################
+
+SUCCESS WORKFLOW BUT WITH NO HTTP_REQUEST_SLEEP(REQ) in auth_session()
+
+#############################################################################3
+
+ The login started. Path: /login/
+[wrk 0]: no hicookie
+[wrk 0]: auth_login: The /ulogin/ started.
+[wrk 0]: user: globi
+[wrk 0]: The password: globi
+[wrk 0]: no hicookie
+**** auth 0xb69addf0 0xb6b09f60 ***
+*** Type cookie! ***
+*** entering kore_auth_cookie ***
+*** before http_request_header *** 
+*** after http_request_header ***
+[wrk 0]: Entering auth_session().
+[wrk 0]: cookie: user_sess, path: /dashboard/
+***entering pgsql_conn_next
+conn is null
+connection created!
+get job
+[wrk 0]: got pgsql connection
+scedule enter
+[wrk 0]: db_state_change: 2
+[wrk 0]: cb state wait
+[wrk 0]: ***ret*** va_list : 1
+[wrk 0]: query fired off!
+*** kore result retry ***
+**** auth 0xb69addf0 0xb6b09f60 ***
+*** Type cookie! ***
+*** entering kore_auth_cookie ***
+*** before http_request_header *** 
+*** after http_request_header ***
+[wrk 0]: Entering auth_session().
+[wrk 0]: cookie: user_sess, path: /dashboard/
+[wrk 0]: extra is NOT NULL***
+[wrk 0]: STATE***: 2
+[wrk 0]: *** schon wieder retry???***
+*** kore result retry ***
+**** auth 0xb69addf0 0xb6b09f60 ***
+*** Type cookie! ***
+*** entering kore_auth_cookie ***
+*** before http_request_header *** 
+*** after http_request_header ***
+[wrk 0]: Entering auth_session().
+[wrk 0]: cookie: user_sess, path: /dashboard/
+[wrk 0]: extra is NOT NULL***
+[wrk 0]: STATE***: 2
+[wrk 0]: *** schon wieder retry???***
+*** kore result retry ***
+**** auth 0xb69addf0 0xb6b09f60 ***
+*** Type cookie! ***
+*** entering kore_auth_cookie ***
+*** before http_request_header *** 
+*** after http_request_header ***
+[wrk 0]: Entering auth_session().
+[wrk 0]: cookie: user_sess, path: /dashboard/
+[wrk 0]: extra is NOT NULL***
+[wrk 0]: STATE***: 2
+[wrk 0]: *** schon wieder retry???***
+*** kore result retry ***
+*** ENTERING KORE_PGSQL_HANDLE ***
+***before pgsql_read_result***
+while pgsql->result
+*** state result ***?
+[wrk 0]: db_state_change: 3
+[wrk 0]: cb state result
+[wrk 0]: Entering into db_results(),p->conn->name: sess_auth
+[wrk 0]: result name: user_sess
+[wrk 0]: Aha, state->result_name is NULL
+*** after pqclear***
+***end of while***
+*****************************
+***pgsql->state is not COMMANDOK!:3 
+***pgsql->result is NULL***
+***REQ IS NULL***
+*** END OF pgsql_read_result ***
+*** else no wait state***
+***before  HANDLE CB ***
+[wrk 0]: db_state_change: 5
+[wrk 0]: command_status (null)
+name: sess_auth
+string is not ok?
+ *** kore_pgsql_continue CONTINUE ****
+***state done in continue***
+*** before conn release ***
+***RELEASE CONN***
+*** flag sceduled *** 
+fd before kore_platform_disable_read: 9
+*** after state complete ***
+[wrk 0]: db_state_change: 6
+[wrk 0]: cb state complete
+*** Before wakeup ****
+*** ENTERING WAKEUP ***
+*** BEFORE LOOP FOR ***
+*** end conn release *** 
+*** AFTER PGSQL_CONN_RELEASE ***
+***after handle cb***
+**** auth 0xb69addf0 0xb6b09f60 ***
+*** Type cookie! ***
+*** entering kore_auth_cookie ***
+*** before http_request_header *** 
+*** after http_request_header ***
+[wrk 0]: Entering auth_session().
+[wrk 0]: cookie: user_sess, path: /dashboard/
+[wrk 0]: extra is NOT NULL***
+[wrk 0]: STATE***: 6
+[wrk 0]: das ist result***!!!
+[wrk 0]: STATE->RESULT_NAME: user_sess
+[wrk 0]: cookie compare is OK
+*** kore auth run() is succesful for /dashboard/ ***
+*** kore result retry ***
+[wrk 0]: The /dashboard/ started.
+[wrk 0]: result name: user_sess
+[wrk 0]: union int a: 4 : b: 4
+*** ENTERING QUEUE REMOVE  ***
+kore_pgsql_cleanup

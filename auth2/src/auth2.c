@@ -579,6 +579,7 @@ kore_pgsql_init(&state->p);
 kore_pgsql_bind_callback(&state->p,db_state_change,req);
 //db_query_params(&state->p,sessi,"select alt from banners where alt='user_sess'",NULL);
 db_query_params(&state->p, sessi, "select alt from banners where alt=$1",0,1,cookie,strlen(cookie),0);
+//http_request_sleep(req);
 return (KORE_RESULT_RETRY);
 }else{
 kore_log(LOG_INFO,red "extra is NOT NULL***" rst);
@@ -588,7 +589,7 @@ kore_log(LOG_INFO,red "STATE***: %d" rst, (&state->p)->state);
 
 if((&state->p)->state==KORE_PGSQL_STATE_COMPLETE){
 kore_log(LOG_INFO,red "das ist result***!!!" rst);
-http_request_wakeup(req);
+//http_request_wakeup(req);
 if(state->result_name !=NULL){
 kore_log(LOG_INFO,red "STATE->RESULT_NAME: %s" rst,state->result_name);	
 if(!strcmp(state->result_name,cookie)){
@@ -615,7 +616,8 @@ http_state_cleanup(req);
 return (KORE_RESULT_ERROR);	
 }else{
 kore_log(LOG_INFO,yellow "*** schon wieder retry???***" rst);
-http_request_sleep(req);
+//http_request_sleep(req);
+//return;
 return (KORE_RESULT_RETRY);
 }
 return (KORE_RESULT_ERROR);
