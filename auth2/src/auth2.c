@@ -78,13 +78,32 @@ int init(int state){
 kore_pgsql_register(dbc, "dbname=postgres");
 kore_pgsql_register(sessi,"dbname=postgres");
 kore_pgsql_register(q_fucker,"dbname=postgres");
-struct kore_pgsql*pgsql; 
+
+/*struct kore_pgsql*pgsql; 
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 
 kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
 db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
+*/
+struct kore_buf*b;
+b=kore_buf_alloc(128);
+char*suka="suka";char*mich="mich";char*dura="dura";
+kore_buf_appendf(b,"das %s ",mich);
+kore_buf_appendf(b," etwas etwas\
+ etwas");
+kore_buf_appendf(b," %s",suka);
+kore_buf_appendf(b," %s",dura);
+kore_buf_appendf(b," something something...");
+char *s=kore_buf_stringify(b,NULL);
+printf("%s\n",s);
+kore_free(b); 
 return (KORE_RESULT_OK);	
+}
+void dus(char*mich,char*suka,char*dura){
+struct kore_buf*b;
+b=kore_buf_alloc(128);
+kore_buf_append(b,"%s ",mich);
 }
 
 int page(struct http_request *req)
