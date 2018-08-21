@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include <kore/kore.h>
 #include <kore/http.h>
 #include <kore/pgsql.h>
@@ -10,6 +12,10 @@
 const char*q_name="db";
 const char*q_fucker="fucker";
 struct kore_pgsql*for_fucker=NULL;
+
+static volatile sig_atomic_t blog_sig=-1;
+void signal_handler(int);
+void tick(void*,u_int64_t);
 
 int	page(struct http_request *);
 //void kore_worker_configure(void);
@@ -30,18 +36,50 @@ void websocket_message(struct connection*,u_int8_t,void*,size_t);
 void han(void);
 void connection_new(struct connection*);
 void connection_del(struct connection*);
+
 void han(){
-	printf(green "at exit occured.\n" rst);
-	//if(for_fucker !=NULL)free(for_fucker);//kore_pgsql_cleanup(for_fucker);
-	//kore_pgsql_continue(for_fucker);	
+printf(green "at exit occured.\n" rst);
+//if(for_fucker !=NULL)free(for_fucker);//kore_pgsql_cleanup(for_fucker);
+//kore_pgsql_continue(for_fucker);	
 	}
 void kore_worker_configure(){
-	printf("configure worker\n");
-	atexit(han);
-	}
+kore_log(LOG_INFO,"worker_configure\n");
+atexit(han);
+/*
+ // it sucks, don't know how to properly  catch sigint to free some stuff
+struct sigaction sa;
+memset(&sa,0,sizeof(sa));
+sa.sa_handler=signal_handler;
+if(sigfillset(&sa.sa_mask)==-1)fatal("sigfillset: %s",errno_s);
+if(sigaction(SIGINT,&sa,NULL)==-1)fatal("sigaction: %s",errno_s);
+*/ 
+(void)kore_timer_add(tick,1000,NULL,0);
+
+
+
+kore_pgsql_register(q_name,"dbname=postgres");
+kore_pgsql_register("fucker","dbname=postgres");
+struct kore_pgsql*pgsql; 
+pgsql=kore_calloc(1,sizeof(*pgsql));
+kore_pgsql_init(pgsql);
+kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
+db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
+}
+
+void signal_handler(int sig){
+blog_sig=sig;	
+}
+
+void tick(void*unused, u_int64_t now){
+kore_log(LOG_INFO,"tick");
+if(blog_sig==SIGINT){kore_log(LOG_INFO,"sig int?");}	
+}
+
+
 int init(int s){
 	
 kore_log(LOG_INFO,"init()");
+/*
 kore_pgsql_register(q_name,"dbname=postgres");
 kore_pgsql_register("fucker","dbname=postgres");
 //return (KORE_RESULT_OK);
@@ -54,6 +92,7 @@ kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
 db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
 //db_query(pgsql,q_name, "LISTEN revents");
 //db_query(pgsql,q_name,"LISTEN on_coders");
+*/ 
 return (KORE_RESULT_OK);	
 }
 
