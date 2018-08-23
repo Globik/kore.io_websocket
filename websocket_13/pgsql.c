@@ -33,6 +33,7 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 
+int SUPERDB=0;int SUPERSUKA=0;
 struct pgsql_wait {
 	struct kore_pgsql	*pgsql;
 	TAILQ_ENTRY(pgsql_wait)	list;
@@ -200,7 +201,7 @@ kore_pgsql_query(struct kore_pgsql *pgsql, const char *query)
 			pgsql_set_error(pgsql, PQerrorMessage(pgsql->conn->db));
 			return (KORE_RESULT_ERROR);
 		}
-
+kore_log(LOG_INFO, green "*** BEFORE PGSQL_SCHEDULE(PGSQL)! IN QUERY SENDING!!! ***" rst);
 		pgsql_schedule(pgsql);
 	}
 
@@ -308,6 +309,7 @@ void
 kore_pgsql_handle(void *c, int err)
 {
 	printf("*** ENTERING KORE_PGSQL_HANDLE ***\n");
+	printf("*** SUPERDB!!! : %d ****\n",SUPERDB);
 	struct kore_pgsql	*pgsql;
 	struct pgsql_conn	*conn = (struct pgsql_conn *)c;
 
@@ -478,7 +480,7 @@ rescan:
 		printf(yellow "conn is not NULL, before pqtransactionstatus\n" rst);
 		state = PQtransactionStatus(conn->db);
 		if (state == PQTRANS_INERROR) {
-			printf(red "pqtrans_inerror\n" rst);
+			kore_log(LOG_INFO,red "pqtrans_inerror\n" rst);
 			conn->flags &= ~PGSQL_CONN_FREE;
 			TAILQ_REMOVE(&pgsql_conn_free, conn, list);
 
@@ -487,19 +489,20 @@ rescan:
 			rollback.flags = KORE_PGSQL_SYNC;
 
 			if (!kore_pgsql_query(&rollback, "ROLLBACK")) {
+				kore_log(LOG_INFO, red "*** NO ROLLBACK ***" rst);
 				kore_pgsql_logerror(&rollback);
 				kore_pgsql_cleanup(&rollback);
 				pgsql_conn_cleanup(conn);
 			} else {
 				kore_pgsql_cleanup(&rollback);
 			}
-
+kore_log(LOG_INFO, yellow "*** GOTO RESCAN!!! ***" rst);
 			goto rescan;
 		}
 	}
 
 	if (conn == NULL) {
-		printf(green "conn is null\n" rst);
+		kore_log(LOG_INFO, green "*** CONN is NULL! ***\n" rst);
 		if (db->conn_max != 0 &&
 		    db->conn_count >= db->conn_max) {
 				printf("db->conn_count: %d\n",db->conn_count);
@@ -538,13 +541,13 @@ pgsql_set_error(struct kore_pgsql *pgsql, const char *msg)
 static void
 pgsql_schedule(struct kore_pgsql *pgsql)
 {
-	printf("scedule enter\n");
+	kore_log(LOG_INFO, yellow "*** pgsql_schedule(pgsql) Entering!!! ***" rst);
 	int		fd;
 
 	fd = PQsocket(pgsql->conn->db);
 	if (fd < 0)
 		fatal("PQsocket returned < 0 fd on open connection");
-
+kore_log(LOG_INFO, red "*** FD IN SCHEDULE: %d ***" rst,fd);
 	kore_platform_schedule_read(fd, pgsql->conn);
 	pgsql->state = KORE_PGSQL_STATE_WAIT;
 	pgsql->flags |= KORE_PGSQL_SCHEDULED;
@@ -635,6 +638,9 @@ printf("*** AFTER CB WAKEUP ***\n");
 static struct pgsql_conn *
 pgsql_conn_create(struct kore_pgsql *pgsql, struct pgsql_db *db)
 {
+	int  bdone=0;
+	int connected=0;
+	int retval;
 	struct pgsql_conn	*conn;
 
 	if (db == NULL || db->conn_string == NULL)
@@ -649,13 +655,79 @@ pgsql_conn_create(struct kore_pgsql *pgsql, struct pgsql_db *db)
 	conn->name = kore_strdup(db->name);
 	TAILQ_INSERT_TAIL(&pgsql_conn_free, conn, list);
 
-	conn->db = PQconnectdb(db->conn_string);
+	//conn->db = PQconnectdb(db->conn_string);
+	conn->db=PQconnectStart(db->conn_string);
+	
+	ConnStatusType status=PQstatus(conn->db);
+	if(status==CONNECTION_BAD){
+		kore_log(LOG_INFO, red "*** CONNECTION_BAD!!! ***" rst);
+		pgsql_set_error(pgsql, PQerrorMessage(conn->db));
+		pgsql_conn_cleanup(conn);
+		return (NULL);
+	}else if(status==CONNECTION_STARTED){
+	kore_log(LOG_INFO, green "*** CONNECTION STARTED! ***" rst);	
+	}else if(status==CONNECTION_MADE){
+	kore_log(LOG_INFO, green "*** CONNECTION_MADE! ***\n" rst);	
+	}else{
+	printf("*** UNKNOWN ONNECTION ***\n");
+	}
+	fd_set rfds;
+	int u=PQsetnonblocking(conn->db,1);
+	printf("*** set non block conn->db: %d ****\n",u);
+	
+	PostgresPollingStatusType connstatus;
+	int fd=PQsocket(conn->db);
+	if(fd<0){printf(red "*** FD IS: %d\n" rst,fd);}
+	while(!bdone){
+	if(!connected){
+	connstatus=PQconnectPoll(conn->db);
+	if(connstatus==PGRES_POLLING_FAILED){
+	kore_log(LOG_INFO, red "*** PGRES_POLLING_FAILED! ***" rst);
+	pgsql_set_error(pgsql, PQerrorMessage(conn->db));
+	pgsql_conn_cleanup(conn);
+	bdone=1;
+	return (NULL);	
+	}else if(connstatus==PGRES_POLLING_WRITING){
+	kore_log(LOG_INFO, red "*** PGRES_POLLING_WRITING! ***" rst);	
+	kore_log(LOG_INFO, green "*** NOTHING TO BE DONE HERE??? ***" rst);
+	//pgsql_schedule(pgsql);
+	}else if(connstatus==PGRES_POLLING_READING){
+	//printf("*** PGRES_POLLING_READING! ***\n");	
+	//pgsql_schedule(pgsql);
+	//int fd=PQsocket(conn->db);
+	//kore_platform_schedule_read(fd, conn->db);
+	FD_SET(fd,&rfds);
+	SUPERSUKA+=1;
+	}else if(connstatus==PGRES_POLLING_OK){
+	kore_log(LOG_INFO, green "*** PGRES_POLLING_OK! ***" rst);	
+	kore_log(LOG_INFO, yellow "*** SUPERSUKA(how much was poll reading): %d ***" rst,SUPERSUKA);
+	kore_log(LOG_INFO,red "*** SHOW ME FD! %d ***" rst, fd);
+	SUPERSUKA=0;
+	bdone=1;
+	connected=1;
+	SUPERDB+=100;
+	//close(fd);
+	break;
+	}else{printf("*** UNKNOWN PGRES STATE ***\n");}	
+	}//connected
+	// the fuck knows what I'm doing right here
+	// is it really db connection here "asynchronous"??? Or is it all  about just like PQconnectdb???
+	retval=select(fd+1,&rfds,NULL,NULL,NULL);
+	kore_log(LOG_INFO, red "*** retval : %d ***" rst,retval);
+	kore_log(LOG_INFO, red "*** a fd : %d ***" rst,fd);
+	if(!connected){printf("**not connected***\n");
+		//break;
+		}
+	
+}//while loop
+	//kk
+	/*
 	if (conn->db == NULL || (PQstatus(conn->db) != CONNECTION_OK)) {
 		pgsql_set_error(pgsql, PQerrorMessage(conn->db));
 		pgsql_conn_cleanup(conn);
 		return (NULL);
-	}
-
+	}*/
+printf("*** RETURNING NOW CONN INSTANCE! ***\n");
 	return (conn);
 }
 
@@ -677,7 +749,8 @@ pgsql_conn_release(struct kore_pgsql *pgsql)
 			printf("*** flag sceduled *** \n");
 			fd = PQsocket(pgsql->conn->db);
 			printf("fd before kore_platform_disable_read: %d\n",fd);
-			kore_platform_disable_read(fd);
+			printf(red "*** pgsql->conn->name : %s\n***" rst, pgsql->conn->name);
+			if(strcmp(pgsql->conn->name,"fucker"))kore_platform_disable_read(fd);
 
 			if (pgsql->state != KORE_PGSQL_STATE_DONE){
 				printf(" *** state not done ***\n");
@@ -827,7 +900,7 @@ printf("*** state result ***?\n");
 	case PGRES_FATAL_ERROR:
 	printf("*** pgres fatal error ***\n");
 		pgsql_set_error(pgsql, PQresultErrorMessage(pgsql->result));
-	//	if (pgsql->cb != NULL) pgsql->cb(pgsql, pgsql->arg);
+	if (pgsql->cb != NULL) pgsql->cb(pgsql, pgsql->arg);
 	if(pgsql->req !=NULL){printf("*** some err. return req ***\n");return;}
 		break;
 	}

@@ -4,6 +4,10 @@
 #include <kore/http.h>
 #include <kore/pgsql.h>
 #include <kore/tasks.h>
+//#include <stdint.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h> //PRIu64
+//#include <sys/types.h>
 #include "assets.h"
 #define green "\x1b[32m"
 #define yellow "\x1b[33m"
@@ -39,9 +43,11 @@ void connection_del(struct connection*);
 
 void han(){
 printf(green "at exit occured.\n" rst);
-//if(for_fucker !=NULL)free(for_fucker);//kore_pgsql_cleanup(for_fucker);
-//kore_pgsql_continue(for_fucker);	
-	}
+
+//kore_pgsql_cleanup(for_fucker);
+if(for_fucker !=NULL)kore_pgsql_continue(for_fucker);
+for_fucker=NULL;
+}
 void kore_worker_configure(){
 kore_log(LOG_INFO,"worker_configure\n");
 atexit(han);
@@ -53,7 +59,10 @@ sa.sa_handler=signal_handler;
 if(sigfillset(&sa.sa_mask)==-1)fatal("sigfillset: %s",errno_s);
 if(sigaction(SIGINT,&sa,NULL)==-1)fatal("sigaction: %s",errno_s);
 */ 
-(void)kore_timer_add(tick,1000,NULL,0);
+(void)kore_timer_add(tick,1000,NULL,1);
+u_int64_t mis=kore_time_ms();
+printf("%" PRIu64 "\n",mis);
+kore_log(LOG_INFO,green "ms: %" PRIu64 "" rst, mis);
 
 
 
@@ -64,6 +73,7 @@ pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
 db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
+for_fucker=pgsql;
 }
 
 void signal_handler(int sig){
@@ -72,6 +82,9 @@ blog_sig=sig;
 
 void tick(void*unused, u_int64_t now){
 kore_log(LOG_INFO,"tick");
+//u_int64_t mis=kore_time_ms();
+printf(yellow "%" PRIu64 "\n" rst,now);
+//(void)kore_timer_add(tick,1000,NULL,1);
 if(blog_sig==SIGINT){kore_log(LOG_INFO,"sig int?");}	
 }
 
@@ -113,7 +126,9 @@ case KORE_PGSQL_STATE_DONE:
 kore_log(LOG_INFO,yellow "command_status %s" rst, PQcmdStatus(p->result));
 //printf(red "int extra : %d\n" rst,(int)p->arg);
 printf(green "name: %s\n" rst,p->conn->name);
-if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");}else{
+if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");
+	//p->state=KORE_PGSQL_STATE_COMMANDOK;
+}else{
 printf("string is not ok?\n");
 kore_pgsql_continue(p);	
 }

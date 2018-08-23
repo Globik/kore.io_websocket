@@ -27,10 +27,14 @@ class Boss extends EventEmitter{
 	}
 }
 purge(){
-	return plans.purge().then(function(bu){console.log('bu: ',bu)});
+return plans.purge().then(function(bu){console.log('bu: ',bu)});
 }
 }
 
 var b=new Boss();
 b.supervise().then(function(d){console.log('d',d)});
-	
+	function foo(){
+		console.log("foo")
+		setTimeout(function(){console.log("foo1");foo();},1000);
+		}
+		foo();
