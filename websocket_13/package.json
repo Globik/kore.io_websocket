@@ -1,0 +1,13 @@
+{
+  "name": "scheduler",
+  "version": "0.0.0",
+  "description": "node.js pg job scheduler",
+  "main": "./app.js",
+  "engines": {
+    "node": ">=6.0.0",
+    "npm": ">=5.0.0"
+  },
+  "dependencies": {
+    "pg-boss": "^3.0.0"
+  }
+}

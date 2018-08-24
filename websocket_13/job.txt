@@ -1,0 +1,51 @@
+ ## startAfter enable nice print vertically \x
+ id: d82cba20-a7b1-11e8-a0b3-ab84dd5e4759 |
+ name: jobbi | 
+ priority:       0 |data: {"param": "param1"} |
+ 
+ state: created | 
+ retryLimit:         0 |
+  retryCount:         0 | 
+  retrydelay:         0 |
+  retrybackoff: f            |
+ startafter: 2018-08-24 11:25:21.267352-04 | 
+ startedon: null|
+ singletonkey:| 
+ singletonon: |
+ expirein 00:15:00 |
+ createdone  2018-08-24 11:24:51.267352-04 |
+ completedon:
+ 
+ ############# after done(1row)
+ 
+ d82cba20-a7b1-11e8-a0b3-ab84dd5e4759 |
+  jobbi |0 | {"param": "param1"} | 
+ state: active | 0 | 0 |0 |f| 
+ startafter: 2018-08-24 11:25:21.267352-04 | 
+ startdon:   2018-08-24 11:25:22.049197-04 ||| 
+ expirein: 00:15:00 | 
+ createdone: 2018-08-24 11:24:51.267352-04 | 
+ 
+ ### expired occured(2 rows) =>
+ 
+ d82cba20-a7b1-11e8-a0b3-ab84dd5e4759 | jobbi|0 | {"param": "param1"}|
+ state: expired |0 |0 |0 |f|
+ startafter: 2018-08-24 11:25:21.267352-04 | 
+ startedon:  2018-08-24 11:25:22.049197-04 ||| 
+ expirein: 00:15:00 | 
+ createdon: 2018-08-24 11:24:51.267352-04 | 
+ completedon: 2018-08-24 11:40:30.588098-04
+ 
+ 
+ # marked as completed job=>
+ 
+ e9cb7b21-3bcc-4c25-8038-f4e4815ca3c8 | jobbi__state__completed |0|
+ data: {"state": "expired", "failed": true, 
+ "request": {"id": "d82cba20-a7b1-11e8-a0b3-ab84dd5e4759", "data": {"param": "param1"}, "name": "jobbi"},
+ "response": null, "createdOn": "2018-08-24T11:24:51.267352-04:00", 
+ "startedOn": "2018-08-24T11:25:22.049197-04:00", 
+ "retryCount": 0, 
+ "completedOn": "2018-08-24T11:40:30.588098-04:00"} | 
+  created |0 |0|0|f| 
+  2018-08-24 11:40:30.588098-04 |||| 00:15:00 |
+  2018-08-24 11:40:30.588098-04 |
