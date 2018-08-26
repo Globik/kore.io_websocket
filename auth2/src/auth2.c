@@ -550,7 +550,6 @@ if(state->result_name && state->result_name !=NULL){
 kore_log(LOG_INFO,yellow "result name: %s" rst,state->result_name);
 kore_log(LOG_INFO,red "union int a: %d : b: %d" rst,state->mu.a,state->mu.b);
 kore_free(state->result_name);
-	
 }
 kore_pgsql_cleanup(&state->p);
 http_state_cleanup(req);

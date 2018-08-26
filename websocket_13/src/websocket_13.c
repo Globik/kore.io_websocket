@@ -15,14 +15,21 @@
 #define rst "\x1b[0m"
 const char*q_name="db";
 const char*q_fucker="fucker";
-struct kore_pgsql*for_fucker=NULL;
+const char*q_subscribe="subscribe";
+struct kore_pgsql*for_fucker=NULL;// for listen notify
+struct kore_timer*tim=NULL;
+struct kore_pgsql*pgsql2=NULL;//for pgboss job scheduler
+
+enum {
+	WOWA=7
+};
 
 static volatile sig_atomic_t blog_sig=-1;
 void signal_handler(int);
 void tick(void*,u_int64_t);
 
 int	page(struct http_request *);
-//void kore_worker_configure(void);
+
 int init(int);
 
 void on_notify(struct kore_pgsql*);
@@ -30,7 +37,27 @@ void on_notify(struct kore_pgsql*);
 void db_state_change(struct kore_pgsql*,void*);
 
 void db_query(struct kore_pgsql*,const char*, const char*);
-void db_results(struct kore_pgsql*,struct connection*);
+void db_query_params(struct kore_pgsql*p,const char*qname,const char*str_query,int,int,...);
+void db_results(struct kore_pgsql*,void*);
+
+const char*das_nextJob_query="WITH nextJob as (SELECT id FROM pgboss.job WHERE state < 'active' \
+AND name = ANY($1) AND startAfter < now() \
+ORDER BY priority desc,createdOn,id LIMIT $2 FOR UPDATE SKIP LOCKED) UPDATE pgboss.job j SET state='active', \
+startedOn=now(),retryCount=CASE WHEN state='retry' THEN retryCount + 1 ELSE retryCount END FROM nextJob \
+WHERE j.id=nextJob.id RETURNING j.id, name, to_json(data::text)";
+
+/*
+ 
+WITH nextJob as (SELECT id FROM pgboss.job WHERE state < 'active' AND name = ANY('{jobbi,fucker}') AND startAfter < now() ORDER BY priority desc,createdOn,id LIMIT 1 FOR UPDATE SKIP LOCKED) UPDATE pgboss.job j SET state='active', startedOn=now(),retryCount=CASE WHEN state='retry' THEN retryCount + 1 ELSE retryCount END FROM nextJob WHERE j.id=nextJob.id RETURNING j.id, name, data;
+
+// data string to json:
+
+WITH nextJob as (SELECT id FROM pgboss.job WHERE state < 'active' AND name = ANY('{jobbi,fucker}') AND startAfter < now() ORDER BY priority desc,createdOn,id LIMIT 1 FOR UPDATE SKIP LOCKED) UPDATE pgboss.job j SET state='active',startedOn=now(),retryCount=CASE WHEN state='retry' THEN retryCount + 1 ELSE retryCount END FROM nextJob WHERE j.id=nextJob.id RETURNING j.id, name, to_json(data::text);
+
+
+
+*/
+
 
 
 int page_ws_connect(struct http_request*);
@@ -43,12 +70,22 @@ void connection_del(struct connection*);
 
 void han(){
 printf(green "at exit occured.\n" rst);
-
-//kore_pgsql_cleanup(for_fucker);
-if(for_fucker !=NULL)kore_pgsql_continue(for_fucker);
+if(tim !=NULL){
+kore_timer_remove(tim);
+tim=NULL;
+}
+//if(for_fucker !=NULL)kore_pgsql_cleanup(for_fucker);
+if(for_fucker !=NULL){
+kore_pgsql_continue(for_fucker);
 for_fucker=NULL;
 }
+if(pgsql2 !=NULL){
+kore_pgsql_cleanup(pgsql2);
+pgsql2=NULL;
+}
+}
 void kore_worker_configure(){
+	kore_log(LOG_INFO, red "enum wowa: %d" rst, WOWA);
 kore_log(LOG_INFO,"worker_configure\n");
 atexit(han);
 /*
@@ -59,21 +96,29 @@ sa.sa_handler=signal_handler;
 if(sigfillset(&sa.sa_mask)==-1)fatal("sigfillset: %s",errno_s);
 if(sigaction(SIGINT,&sa,NULL)==-1)fatal("sigaction: %s",errno_s);
 */ 
-(void)kore_timer_add(tick,1000,NULL,1);
-u_int64_t mis=kore_time_ms();
-printf("%" PRIu64 "\n",mis);
-kore_log(LOG_INFO,green "ms: %" PRIu64 "" rst, mis);
+//(void)
+
 
 
 
 kore_pgsql_register(q_name,"dbname=postgres");
 kore_pgsql_register("fucker","dbname=postgres");
+kore_pgsql_register(q_subscribe,"dbname=postgres");
 struct kore_pgsql*pgsql; 
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
 db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
 for_fucker=pgsql;
+
+pgsql2=kore_calloc(1,sizeof(*pgsql2));
+kore_pgsql_init(pgsql2);
+kore_pgsql_bind_callback(pgsql2, db_state_change, NULL);
+
+tim=kore_timer_add(tick,5000,pgsql2,0);
+u_int64_t mis=kore_time_ms();
+printf("%" PRIu64 "\n",mis);
+kore_log(LOG_INFO,green "ms: %" PRIu64 "" rst, mis);
 }
 
 void signal_handler(int sig){
@@ -81,11 +126,23 @@ blog_sig=sig;
 }
 
 void tick(void*unused, u_int64_t now){
-kore_log(LOG_INFO,"tick");
-//u_int64_t mis=kore_time_ms();
+struct kore_pgsql*p=(struct kore_pgsql*)unused;
+if(p==NULL)return;
+kore_log(LOG_INFO,"tick-tack");
 printf(yellow "%" PRIu64 "\n" rst,now);
-//(void)kore_timer_add(tick,1000,NULL,1);
-if(blog_sig==SIGINT){kore_log(LOG_INFO,"sig int?");}	
+if(blog_sig==SIGINT){kore_log(LOG_INFO,"sig int?");}
+
+const char*limit_int="1";
+struct kore_buf*b;
+b=kore_buf_alloc(64);
+const char*jobbi="jobbi";
+// name = ANY('{jobbi,fucker}')
+kore_buf_appendf(b,"{\"%s\"}",jobbi);
+
+char *s=kore_buf_stringify(b,NULL);
+kore_log(LOG_INFO, red "BECOMING: %s" rst,s);
+db_query_params(p,q_subscribe,das_nextJob_query,0,2,s,strlen(s),0,limit_int,strlen(limit_int),0);
+kore_free(b);
 }
 
 
@@ -195,7 +252,27 @@ kore_log(LOG_INFO,"pgsql->notify.channel: %s",p->notify.channel);
 kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,p->notify.extra,strlen(p->notify.extra),/*WEBSOCKET_BROADCAST_GLOBAL*/4);
 }
 
-void db_results(struct kore_pgsql*p,struct connection*c){
+void db_results(struct kore_pgsql*p, void*data){
+if(!strcmp(q_subscribe, p->conn->name)){
+kore_log(LOG_INFO,green "it's subscribe result!" rst);
+char *name2;int i2,rows2;char* jobid;char*jdata;
+rows2=kore_pgsql_ntuples(p);
+kore_log(LOG_INFO,yellow "rows2: %d" rst,rows2);
+// id | name | data
+//if(rows2==0)return;
+if(rows2==1){
+for(i2=0;i2<rows2;i2++){
+name2=kore_pgsql_getvalue(p,i2,1);
+jobid=kore_pgsql_getvalue(p,i2,0);
+jdata=kore_pgsql_getvalue(p,i2,2);
+}
+
+kore_log(LOG_INFO,green "jobid: %s" rst,jobid);
+kore_log(LOG_INFO,green "name2: %s" rst,name2);
+kore_log(LOG_INFO,green "jdata: %s" rst,jdata);
+}
+}else{
+struct connection*c=(struct connection*)data;
 printf("entering into db_results()\n");
 printf("memo2: %p\n",(void*)c->hdlr_extra);
 printf("memo pgsql->arg: %p\n",(void*)p->arg);
@@ -214,6 +291,7 @@ if(dame !=NULL)kore_log(LOG_INFO,green "result alt: %s" rst,dame);
 //kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,name,strlen(name),/*WEBSOCKET_BROADCAST_GLOBAL*/4);	
 kore_websocket_send(c,WEBSOCKET_OP_TEXT,name,strlen(name));
 //kore_pgsql_continue(p);	
+}
 }
 
 
@@ -293,4 +371,24 @@ kore_log(LOG_INFO, yellow "connection db cb disconnecting..: %p" rst,(void*)c);
 if(c->hdlr_extra !=NULL)kore_pgsql_cleanup(c->hdlr_extra);
 kore_free(c->hdlr_extra);
 c->hdlr_extra=NULL;
+}
+
+
+void db_query_params(struct kore_pgsql*p,const char*qname,const char*str_query,int result,int counts,...){
+if(!kore_pgsql_setup(p, qname, KORE_PGSQL_ASYNC)){
+if(p->state==KORE_PGSQL_STATE_INIT){
+kore_log(LOG_INFO,"waiting for available pgsql connection");
+return;	
+}
+kore_log(LOG_INFO, red "err here" rst);
+kore_pgsql_logerror(p);
+return;	
+}
+int ret;
+va_list		args;
+va_start(args, counts);
+ret = kore_pgsql_v_query_params(p, str_query, result, counts, args);
+va_end(args);
+if(ret !=1){kore_pgsql_logerror(p);return;}
+kore_log(LOG_INFO,red "***ret*** va_list : %d" rst,ret);// 1 is OK
 }
