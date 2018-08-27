@@ -1,51 +1,154 @@
- ## startAfter enable nice print vertically \x
- id: d82cba20-a7b1-11e8-a0b3-ab84dd5e4759 |
- name: jobbi | 
- priority:       0 |data: {"param": "param1"} |
- 
- state: created | 
- retryLimit:         0 |
-  retryCount:         0 | 
-  retrydelay:         0 |
-  retrybackoff: f            |
- startafter: 2018-08-24 11:25:21.267352-04 | 
- startedon: null|
- singletonkey:| 
- singletonon: |
- expirein 00:15:00 |
- createdone  2018-08-24 11:24:51.267352-04 |
- completedon:
- 
- ############# after done(1row)
- 
- d82cba20-a7b1-11e8-a0b3-ab84dd5e4759 |
-  jobbi |0 | {"param": "param1"} | 
- state: active | 0 | 0 |0 |f| 
- startafter: 2018-08-24 11:25:21.267352-04 | 
- startdon:   2018-08-24 11:25:22.049197-04 ||| 
- expirein: 00:15:00 | 
- createdone: 2018-08-24 11:24:51.267352-04 | 
- 
- ### expired occured(2 rows) =>
- 
- d82cba20-a7b1-11e8-a0b3-ab84dd5e4759 | jobbi|0 | {"param": "param1"}|
- state: expired |0 |0 |0 |f|
- startafter: 2018-08-24 11:25:21.267352-04 | 
- startedon:  2018-08-24 11:25:22.049197-04 ||| 
- expirein: 00:15:00 | 
- createdon: 2018-08-24 11:24:51.267352-04 | 
- completedon: 2018-08-24 11:40:30.588098-04
- 
- 
- # marked as completed job=>
- 
- e9cb7b21-3bcc-4c25-8038-f4e4815ca3c8 | jobbi__state__completed |0|
- data: {"state": "expired", "failed": true, 
- "request": {"id": "d82cba20-a7b1-11e8-a0b3-ab84dd5e4759", "data": {"param": "param1"}, "name": "jobbi"},
- "response": null, "createdOn": "2018-08-24T11:24:51.267352-04:00", 
- "startedOn": "2018-08-24T11:25:22.049197-04:00", 
- "retryCount": 0, 
- "completedOn": "2018-08-24T11:40:30.588098-04:00"} | 
-  created |0 |0|0|f| 
-  2018-08-24 11:40:30.588098-04 |||| 00:15:00 |
-  2018-08-24 11:40:30.588098-04 |
+ ## enable nice print vertically \x
+ ## startAfter 8 sec
+
+//NEU
+
+id           | 427b7e90-aa08-11e8-a140-a71161a0bd00
+name         | jobbi
+priority     | 0
+data         | {"param": "param1"}
+state        | created
+retrylimit   | 0
+retrycount   | 0
+retrydelay   | 0
+retrybackoff | f
+startafter   | 2018-08-27 10:48:36.667149-04
+startedon    | 
+singletonkey | 
+singletonon  | 
+expirein     | 00:15:00
+createdon    | 2018-08-27 10:48:28.667149-04
+completedon  | 
+
+//FAILED
+
+id           | 427b7e90-aa08-11e8-a140-a71161a0bd00
+name         | jobbi
+priority     | 0
+data         | {"param": "param1"}
+state        | failed
+retrylimit   | 0
+retrycount   | 0
+retrydelay   | 0
+retrybackoff | f
+startafter   | 2018-08-27 10:48:36.667149-04
+startedon    | 2018-08-27 10:48:41.997038-04
+singletonkey | 
+singletonon  | 
+expirein     | 00:15:00
+createdon    | 2018-08-27 10:48:28.667149-04
+completedon  | 2018-08-27 10:48:42.068522-04
+
+// STATE_COMPLETED
+
+id           | 351010aa-b796-4c8e-9eb8-4e12d0ec0552
+name         | jobbi__state__completed
+priority     | 0
+data         | {"state": "failed", "failed": true, 
+"request": {"id": "427b7e90-aa08-11e8-a140-a71161a0bd00", 
+"data": {"param": "param1"}, "name": "jobbi"}, 
+"response": {"value": "fucking error"}, 
+"createdOn": "2018-08-27T10:48:28.667149-04:00", 
+"startedOn": "2018-08-27T10:48:41.997038-04:00", 
+"retryCount": 0, 
+"completedOn": "2018-08-27T10:48:42.068522-04:00"}
+
+state        | created
+retrylimit   | 0
+retrycount   | 0
+retrydelay   | 0
+retrybackoff | f
+startafter   | 2018-08-27 10:48:42.068522-04
+startedon    | 
+singletonkey | 
+singletonon  | 
+expirein     | 00:15:00
+createdon    | 2018-08-27 10:48:42.068522-04
+completedon  | 
+=========================
+CODE FLOWS WITHIN NODE.JS
+=========================
+
+*** CREATING A JOB!!! ***
+returning id!
+created job from request:  jobbi : 1e04bb80-aa12-11e8-86e7-0d8449a37cb9
+###################################################################settimeout occured in worker.js  18000
+fetching some stuff
+there is a result in fetch
+returning jobs in fetch
+on fetch
+jobs in watch:  [ { id: '1e04bb80-aa12-11e8-86e7-0d8449a37cb9',
+    name: 'jobbi',
+    data: { param: 'param1' },
+    done: [Function] } ]
+job in manag.watch:  { id: '1e04bb80-aa12-11e8-86e7-0d8449a37cb9',
+  name: 'jobbi',
+  data: { param: 'param1' },
+  done: [Function] }
+Subcriber[name, id, data]:  jobbi 
+ 1e04bb80-aa12-11e8-86e7-0d8449a37cb9 
+ { param: 'param1' }
+adding fail or complete callback in fetch
+a fail occured: id, data:  1e04bb80-aa12-11e8-86e7-0d8449a37cb9 fucking error
+*** A? *** Promise { <pending> }
+mapcomplidarg=>ids:  [ '1e04bb80-aa12-11e8-86e7-0d8449a37cb9' ]
+mapcompldataarg=> data:  fucking error
+a result in fail command, ids,result.rowCount:  [ '1e04bb80-aa12-11e8-86e7-0d8449a37cb9' ] 1
+mapCompletitionResponse occured , ids, ids.length, result.rowCount [ '1e04bb80-aa12-11e8-86e7-0d8449a37cb9' ] 1 1
+****************************
+val.jobs[0]:  1e04bb80-aa12-11e8-86e7-0d8449a37cb9
+val.requested:  1
+val.updated:  1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+========
+END
+=========
+=====================
+FAILED COMMAND QUERY:
+=====================
+WITH results AS (
+      UPDATE pgboss.job
+      SET state = CASE
+          WHEN retryCount < retryLimit
+          THEN 'retry'::pgboss.job_state
+          ELSE 'failed'::pgboss.job_state
+          END,        
+        completedOn = CASE
+          WHEN retryCount < retryLimit
+          THEN NULL
+          ELSE now()
+          END,
+        startAfter = CASE
+          WHEN retryCount = retryLimit THEN startAfter
+          WHEN NOT retryBackoff THEN now() + retryDelay * interval '1'
+          ELSE now() +
+            (
+                retryDelay * 2 ^ LEAST(16, retryCount + 1) / 2
+                +
+                retryDelay * 2 ^ LEAST(16, retryCount + 1) / 2 * random()
+            )
+            * interval '1'
+          END
+      WHERE id = ANY($1)
+        AND state < 'completed'
+      RETURNING *
+    )
+    INSERT INTO pgboss.job (name, data)
+    SELECT
+      name || '__state__completed',
+      jsonb_build_object(
+    'request', jsonb_build_object('id', id, 'name', name, 'data', data),
+    'response', $2::jsonb,
+    'state', state,
+    'retryCount', retryCount,
+    'createdOn', createdOn,
+    'startedOn', startedOn,
+    'completedOn', completedOn,
+    'failed', CASE WHEN state = 'completed' THEN false ELSE true END
+  )
+    FROM results
+    WHERE state = 'failed'
+      AND NOT name LIKE '%__state__completed'
+    RETURNING 1
+==============
+

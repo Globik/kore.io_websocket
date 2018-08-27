@@ -18,7 +18,7 @@ await next();
 srouter.get('/',async ctx=>{
 let b=ctx.boss;
 try{
-let jobid= await b.publish(jobname,{param:'param1'},{startAfter:'8 seconds'});
+let jobid= await b.publish(jobname,{param:'Chicago'},{startAfter:'10 seconds'});
 console.log('created job from request: ', jobname,':',jobid);
 }catch(e){console.log('err in req: ',e)}
 ctx.body={"info":"info","page":"/"}
@@ -34,10 +34,20 @@ function ready(){
 console.log("pg boss is ready!");
 
 boss.subscribe(jobname,{newJobCheckIntervalSeconds:10000},(job)=>{
-console.log('sub ',job.name,'\n',job.id,'\n',job.data);	
-//done().then(()=>{console.log('confirmed done.')})
-job.done("fucking error");
-}).then(()=>{console.log("subscription created!")}).catch(err=>{console.log('err3: ',err);})	
+console.log('Subcriber[name, id, data]: ',job.name,'\n',job.id,'\n',job.data);	
+
+var a=job.done("o no, Fucker!").then(function(val){
+//console.log("*** val_A: ***",val)
+	console.log("****************************");
+	console.log("val.jobs[0]: ",val.jobs[0]);
+	console.log("val.requested: ",val.requested);
+	console.log("val.updated: ",val.updated);
+	console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+}).catch(function(er){console.log("err_A: ",er)});
+
+console.log("*** A? ***",a);//should be a Promise
+
+}).then((vali)=>{console.log("subscription created!",vali)}).catch(err=>{console.log('err3: ',err);})	
 
 /*
 boss.subscribe('jobname',{newJobCheckIntervalSeconds:4},(job)=>{
