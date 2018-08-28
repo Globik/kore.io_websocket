@@ -97,7 +97,7 @@ kore_pgsql_sys_cleanup(void)
 
 	for (conn = TAILQ_FIRST(&pgsql_conn_free); conn != NULL; conn = next) {
 		next = TAILQ_NEXT(conn, list);
-		printf("kore_pgsql_sys_cleanup from pgsql_conn_free\n");
+		//printf("kore_pgsql_sys_cleanup from pgsql_conn_free\n");
 		pgsql_conn_cleanup(conn);
 	}
 }
@@ -136,19 +136,22 @@ kore_pgsql_setup(struct kore_pgsql *pgsql, const char *dbname, int flags)
 	}
 
 	if (db == NULL) {
-		printf("fucking db is null\n");
+		printf(red "no database found in names\n" rst);
 		pgsql_set_error(pgsql, "no database found");
 		return (KORE_RESULT_ERROR);
 	}
 
-	if ((pgsql->conn = pgsql_conn_next(pgsql, db)) == NULL){printf(yellow "\n\n*** return FUCK  from setup error\n" rst);
+	if ((pgsql->conn = pgsql_conn_next(pgsql, db)) == NULL){
+		printf(red "\n\n*** return kore_result error from setup error\n" rst);
 		return (KORE_RESULT_ERROR);}
 
 	if (pgsql->flags & KORE_PGSQL_ASYNC) {
-		printf("get job\n");
+		//printf("get job\n");
 		pgsql->conn->job = kore_pool_get(&pgsql_job_pool);
 		pgsql->conn->job->pgsql = pgsql;
-	}else{printf(red "no fucking flags in async\n" rst);}
+	}else{
+	//printf(red "no fucking flags in async\n" rst);
+	}
 
 	return (KORE_RESULT_OK);
 }
@@ -203,7 +206,7 @@ kore_pgsql_query(struct kore_pgsql *pgsql, const char *query)
 			pgsql_set_error(pgsql, PQerrorMessage(pgsql->conn->db));
 			return (KORE_RESULT_ERROR);
 		}
-kore_log(LOG_INFO, green "*** BEFORE PGSQL_SCHEDULE(PGSQL)! IN QUERY SENDING!!! ***" rst);
+//kore_log(LOG_INFO, green "*** BEFORE PGSQL_SCHEDULE(PGSQL)! IN QUERY SENDING!!! ***" rst);
 		pgsql_schedule(pgsql);
 	}
 
@@ -310,8 +313,8 @@ kore_pgsql_register(const char *dbname, const char *connstring)
 void
 kore_pgsql_handle(void *c, int err)
 {
-	printf("*** ENTERING KORE_PGSQL_HANDLE ***\n");
-	printf("*** SUPERDB!!! : %d ****\n",SUPERDB);
+	//printf("*** ENTERING KORE_PGSQL_HANDLE ***\n");
+	//printf("*** SUPERDB!!! : %d ****\n",SUPERDB);
 	struct kore_pgsql	*pgsql;
 	struct pgsql_conn	*conn = (struct pgsql_conn *)c;
 
@@ -323,17 +326,17 @@ kore_pgsql_handle(void *c, int err)
 	pgsql = conn->job->pgsql;
 
 	if (!PQconsumeInput(conn->db)) {
-		printf("*** NOT CONSUME INPUT ***\n");
+		//printf("*** NOT CONSUME INPUT ***\n");
 		pgsql->state = KORE_PGSQL_STATE_ERROR;
 		pgsql->error = kore_strdup(PQerrorMessage(conn->db));
 	} 
 	else {
-		printf("***before pgsql_read_result***\n");
+		//printf("***before pgsql_read_result***\n");
 		pgsql_read_result(pgsql);
 	}
 
 	if (pgsql->state == KORE_PGSQL_STATE_WAIT) {
-		printf("***state wait in handle pgsql***\n");
+		//printf("***state wait in handle pgsql***\n");
 #if !defined(KORE_NO_HTTP)
 		if (pgsql->req != NULL)
 			http_request_sleep(pgsql->req);
@@ -341,15 +344,15 @@ kore_pgsql_handle(void *c, int err)
 		if (pgsql->cb != NULL)
 			pgsql->cb(pgsql, pgsql->arg);
 	} else {
-		printf("*** else no wait state***\n");
+	//	printf("*** else no wait state***\n");
 #if !defined(KORE_NO_HTTP)
 		if (pgsql->req != NULL)
 			http_request_wakeup(pgsql->req);
 #endif
 		if (pgsql->cb != NULL){
-			printf("***before  HANDLE CB ***\n");
+		//	printf("***before  HANDLE CB ***\n");
 			pgsql->cb(pgsql, pgsql->arg);
-			printf("***after handle cb***\n");
+		//	printf("***after handle cb***\n");
 			}
 	}
 }
@@ -357,14 +360,14 @@ kore_pgsql_handle(void *c, int err)
 void
 kore_pgsql_continue(struct kore_pgsql *pgsql)
 {
-	printf(" *** kore_pgsql_continue CONTINUE ****\n");
+	//printf(" *** kore_pgsql_continue CONTINUE ****\n");
 	if (pgsql->error) {
 		kore_free(pgsql->error);
 		pgsql->error = NULL;
 	}
 
 	if (pgsql->result) {
-		printf("***it looks like result in continue***\n");
+	//	printf("***it looks like result in continue***\n");
 		PQclear(pgsql->result);
 		pgsql->result = NULL;
 	}
@@ -372,24 +375,24 @@ kore_pgsql_continue(struct kore_pgsql *pgsql)
 	switch (pgsql->state) {
 	case KORE_PGSQL_STATE_INIT:
 	case KORE_PGSQL_STATE_WAIT:
-	printf("***state init and wait in continue***\n");
+	//printf("***state init and wait in continue***\n");
 		break;
 	case KORE_PGSQL_STATE_DONE:
-	printf("***state done in continue***\n");
+	//printf("***state done in continue***\n");
 #if !defined(KORE_NO_HTTP)
 		if (pgsql->req != NULL)
 			http_request_wakeup(pgsql->req);
 #endif
-printf("*** before conn release ***\n");
+//printf("*** before conn release ***\n");
 		pgsql_conn_release(pgsql);
-printf("*** AFTER PGSQL_CONN_RELEASE ***\n");
+//printf("*** AFTER PGSQL_CONN_RELEASE ***\n");
 		break;
 	case KORE_PGSQL_STATE_ERROR:
 	case KORE_PGSQL_STATE_RESULT:
 	case KORE_PGSQL_STATE_NOTIFY:
 	case KORE_PGSQL_STATE_COMMANDOK:
 	
-	printf("***before kore pgsql handle in continue***\n");
+	//printf("***before kore pgsql handle in continue***\n");
 		kore_pgsql_handle(pgsql->conn, 0);
 		break;
 	default:
@@ -401,7 +404,7 @@ void
 kore_pgsql_cleanup(struct kore_pgsql *pgsql)
 {
 	pgsql_queue_remove(pgsql);
-printf("kore_pgsql_cleanup\n");
+//printf("kore_pgsql_cleanup\n");
 	if (pgsql->result != NULL)
 		PQclear(pgsql->result);
 
@@ -416,7 +419,7 @@ printf("kore_pgsql_cleanup\n");
 	pgsql->conn = NULL;
 
 	if (pgsql->flags & PGSQL_LIST_INSERTED) {
-		printf("flag pgsql_list_inserted detected\n");
+		//printf("flag pgsql_list_inserted detected\n");
 		LIST_REMOVE(pgsql, rlist);
 		pgsql->flags &= ~PGSQL_LIST_INSERTED;
 	}
@@ -462,7 +465,7 @@ kore_pgsql_getvalue(struct kore_pgsql *pgsql, int row, int col)
 static struct pgsql_conn *
 pgsql_conn_next(struct kore_pgsql *pgsql, struct pgsql_db *db)
 {
-	printf("***entering pgsql_conn_next\n");
+	//printf("***entering pgsql_conn_next\n");
 	PGTransactionStatusType		state;
 	struct pgsql_conn		*conn;
 	struct kore_pgsql		rollback;
@@ -473,14 +476,14 @@ rescan:
 	TAILQ_FOREACH(conn, &pgsql_conn_free, list) {
 		if (!(conn->flags & PGSQL_CONN_FREE)){
 			fatal("got a pgsql connection that was not free?");
-			printf("got a pgsql connection that was not free?\n");
+			//printf("got a pgsql connection that was not free?\n");
 		}
 		if (!strcmp(conn->name, db->name))
 			break;
 	}
 
 	if (conn != NULL) {
-		printf(yellow "conn is not NULL, before pqtransactionstatus\n" rst);
+		//printf(yellow "conn is not NULL, before pqtransactionstatus\n" rst);
 		state = PQtransactionStatus(conn->db);
 		if (state == PQTRANS_INERROR) {
 			kore_log(LOG_INFO,red "pqtrans_inerror\n" rst);
@@ -497,26 +500,26 @@ rescan:
 				kore_pgsql_cleanup(&rollback);
 				pgsql_conn_cleanup(conn);
 			} else {
-				printf("*** CLEANUP ROLLBACK!***\n");
+			//	printf("*** CLEANUP ROLLBACK!***\n");
 				kore_pgsql_cleanup(&rollback);
 			}
-kore_log(LOG_INFO, yellow "*** GOTO RESCAN!!! ***" rst);
+//kore_log(LOG_INFO, yellow "*** GOTO RESCAN!!! ***" rst);
 			goto rescan;
 		}
 	}
 
 	if (conn == NULL) {
-		kore_log(LOG_INFO, green "*** CONN is NULL! ***\n" rst);
+		//kore_log(LOG_INFO, green "*** CONN is NULL! ***\n" rst);
 		if (db->conn_max != 0 &&  db->conn_count >= db->conn_max) {
-				printf("db->conn_count: %d\n",db->conn_count);
+				printf(red "db->conn_count: %d\n" rst,db->conn_count);
 			if ((pgsql->flags & KORE_PGSQL_ASYNC) && pgsql_queue_count < pgsql_queue_limit) {
-					printf("pgsql_queue_count: %d\n",pgsql_queue_count);
+					printf(red "pgsql_queue_count: %d\n" rst,pgsql_queue_count);
 				pgsql_queue_add(pgsql);
 			} else {
 				kore_log(LOG_INFO, yellow "\n\n\n\n no available connection \n\n\n\n" rst);
 				pgsql_set_error(pgsql,"no available connection");
 			}
-printf(red "***returning NULL from here ***\n\n");
+//printf(red "***returning NULL from here ***\n\n");
 			return (NULL);
 		}
 
@@ -528,7 +531,7 @@ printf(red "***returning NULL from here ***\n\n");
 
 	conn->flags &= ~PGSQL_CONN_FREE;
 	TAILQ_REMOVE(&pgsql_conn_free, conn, list);
-printf("connection created!\n");
+//printf("connection created!\n");
 	return (conn);
 }
 
@@ -545,13 +548,13 @@ pgsql_set_error(struct kore_pgsql *pgsql, const char *msg)
 static void
 pgsql_schedule(struct kore_pgsql *pgsql)
 {
-	kore_log(LOG_INFO, yellow "*** pgsql_schedule(pgsql) Entering!!! ***" rst);
+	//kore_log(LOG_INFO, yellow "*** pgsql_schedule(pgsql) Entering!!! ***" rst);
 	int		fd;
 
 	fd = PQsocket(pgsql->conn->db);
 	if (fd < 0)
 		fatal("PQsocket returned < 0 fd on open connection");
-kore_log(LOG_INFO, red "*** FD IN SCHEDULE: %d ***" rst,fd);
+//kore_log(LOG_INFO, red "*** FD IN SCHEDULE: %d ***" rst,fd);
 	kore_platform_schedule_read(fd, pgsql->conn);
 	pgsql->state = KORE_PGSQL_STATE_WAIT;
 	pgsql->flags |= KORE_PGSQL_SCHEDULED;
@@ -567,7 +570,7 @@ kore_log(LOG_INFO, red "*** FD IN SCHEDULE: %d ***" rst,fd);
 static void
 pgsql_queue_add(struct kore_pgsql *pgsql)
 {
-	printf("*** ENTERING QUEUEADD ***\n");
+	//printf("*** ENTERING QUEUEADD ***\n");
 	struct pgsql_wait	*pgw;
 
 #if !defined(KORE_NO_HTTP)
@@ -576,20 +579,23 @@ pgsql_queue_add(struct kore_pgsql *pgsql)
 #endif
 
 if(pgsql->conn){
-if(pgsql->conn==NULL){printf(red "\n\n\n\n\n\n ** ERROR!!!! pgsql->conn is NULL!!! que add***\n\n\n"rst);}	
+if(pgsql->conn==NULL){
+printf(red "\n\n\n\n\n\n ** ERROR!!!! pgsql->conn is NULL!!! que add***\n\n\n"rst);
+}	
 }
 
 	pgw = kore_pool_get(&pgsql_wait_pool);
 	pgw->pgsql = pgsql;
-printf("inserting into wait queue\n");
+//printf("inserting into wait queue\n");
 	pgsql_queue_count++;
 	TAILQ_INSERT_TAIL(&pgsql_wait_queue, pgw, list);
-	printf("***  END QUEUEADD***\n");
+//	printf("***  END QUEUEADD***\n");
 }
 
 static void
 pgsql_queue_remove(struct kore_pgsql *pgsql)
-{printf("*** ENTERING QUEUE REMOVE  ***\n");
+{
+	//printf("*** ENTERING QUEUE REMOVE  ***\n");
 	struct pgsql_wait	*pgw, *next;
 
 	for (pgw = TAILQ_FIRST(&pgsql_wait_queue); pgw != NULL; pgw = next) {
@@ -598,7 +604,7 @@ pgsql_queue_remove(struct kore_pgsql *pgsql)
 			continue;
 
 		pgsql_queue_count--;
-		printf("removing from wait queue\n");
+	//	printf("removing from wait queue\n");
 		TAILQ_REMOVE(&pgsql_wait_queue, pgw, list);
 		kore_pool_put(&pgsql_wait_pool, pgw);
 		return;
@@ -609,16 +615,16 @@ static void
 pgsql_queue_wakeup(void)
 {
 	
-	printf("*** ENTERING WAKEUP ***\n");
-	//return;
+	//printf("*** ENTERING WAKEUP ***\n");
+	
 	struct pgsql_wait	*pgw, *next;
-printf("*** BEFORE LOOP FOR ***\n");
+//printf("*** BEFORE LOOP FOR ***\n");
 	for (pgw = TAILQ_FIRST(&pgsql_wait_queue); pgw != NULL; pgw = next) {
 		next = TAILQ_NEXT(pgw, list);
-printf("*** AFTER NEXT OF WAIT QUEUE ***\n");
+//printf("*** AFTER NEXT OF WAIT QUEUE ***\n");
 #if !defined(KORE_NO_HTTP)
 		if (pgw->pgsql->req != NULL) {
-			printf("*** REQ IS NOT NULL***\n");
+			//printf("*** REQ IS NOT NULL***\n");
 			if (pgw->pgsql->req->flags & HTTP_REQUEST_DELETE) {
 				pgsql_queue_count--;
 				TAILQ_REMOVE(&pgsql_wait_queue, pgw, list);
@@ -629,14 +635,14 @@ printf("*** AFTER NEXT OF WAIT QUEUE ***\n");
 			http_request_wakeup(pgw->pgsql->req);
 		}
 #endif
-printf("*** BEFORE CB IN WAKEUP ***\n");
+//printf("*** BEFORE CB IN WAKEUP ***\n");
 		if (pgw->pgsql->cb != NULL)
 pgw->pgsql->cb(pgw->pgsql, pgw->pgsql->arg);
-printf("*** AFTER CB WAKEUP ***\n");
+//printf("*** AFTER CB WAKEUP ***\n");
 		pgsql_queue_count--;
-		printf("*** BEFORE REMV QUE from wait queue ***\n");
+		//printf("*** BEFORE REMV QUE from wait queue ***\n");
 		TAILQ_REMOVE(&pgsql_wait_queue, pgw, list);
-		printf("*** BEFORE POOL PUT in wakup ***\n");
+		//printf("*** BEFORE POOL PUT in wakup ***\n");
 		kore_pool_put(&pgsql_wait_pool, pgw);
 		return;
 	}
@@ -673,15 +679,16 @@ pgsql_conn_create(struct kore_pgsql *pgsql, struct pgsql_db *db)
 		pgsql_conn_cleanup(conn);
 		return (NULL);
 	}else if(status==CONNECTION_STARTED){
-	kore_log(LOG_INFO, green "*** CONNECTION STARTED! ***" rst);	
+	//kore_log(LOG_INFO, green "*** CONNECTION STARTED! ***" rst);	
 	}else if(status==CONNECTION_MADE){
-	kore_log(LOG_INFO, green "*** CONNECTION_MADE! ***\n" rst);	
+	//kore_log(LOG_INFO, green "*** CONNECTION_MADE! ***\n" rst);	
 	}else{
 	printf("*** UNKNOWN ONNECTION ***\n");
 	}
 	fd_set rfds;
-	int u=PQsetnonblocking(conn->db,1);
-	printf("*** set non block conn->db: %d ****\n",u);
+	//int u=
+	PQsetnonblocking(conn->db,1);
+	//printf("*** set non block conn->db: %d ****\n",u);
 	
 	PostgresPollingStatusType connstatus;
 	int fd=PQsocket(conn->db);
@@ -696,9 +703,8 @@ pgsql_conn_create(struct kore_pgsql *pgsql, struct pgsql_db *db)
 	bdone=1;
 	return (NULL);	
 	}else if(connstatus==PGRES_POLLING_WRITING){
-	kore_log(LOG_INFO, red "*** PGRES_POLLING_WRITING! ***" rst);	
-	kore_log(LOG_INFO, green "*** NOTHING TO BE DONE HERE??? ***" rst);
-	//pgsql_schedule(pgsql);
+	//kore_log(LOG_INFO, red "*** PGRES_POLLING_WRITING! ***" rst);	
+	//kore_log(LOG_INFO, green "*** NOTHING TO BE DONE HERE??? ***" rst);
 	}else if(connstatus==PGRES_POLLING_READING){
 	//printf("*** PGRES_POLLING_READING! ***\n");	
 	//pgsql_schedule(pgsql);
@@ -707,23 +713,22 @@ pgsql_conn_create(struct kore_pgsql *pgsql, struct pgsql_db *db)
 	FD_SET(fd,&rfds);
 	SUPERSUKA+=1;
 	}else if(connstatus==PGRES_POLLING_OK){
-	kore_log(LOG_INFO, green "*** PGRES_POLLING_OK! ***" rst);	
-	kore_log(LOG_INFO, yellow "*** SUPERSUKA(how much was poll reading): %d ***" rst,SUPERSUKA);
-	kore_log(LOG_INFO,red "*** SHOW ME FD! %d ***" rst, fd);
+	//kore_log(LOG_INFO, green "*** PGRES_POLLING_OK! ***" rst);	
+	//kore_log(LOG_INFO, yellow "*** SUPERSUKA(how much was poll reading): %d ***" rst,SUPERSUKA);
+	//kore_log(LOG_INFO,red "*** SHOW ME FD! %d ***" rst, fd);
 	SUPERSUKA=0;
 	bdone=1;
 	connected=1;
 	SUPERDB+=1;
-	//close(fd);
 	break;
 	}else{printf("*** UNKNOWN PGRES STATE ***\n");}	
 	}//connected
 	// the fuck knows what I'm doing right here
 	// is it really db connection here "asynchronous"??? Or is it all  about just like PQconnectdb???
 	retval=select(fd+1,&rfds,NULL,NULL,NULL);
-	kore_log(LOG_INFO, green"*** retval : %d ***n" rst,retval);
+	//kore_log(LOG_INFO, green"*** retval : %d ***n" rst,retval);
 	if(retval < 0){printf(red "\n\n\n *** RETVAL IN SELECTL %d ****\n\n\n" rst, retval);}
-	kore_log(LOG_INFO, red "*** a fd : %d ***" rst,fd);
+	//kore_log(LOG_INFO, red "*** a fd : %d ***" rst,fd);
 	if(!connected){
 	//printf(red "\n\n *** NOT CONNECTED!!!! ***\n" rst);
 		//break;
@@ -739,33 +744,33 @@ pgsql_conn_create(struct kore_pgsql *pgsql, struct pgsql_db *db)
 	}*/
 	if (conn->db == NULL/* || (PQstatus(conn->db) != CONNECTION_OK)*/) {
 		kore_log(LOG_INFO, red "\n\n\n\n\n\n *** ACHTUNG!!! CONN->DB IS NULL!!! ***\n\n\n\n\n" rst);
-		//pgsql_set_error(pgsql, PQerrorMessage(conn->db));
-		//pgsql_conn_cleanup(conn);
-		//return (NULL);
+		pgsql_set_error(pgsql, PQerrorMessage(conn->db));
+		pgsql_conn_cleanup(conn);
+		return (NULL);
 	}
-printf("*** RETURNING NOW CONN INSTANCE! in conn create***\n");
+//printf("*** RETURNING NOW CONN INSTANCE! in conn create***\n");
 	return (conn);
 }
 
 static void
 pgsql_conn_release(struct kore_pgsql *pgsql)
 {
-	printf("***RELEASE CONN***\n");
+	//printf("***RELEASE CONN***\n");
 	int		fd;
 	PGresult	*result;
 
 	if (pgsql->conn == NULL){
-		printf("***pgsql->conn is NULL ***\n");
+	//	printf("***pgsql->conn is NULL ***\n");
 		return;
 	}
 
 	/* Async query cleanup */
 	if (pgsql->flags & KORE_PGSQL_ASYNC) {
 		if (pgsql->flags & KORE_PGSQL_SCHEDULED) {
-			printf("*** flag sceduled *** \n");
+		//	printf("*** flag sceduled *** \n");
 			fd = PQsocket(pgsql->conn->db);
-			printf("fd before kore_platform_disable_read: %d\n",fd);
-			printf(red "*** pgsql->conn->name : %s\n***" rst, pgsql->conn->name);
+		//	printf("fd before kore_platform_disable_read: %d\n",fd);
+			//printf(red "*** pgsql->conn->name : %s\n***" rst, pgsql->conn->name);
 			kore_log(LOG_INFO,red "fd is: %d" rst,fd);
 				kore_platform_disable_read(fd);
 			/*
@@ -780,7 +785,7 @@ pgsql_conn_release(struct kore_pgsql *pgsql)
 				}
 */
 			if (pgsql->state != KORE_PGSQL_STATE_DONE){
-				printf(" *** state not done ***\n");
+			//	printf(" *** state not done ***\n");
 				pgsql_cancel(pgsql);
 			}
 		}
@@ -789,7 +794,7 @@ pgsql_conn_release(struct kore_pgsql *pgsql)
 
 	/* Drain just in case. */
 	while ((result = PQgetResult(pgsql->conn->db)) != NULL){
-		printf("*** THERE ARE RESULTS!!!! By now PQclear that***\n");
+		//printf("*** THERE ARE RESULTS!!!! By now PQclear that***\n");
 		PQclear(result);
 	}
 
@@ -799,27 +804,27 @@ pgsql_conn_release(struct kore_pgsql *pgsql)
 
 	pgsql->conn = NULL;
 	pgsql->state = KORE_PGSQL_STATE_COMPLETE;
-printf("*** after state complete ***\n");
+//printf("*** after state complete ***\n");
 if (pgsql->cb != NULL)pgsql->cb(pgsql, pgsql->arg);
-printf("*** Before wakeup ****\n");
+//printf("*** Before wakeup ****\n");
 	pgsql_queue_wakeup();
-	printf("*** end conn release *** \n");
+//	printf("*** end conn release *** \n");
 }
 
 static void
 pgsql_conn_cleanup(struct pgsql_conn *conn)
 {
-	printf("***entering pgsql_conn_cleanup()***\n");
+	//printf("***entering pgsql_conn_cleanup()***\n");
 	struct kore_pgsql	*pgsql;
 	struct pgsql_db		*pgsqldb;
 
 	if (conn->flags & PGSQL_CONN_FREE){
-		printf("***remove from connection free***\n");
+	//	printf("***remove from connection free***\n");
 		TAILQ_REMOVE(&pgsql_conn_free, conn, list);
 	}
 
 	if (conn->job) {
-		printf("***CONN JOB!!***\n");
+	//	printf("***CONN JOB!!***\n");
 		pgsql = conn->job->pgsql;
 #if !defined(KORE_NO_HTTP)
 		if (pgsql->req != NULL)
@@ -834,7 +839,7 @@ pgsql_conn_cleanup(struct pgsql_conn *conn)
 
 	if (conn->db != NULL)
 		PQfinish(conn->db);
-printf("*** after finish ***\n");
+//printf("*** after finish ***\n");
 	LIST_FOREACH(pgsqldb, &pgsql_db_conn_strings, rlist) {
 		if (strcmp(pgsqldb->name, conn->name)) {
 			pgsqldb->conn_count--;
@@ -849,14 +854,20 @@ printf("*** after finish ***\n");
 static void
 pgsql_read_result(struct kore_pgsql *pgsql)
 {
-	kore_log(LOG_INFO, green "\n\n*** SUPERDB: %d ***\n\n" rst, SUPERDB);
-	printf("entering pgsql read result***()\n");
+	//kore_log(LOG_INFO, green "\n\n*** SUPERDB: %d ***\n\n" rst, SUPERDB);
+	//printf("entering pgsql read result***()\n");
 	PGnotify	*notify;
-printf(red "before busy***\n" rst);
-if(pgsql->conn){printf(red "YES! pgsql->conn ***\n" rst);}else{printf(red "NO! pgsql->conn!!!! ***\n" rst);
-if(pgsql->conn==NULL){printf(red "\n\n\n\n\nERROR!!! YES IS NULL pgsql->conn returning!!!! **** \n\n\n\n\n" rst);return;}
+//printf(red "before busy***\n" rst);
+if(pgsql->conn){
+//printf(red "YES! pgsql->conn ***\n" rst);
+}else{
+//printf(red "NO! pgsql->conn!!!! ***\n" rst);
+if(pgsql->conn==NULL){
+printf(red "\n\n\n\n\nERROR!!! YES IS NULL pgsql->conn returning!!!! One need to destroy it **** \n\n\n\n\n" rst);return;}
 	}
-if(pgsql->conn->db){printf(red "YES! pgsql->conn->db!!!  ***\n" rst);}else{printf(red "NO!!!! pgsql->conn->db !!!! ***\n" rst);}
+if(pgsql->conn->db){
+//printf(red "YES! pgsql->conn->db!!!  ***\n" rst);
+}else{printf(red "NO!!!! pgsql->conn->db !!!! ***\n" rst);}
 	if (PQisBusy(pgsql->conn->db)) {
 		pgsql->state = KORE_PGSQL_STATE_WAIT;
 		kore_log(LOG_INFO, red "*** Oh, nooo!!! The busy wait occured! returning! ***\n" rst);
@@ -879,15 +890,15 @@ if(pgsql->conn->db){printf(red "YES! pgsql->conn->db!!!  ***\n" rst);}else{print
 	pgsql->result = PQgetResult(pgsql->conn->db);
 	*/
 	if (pgsql->result == NULL) {
-		printf(green "pgsql->result is NULL\n" rst);
+		//printf(green "pgsql->result is NULL\n" rst);
 		//pgsql->state = KORE_PGSQL_STATE_DONE;
 		//return;
 	}
 	
 	//PQconsumeInput(pgsql->conn->db);
-	printf(red "BEFORE WHILE LOOP RESULT***\n" rst);
+	//printf(red "BEFORE WHILE LOOP RESULT***\n" rst);
 while((pgsql->result=PQgetResult(pgsql->conn->db))!=NULL){
-	printf("while pgsql->result\n");
+	//printf("while pgsql->result\n");
 	/*if(PQresultStatus(pgsql->result)==PGRES_COMMAND_OK){
 		printf("status is ok!\n");
 		pgsql->state = KORE_PGSQL_STATE_DONE;
@@ -909,56 +920,68 @@ while((pgsql->result=PQgetResult(pgsql->conn->db))!=NULL){
 	case PGRES_COPY_BOTH:
 		break;
 	case PGRES_COMMAND_OK:
-	printf("pgres_command is ok %p\n", (void*)pgsql);
-	printf("comm on result: %s\n",PQcmdStatus(pgsql->result));
+	//printf("pgres_command is ok %p\n", (void*)pgsql);
+	//printf("comm on result: %s\n",PQcmdStatus(pgsql->result));
 	//	pgsql->state = KORE_PGSQL_STATE_DONE;
 		pgsql->state=KORE_PGSQL_STATE_COMMANDOK;
-		if(pgsql->req !=NULL){printf("*** REQ3 NOT3 NULL3 return3 ***\n");return;}
+		if(pgsql->req !=NULL){
+		//printf("*** REQ3 NOT3 NULL3 return3 ***\n");
+		return;
+		}
 	if (pgsql->cb != NULL) pgsql->cb(pgsql, pgsql->arg);
 		break;
 	case PGRES_TUPLES_OK:
 #if PG_VERSION_NUM >= 90200
 	case PGRES_SINGLE_TUPLE:
 #endif
-printf("*** state result ***?\n");
+//printf("*** state result ***?\n");
 		pgsql->state = KORE_PGSQL_STATE_RESULT;
 		if (pgsql->req != NULL){return;}
 		if (pgsql->cb != NULL) pgsql->cb(pgsql, pgsql->arg);
 		PQclear(pgsql->result);
 		pgsql->result = NULL;
-		printf("*** after pqclear***\n");
+	//	printf("*** after pqclear***\n");
 		
 		break;
 	case PGRES_EMPTY_QUERY:
 	case PGRES_BAD_RESPONSE:
 	case PGRES_FATAL_ERROR:
-	printf("*** pgres fatal error ***\n");
+	//printf("*** pgres fatal error ***\n");
 		pgsql_set_error(pgsql, PQresultErrorMessage(pgsql->result));
 	if (pgsql->cb != NULL) pgsql->cb(pgsql, pgsql->arg);
-	if(pgsql->req !=NULL){printf("*** some err. return req ***\n");return;}
+	if(pgsql->req !=NULL){
+	//printf("*** some err. return req ***\n");
+	return;
+	}
 		break;
 	}
-	printf("***end of while***\n");
+	//printf("***end of while***\n");
 	
 	//if(pgsql->cb !=NULL) pgsql->cb(pgsql,pgsql->arg);
 }
 
-printf("*****************************\n");
+//printf("*****************************\n");
 
 if(pgsql->state==KORE_PGSQL_STATE_COMMANDOK){
-	printf("***immer now pgsql->state is COMMANDOK!***\n");
-	//if(pgsql->req !=NULL){printf("***REQ2 NOT2 NULL2 return2***\n");return;}
+	//printf("***immer now pgsql->state is COMMANDOK!***\n");
 	pgsql->state=KORE_PGSQL_STATE_DONE;
 	}else{
-	printf("***pgsql->state is not COMMANDOK!:%d \n",pgsql->state);
+	//printf("***pgsql->state is not COMMANDOK!:%d \n",pgsql->state);
 	if(pgsql->result==NULL){
-	printf("***pgsql->result is NULL***\n");
+	//printf("***pgsql->result is NULL***\n");
 	pgsql->state=KORE_PGSQL_STATE_DONE;	
-	if(pgsql->req !=NULL){printf("***REQ NOT NULL return***\n");return;}else{printf("***REQ IS NULL***\n");}
-	}else{printf("***pgsql->result is NOT NULL***");}
+	if(pgsql->req !=NULL){
+	//printf("***REQ NOT NULL return***\n");
+	return;
+	}else{
+	//printf("***REQ IS NULL***\n");
+	}
+	}else{
+	//printf("***pgsql->result is NOT NULL***");
+	}
 	}
 
-printf("*** END OF pgsql_read_result ***\n");
+//printf("*** END OF pgsql_read_result ***\n");
 }
 
 static void

@@ -33,10 +33,11 @@ boss.start().then(ready).catch(err=>console.log('boss start err: ',err))
 function ready(){
 console.log("pg boss is ready!");
 
-boss.subscribe(jobname,{newJobCheckIntervalSeconds:10000},(job)=>{
+boss.subscribe(jobname,{newJobCheckIntervalSeconds:1000},(job)=>{
 console.log('Subcriber[name, id, data]: ',job.name,'\n',job.id,'\n',job.data);	
 
-var a=job.done("o no, Fucker!").then(function(val){
+//var a=job.done("o no, Fucker!").then(function(val){
+var a=job.done(null,"some success info").then(function(val){
 //console.log("*** val_A: ***",val)
 	console.log("****************************");
 	console.log("val.jobs[0]: ",val.jobs[0]);

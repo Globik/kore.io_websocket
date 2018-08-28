@@ -1,4 +1,5 @@
 #include <signal.h>
+#include <stdbool.h>
 
 #include <kore/kore.h>
 #include <kore/http.h>
@@ -23,21 +24,33 @@ const char*q_event2="q_event2";
 const char*q_event3="q_event3";
 const char*q_event4="q_event4";
 
+const char*db_url="dbname=postgres";
+
 struct boss_fail{
-char*jobid;	
+char*jobid;
+char*name;
+char*data;	
 };
 
 struct kore_pgsql*for_fucker=NULL;// for listen notify
 struct kore_timer*tim,*tim1,*tim2,*tim3,*tim4=NULL;
 struct kore_pgsql*pgsql1=NULL;//for pgboss job scheduler
 
-void boss_done(struct kore_pgsql*,char*,char*,char*);//,jobid,eri,erfolgi
+void boss_done(char*,char*,char*);//,jobid,eri,erfolgi
+void on_db_cb_done(struct kore_pgsql*,void*);
 
 enum {
 	WOWA=7
 };
 
 static volatile sig_atomic_t blog_sig=-1;
+
+char*das_boss_fail_query(void);
+char*buildJsonCompletionObject(bool g);
+char*completeJobsCommand (void);
+void boss_job_complete(char*,char*);
+void boss_job_fails(char*,char*);
+
 void signal_handler(int);
 void tick(void*,u_int64_t);
 
@@ -85,9 +98,10 @@ void websocket_message(struct connection*,u_int8_t,void*,size_t);
 void han(void);
 void connection_new(struct connection*);
 void connection_del(struct connection*);
-
+struct boss_fail *boss=NULL;
 void han(){
 printf(green "at exit occured.\n" rst);
+kore_free(boss);
 if(tim !=NULL){
 kore_timer_remove(tim);
 tim=NULL;
@@ -103,45 +117,44 @@ pgsql1=NULL;
 }
 }
 void kore_worker_configure(){
-	kore_log(LOG_INFO, red "enum wowa: %d" rst, WOWA);
+kore_log(LOG_INFO, red "enum wowa: %d" rst, WOWA);
 kore_log(LOG_INFO,"worker_configure\n");
 atexit(han);
 
 
-const char*db_url="dbname=postgres";
 
-kore_pgsql_register(q_name,"dbname=postgres");
-kore_pgsql_register("fucker","dbname=postgres");
-kore_pgsql_register(q_subscribe,"dbname=postgres");
-kore_pgsql_register(q_on_boss_job_fail,"dbname=postgres");
 
+kore_pgsql_register(q_name,db_url);
+kore_pgsql_register(q_fucker,db_url);
+kore_pgsql_register(q_subscribe,db_url);
+kore_pgsql_register(q_on_boss_job_fail,db_url);
+
+/*
 kore_pgsql_register(q_event1, db_url);
 kore_pgsql_register(q_event2, db_url);
 kore_pgsql_register(q_event3, db_url);
 kore_pgsql_register(q_event4, db_url);
+*/
 
-/*
 struct kore_pgsql*pgsql; 
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
 db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
 for_fucker=pgsql;
-*/
-struct boss_fail *boss=kore_calloc(1,sizeof(*boss));
-boss->jobid=NULL;
+
+
+boss=kore_calloc(1,sizeof(*boss));
+boss->jobid=NULL;boss->name=NULL;boss->data=NULL;
 
 pgsql1=kore_calloc(1,sizeof(*pgsql1));
 kore_pgsql_init(pgsql1);
-
-
-
 kore_pgsql_bind_callback(pgsql1, db_state_change, boss);
-
-tim=kore_timer_add(tick,1000,pgsql1,0);
+tim=kore_timer_add(tick,5000,pgsql1,0);
 //u_int64_t mis=kore_time_ms();
 //printf("%" PRIu64 "\n",mis);
 //kore_log(LOG_INFO,green "ms: %" PRIu64 "" rst, mis);
+/*
 struct kore_pgsql*pgsql2,*pgsql3,*pgsql4,*pgsql5;
 
 pgsql2=kore_calloc(1,sizeof(*pgsql2));
@@ -164,7 +177,7 @@ tim1=kore_timer_add(tick1,1002,pgsql2,0);
 tim2=kore_timer_add(tick2,1004,pgsql3,0);
 tim3=kore_timer_add(tick3,1006,pgsql4,0);
 tim4=kore_timer_add(tick4,1008,pgsql5,0);
-
+*/
 
 }
 
@@ -188,7 +201,7 @@ kore_buf_appendf(b,"{\"%s\"}",jobbi);
 
 char *s=kore_buf_stringify(b,NULL);
 kore_log(LOG_INFO, red "BECOMING: %s" rst,s);
-db_query_params(p,q_subscribe,das_nextJob_query,0,2,s,strlen(s),0,limit_int,strlen(limit_int),0);
+db_query_params(p,q_subscribe, das_nextJob_query,0,2,s,strlen(s),0,limit_int,strlen(limit_int),0);
 kore_free(b);
 }
 
@@ -251,28 +264,13 @@ case KORE_PGSQL_STATE_DONE:
 kore_log(LOG_INFO,yellow "*** PGSQL_STATE_DONE!!!*** command_status: %s" rst, PQcmdStatus(p->result));
 //printf(red "int extra : %d\n" rst,(int)p->arg);
 printf(green "name: %s\n" rst,p->conn->name);
-if(!strcmp(p->conn->name,q_fucker)){printf("str ok?\n");
-	//p->state=KORE_PGSQL_STATE_COMMANDOK;
+if(!strcmp(p->conn->name,q_fucker)){
+//printf("str ok?\n");
 }else{
-printf("string is not ok?\n");
-
-
-if(!strcmp(p->conn->name,"subscribe"/*q_on_boss_job_fail*/)){
-kore_log(LOG_INFO,red "ok it's a boss fail DONE" rst);
-struct boss_fail*boss=(struct boss_fail*)d;
-printf("aha\n");
-kore_log(LOG_INFO, red "boss->jobid: %s" rst,boss->jobid);
-boss_done(NULL,boss->jobid,"From c an error",NULL);
-kore_free(boss->jobid);
-boss->jobid=NULL;	
-}
-
-
-
-kore_log(LOG_INFO,yellow "after boss_done()" rst);
-
+on_db_cb_done(p,d);
 kore_pgsql_continue(p);	
 }
+
 break;
 case KORE_PGSQL_STATE_COMMANDOK:
 kore_log(LOG_INFO,yellow "**STATE COMMANDOK!***" rst);
@@ -287,6 +285,7 @@ break;
 
 case KORE_PGSQL_STATE_COMPLETE:
 kore_log(LOG_INFO, yellow "*** CB STATE COMPLETE *** %d" rst, KORE_PGSQL_STATE_COMPLETE);
+kore_pgsql_cleanup(p);
 
 break;
 
@@ -309,8 +308,20 @@ kore_pgsql_continue(p);
 break;
 }		
 }
+void on_db_cb_done(struct kore_pgsql*p,void*d){
+if(!strcmp(p->conn->name,"subscribe")){
+//kore_log(LOG_INFO,red "ok it's a boss fail DONE" rst);
+struct boss_fail*bos=(struct boss_fail*)d;
+kore_log(LOG_INFO, red "boss->jobid: %s %s : %s" rst,bos->jobid,bos->name,bos->data);
+//boss_subscribe(bos->jobid, bos->name, bos->data);
+kore_free(bos->jobid);
+kore_free(bos->name);
+kore_free(bos->data);
+bos->jobid=NULL;	
+bos->name=NULL;
+bos->data=NULL;
 
-
+}}
 void db_query(struct kore_pgsql*p,const char*qname,const char*str_query){
 
 
@@ -344,7 +355,7 @@ kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,p->notify.extra,strlen(p->notify
 void db_results(struct kore_pgsql*p, void*data){
 if(!strcmp(q_subscribe, p->conn->name)){
 kore_log(LOG_INFO,green "it's subscribe result!" rst);
-char *name2;int i2,rows2;char* jobid;char*jdata;
+char *name2=NULL;int i2,rows2;char* jobid=NULL;char*jdata=NULL;
 rows2=kore_pgsql_ntuples(p);
 kore_log(LOG_INFO,yellow "rows2: %d" rst,rows2);
 // id | name | data
@@ -359,12 +370,13 @@ jdata=kore_pgsql_getvalue(p,i2,2);
 kore_log(LOG_INFO,green "jobid: %s" rst,jobid);
 kore_log(LOG_INFO,green "name2: %s" rst,name2);
 kore_log(LOG_INFO,green "jdata: %s" rst,jdata);
-struct boss_fail *boss=(struct boss_fail*)data;
-//struct boss_fail boss=data;
-boss->jobid=kore_strdup(jobid);
-// let's make an error into flow (fake)
-//1.pgsql,2.jobid string uuid,3.error string clarify if any,4.success string clarify if any
-//boss_done(p,jobid,"from c an error",NULL);
+boss_done(jobid,name2,jdata);
+struct boss_fail *bos=(struct boss_fail*)data;
+
+bos->jobid=kore_strdup(jobid);
+bos->name=kore_strdup(name2);
+bos->data=kore_strdup(data);
+
 }
 }else if(!strcmp(q_on_boss_job_fail,p->conn->name)){
 kore_log(LOG_INFO, green "it's a %s result occured!" rst, q_on_boss_job_fail);	
@@ -397,94 +409,111 @@ kore_log(LOG_INFO,green "result name: %s" rst,name);
 if(dame !=NULL)kore_log(LOG_INFO,green "result alt: %s" rst,dame);
 //kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,name,strlen(name),/*WEBSOCKET_BROADCAST_GLOBAL*/4);	
 kore_websocket_send(c,WEBSOCKET_OP_TEXT,name,strlen(name));
-//kore_pgsql_continue(p);	
-}
-}
-const char*das_boss_fail_query="WITH results AS ( \
-      UPDATE pgboss.job \
-      SET state = CASE \
-          WHEN retryCount < retryLimit \
-          THEN 'retry'::pgboss.job_state \
-          ELSE 'failed'::pgboss.job_state \
-          END,        \
-        completedOn = CASE \
-          WHEN retryCount < retryLimit \
-          THEN NULL \
-          ELSE now() \
-          END, \
-        startAfter = CASE \
-          WHEN retryCount = retryLimit THEN startAfter \
-          WHEN NOT retryBackoff THEN now() + retryDelay * interval '1' \
-          ELSE now() + \
-            ( \
-                retryDelay * 2 ^ LEAST(16, retryCount + 1) / 2 \
-                + \
-                retryDelay * 2 ^ LEAST(16, retryCount + 1) / 2 * random() \
-            ) \
-            * interval '1' \
-          END \
-      WHERE id = ANY($1) \
-        AND state < 'completed' \
-      RETURNING * \
-    ) \
-    INSERT INTO pgboss.job (name, data) \
-    SELECT \
-      name || '__state__completed', \
-      jsonb_build_object( \
-    'request', jsonb_build_object('id', id, 'name', name, 'data', data), \
-    'response', $2::jsonb, \
-    'state', state, \
-    'retryCount', retryCount, \
-    'createdOn', createdOn, \
-    'startedOn', startedOn, \
-    'completedOn', completedOn, \
-    'failed', CASE WHEN state = 'completed' THEN false ELSE true END \
-  ) \
-    FROM results \
-    WHERE state = 'failed' \
-      AND NOT name LIKE '%__state__completed' \
-    RETURNING 1";
 
-void boss_done(struct kore_pgsql*p,char*jobid,char*eri,char*erfolgi){
-	kore_log(LOG_INFO,green "entering boss done" rst);
-	if(jobid==NULL){kore_log(LOG_INFO,red "jobid is NULL! returning" rst); return;}
-if(eri !=NULL){
-if(erfolgi !=NULL)return;
+}
+}
+
+char*buildJsonCompletionObject(bool g){
+char*m;
+if(g){m="$2::jsonb";}else{m="null";}
+char*s="jsonb_build_object( \
+'request', jsonb_build_object('id', id, 'name', name, 'data', data), 'response', %s,'state', state, 'retryCount', retryCount, \
+'createdOn', createdOn,'startedOn', startedOn,'completedOn', completedOn, 'failed',CASE WHEN state='completed' THEN false ELSE true END)";
+struct kore_buf*buf;
+buf=kore_buf_alloc(128);
+kore_buf_appendf(buf,s,m);
+char*s1=kore_buf_stringify(buf,NULL);
+kore_free(buf);
+return s1;
+}
+
+const char*retryCompletedOnCase="CASE WHEN retryCount < retryLimit THEN NULL ELSE now() END";
+const char*retryStartAfterCase="CASE WHEN retryCount = retryLimit THEN startAfter WHEN NOT retryBackoff THEN now() \
++ retryDelay * interval '1' ELSE now() + (retryDelay * 2 ^ LEAST(16, retryCount + 1) / 2 + retryDelay * 2 ^ LEAST(16, retryCount + 1) / 2 * random() ) * interval '1' END";
+
+char*das_boss_fail_query(){
+struct kore_buf*buf;
+buf=kore_buf_alloc(128);
+char*s="WITH results AS (UPDATE pgboss.job SET state = CASE WHEN retryCount < retryLimit THEN 'retry'::pgboss.job_state \
+ELSE 'failed'::pgboss.job_state END,completedOn = %s ,startAfter = %s WHERE id = ANY($1) AND state < 'completed' RETURNING *) \
+INSERT INTO pgboss.job (name, data) SELECT name || '__state__completed', %s FROM results WHERE \
+state = 'failed' AND NOT name LIKE '%__state__completed' RETURNING 1";
+char *d=buildJsonCompletionObject(true);
+kore_buf_appendf(buf,s, retryCompletedOnCase, retryStartAfterCase,d);
+char*s1=kore_buf_stringify(buf,NULL);
+kore_free(buf);
+return s1;
+}
+
+
+char*completeJobsCommand (){
+char*s= "WITH results AS (UPDATE pgboss.job SET completedOn = now(), state = 'completed' WHERE id = ANY($1) AND state = 'active' \
+      RETURNING *) INSERT INTO pgboss.job (name, data) \
+    SELECT name || '__state__completed',%s FROM results WHERE name NOT LIKE '%__state__completed' RETURNING 1";
+char *d=buildJsonCompletionObject(true);
+struct kore_buf*buf;
+buf=kore_buf_alloc(128);
+kore_buf_appendf(buf,s,d);
+char*s1=kore_buf_stringify(buf,NULL);
+kore_free(buf);
+return s1;
+}
+
+void boss_done(char*jobid,char*name,char*data){
+kore_log(LOG_INFO,green "entering boss done" rst);
+if(jobid==NULL){kore_log(LOG_INFO,red "jobid is NULL! returning" rst); return;}
+
 kore_log(LOG_INFO,red "jobid in boss done: %s" rst,jobid);
-//kore_log(LOG_INFO,green "memo of pgsl: %p" rst, (void*)p);
+kore_log(LOG_INFO,green "***DATA: %s" rst, data);
+kore_log(LOG_INFO, green "*** name : %s ***" rst,name);
 
+//boss_job_fails(jobid,"some failure info");
+boss_job_complete(jobid,"some success info");
+}
 
+void boss_job_fails(char*jobid,char*fail){
 struct kore_pgsql*pgsql; 
 pgsql=kore_calloc(1,sizeof(*pgsql));
+if(pgsql == NULL)return;
 kore_pgsql_init(pgsql);
 kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
-
-
-
 struct kore_buf*b,*b1;
 b1=kore_buf_alloc(64);
 b=kore_buf_alloc(64);
-
-//const char*jobbi="jobbi";
-// id = ANY('{jobbi,fucker}')
-kore_buf_appendf(b1,"{\"%s\"}", jobid);
-
-
+// id = ANY('{jobbi}')
+kore_buf_appendf(b1,"{\"%s\"}",jobid);
 // response,$2::jsonb
-kore_buf_appendf(b,"{\"value\": \"%s\"}",eri);
+kore_buf_appendf(b,"{\"value\": \"%s\"}",fail);
 char*s1=kore_buf_stringify(b1,NULL);
 char *s=kore_buf_stringify(b,NULL);
 kore_log(LOG_INFO, red "BECOMING: %s" rst,s);
-//kore_log(LOG_INFO, red "BECOMING_s1: %s conn->name: %s" rst,s1,p->conn->name);
-db_query_params(pgsql,q_on_boss_job_fail,das_boss_fail_query,0,2,s1,strlen(s1),0,s,strlen(s),0);
-//kore_pgsql_continue(p);
+char*strquery=das_boss_fail_query();
+db_query_params(pgsql,q_on_boss_job_fail,strquery,0,2,s1,strlen(s1),0,s,strlen(s),0);
 kore_free(b1);
 kore_free(b);
-	
-}	
 }
 
-
+void boss_job_complete(char*jobid,char*success){
+struct kore_pgsql*pgsql; 
+pgsql=kore_calloc(1,sizeof(*pgsql));
+if(pgsql == NULL)return;
+kore_pgsql_init(pgsql);
+kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
+struct kore_buf*b,*b1;
+b1=kore_buf_alloc(64);
+b=kore_buf_alloc(64);
+// id = ANY('{jobbi}')
+kore_buf_appendf(b1,"{\"%s\"}",jobid);
+// response,$2::jsonb
+kore_buf_appendf(b,"{\"value\": \"%s\"}",success);
+char *s_jobid = kore_buf_stringify(b1,NULL);
+char *s_response = kore_buf_stringify(b,NULL);
+kore_log(LOG_INFO, red "BECOMING: %s" rst,s_jobid);
+char*strquery=completeJobsCommand();
+db_query_params(pgsql,q_on_boss_job_fail,strquery,0,2,s_jobid,strlen(s_jobid),0,s_response,strlen(s_response),0);
+kore_free(b1);
+kore_free(b);
+}
 
 int
 page(struct http_request *req)
