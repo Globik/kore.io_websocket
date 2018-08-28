@@ -18,13 +18,18 @@ const char*q_fucker="fucker";
 const char*q_subscribe="subscribe";
 const char*q_on_boss_job_fail="job_fails";
 
+const char*q_event1="q_event1";
+const char*q_event2="q_event2";
+const char*q_event3="q_event3";
+const char*q_event4="q_event4";
+
 struct boss_fail{
 char*jobid;	
 };
 
 struct kore_pgsql*for_fucker=NULL;// for listen notify
-struct kore_timer*tim=NULL;
-struct kore_pgsql*pgsql2=NULL;//for pgboss job scheduler
+struct kore_timer*tim,*tim1,*tim2,*tim3,*tim4=NULL;
+struct kore_pgsql*pgsql1=NULL;//for pgboss job scheduler
 
 void boss_done(struct kore_pgsql*,char*,char*,char*);//,jobid,eri,erfolgi
 
@@ -35,6 +40,11 @@ enum {
 static volatile sig_atomic_t blog_sig=-1;
 void signal_handler(int);
 void tick(void*,u_int64_t);
+
+void tick1(void*,u_int64_t);
+void tick2(void*,u_int64_t);
+void tick3(void*,u_int64_t);
+void tick4(void*,u_int64_t);
 
 int	page(struct http_request *);
 
@@ -87,50 +97,75 @@ if(for_fucker !=NULL){
 kore_pgsql_continue(for_fucker);
 for_fucker=NULL;
 }
-if(pgsql2 !=NULL){
-kore_pgsql_cleanup(pgsql2);
-pgsql2=NULL;
+if(pgsql1 !=NULL){
+kore_pgsql_cleanup(pgsql1);
+pgsql1=NULL;
 }
 }
 void kore_worker_configure(){
 	kore_log(LOG_INFO, red "enum wowa: %d" rst, WOWA);
 kore_log(LOG_INFO,"worker_configure\n");
 atexit(han);
-/*
- // it sucks, don't know how to properly  catch sigint to free some stuff
-struct sigaction sa;
-memset(&sa,0,sizeof(sa));
-sa.sa_handler=signal_handler;
-if(sigfillset(&sa.sa_mask)==-1)fatal("sigfillset: %s",errno_s);
-if(sigaction(SIGINT,&sa,NULL)==-1)fatal("sigaction: %s",errno_s);
-*/ 
-//(void)
 
 
-
+const char*db_url="dbname=postgres";
 
 kore_pgsql_register(q_name,"dbname=postgres");
 kore_pgsql_register("fucker","dbname=postgres");
 kore_pgsql_register(q_subscribe,"dbname=postgres");
 kore_pgsql_register(q_on_boss_job_fail,"dbname=postgres");
+
+kore_pgsql_register(q_event1, db_url);
+kore_pgsql_register(q_event2, db_url);
+kore_pgsql_register(q_event3, db_url);
+kore_pgsql_register(q_event4, db_url);
+
+/*
 struct kore_pgsql*pgsql; 
 pgsql=kore_calloc(1,sizeof(*pgsql));
 kore_pgsql_init(pgsql);
 kore_pgsql_bind_callback(pgsql, db_state_change, NULL);
 db_query(pgsql, q_fucker,"LISTEN revents;LISTEN on_coders");
 for_fucker=pgsql;
+*/
+struct boss_fail *boss=kore_calloc(1,sizeof(*boss));
+boss->jobid=NULL;
+
+pgsql1=kore_calloc(1,sizeof(*pgsql1));
+kore_pgsql_init(pgsql1);
+
+
+
+kore_pgsql_bind_callback(pgsql1, db_state_change, boss);
+
+tim=kore_timer_add(tick,1000,pgsql1,0);
+//u_int64_t mis=kore_time_ms();
+//printf("%" PRIu64 "\n",mis);
+//kore_log(LOG_INFO,green "ms: %" PRIu64 "" rst, mis);
+struct kore_pgsql*pgsql2,*pgsql3,*pgsql4,*pgsql5;
 
 pgsql2=kore_calloc(1,sizeof(*pgsql2));
 kore_pgsql_init(pgsql2);
-struct boss_fail *boss=kore_calloc(1,sizeof(*boss));
+kore_pgsql_bind_callback(pgsql2, db_state_change, NULL);
 
-boss->jobid=NULL;
-kore_pgsql_bind_callback(pgsql2, db_state_change, boss);
+pgsql3=kore_calloc(1,sizeof(*pgsql3));
+kore_pgsql_init(pgsql3);
+kore_pgsql_bind_callback(pgsql3, db_state_change, NULL);
 
-tim=kore_timer_add(tick,5000,pgsql2,0);
-u_int64_t mis=kore_time_ms();
-printf("%" PRIu64 "\n",mis);
-kore_log(LOG_INFO,green "ms: %" PRIu64 "" rst, mis);
+pgsql4=kore_calloc(1,sizeof(*pgsql4));
+kore_pgsql_init(pgsql4);
+kore_pgsql_bind_callback(pgsql4, db_state_change, NULL);
+
+pgsql5=kore_calloc(1,sizeof(*pgsql5));
+kore_pgsql_init(pgsql5);
+kore_pgsql_bind_callback(pgsql5, db_state_change, NULL);
+
+tim1=kore_timer_add(tick1,1002,pgsql2,0);
+tim2=kore_timer_add(tick2,1004,pgsql3,0);
+tim3=kore_timer_add(tick3,1006,pgsql4,0);
+tim4=kore_timer_add(tick4,1008,pgsql5,0);
+
+
 }
 
 void signal_handler(int sig){
@@ -157,6 +192,27 @@ db_query_params(p,q_subscribe,das_nextJob_query,0,2,s,strlen(s),0,limit_int,strl
 kore_free(b);
 }
 
+void tick1(void*unused, u_int64_t now){
+struct kore_pgsql*p=(struct kore_pgsql*)unused;
+if(p==NULL)return;
+db_query(p,q_event1,"select*from coders");
+}
+
+void tick2(void*unused, u_int64_t now){
+struct kore_pgsql*p=(struct kore_pgsql*)unused;
+if(p==NULL)return;
+db_query(p,q_event2,"select*from coders");
+}
+void tick3(void*unused, u_int64_t now){
+struct kore_pgsql*p=(struct kore_pgsql*)unused;
+if(p==NULL)return;
+db_query(p,q_event3,"select*from coders");
+}
+void tick4(void*unused, u_int64_t now){
+struct kore_pgsql*p=(struct kore_pgsql*)unused;
+if(p==NULL)return;
+db_query(p,q_event4,"select*from coders");
+}
 
 int init(int s){
 	
@@ -263,14 +319,14 @@ if(p->state==KORE_PGSQL_STATE_INIT){
 kore_log(LOG_INFO,"waiting for available pgsql connection");
 return;	
 }
-kore_log(LOG_INFO, red "err here" rst);
+kore_log(LOG_INFO, red "\n\n\nerr here in db_query\n\n\n" rst);
 kore_pgsql_logerror(p);
 return;	
 }
 kore_log(LOG_INFO,green "got pgsql connection" rst);
 if(!kore_pgsql_query(p,str_query))
 {
-kore_log(LOG_INFO,red "err here2" rst);
+kore_log(LOG_INFO,red "\n\n\nerr here_2\n\n\n\n" rst);
 kore_pgsql_logerror(p);
 return;	
 }
@@ -314,6 +370,14 @@ boss->jobid=kore_strdup(jobid);
 kore_log(LOG_INFO, green "it's a %s result occured!" rst, q_on_boss_job_fail);	
 int rows3=kore_pgsql_ntuples(p);
 kore_log(LOG_INFO,yellow "rows3: %d" rst,rows3);
+}else if(!strcmp(q_event1,p->conn->name)){
+	kore_log(LOG_INFO, green "*** RESULT EVENT1!!!!***" rst);
+}else if(!strcmp(q_event2,p->conn->name)){
+	kore_log(LOG_INFO, green "*** RESULT EVENT2 !!!!***" rst);
+}else if(!strcmp(q_event3,p->conn->name)){
+	kore_log(LOG_INFO, green "*** RESULT EVENT3 !!!!***" rst);
+}else if(!strcmp(q_event4,p->conn->name)){
+	kore_log(LOG_INFO, green "*** RESULT EVENT4 !!!!***" rst);
 }else{
 struct connection*c=(struct connection*)data;
 printf("entering into db_results()\n");
