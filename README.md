@@ -29,6 +29,14 @@ This is useful for handling ok's command or results at once after performing mul
 
 trying to implement authentication and authorization based on cookies and postgresql storage. 
 
+[list](https://github.com/Globik/kore.io_websocket/tree/master/list)
+
+Free BSD 10 queue.h
+
+Trying reimplement node.js event emitter based on it.
+
+And on [https://github.com/thlorenz/ee.c](https://github.com/thlorenz/ee.c)
+
 [template](https://github.com/Globik/kore.io_websocket/tree/master/template) - 
 
 Simple hardcoded html template rendering based on  kore_buf_appendf().
