@@ -11,7 +11,10 @@ typedef struct node
 } node_t;
 typedef TAILQ_HEAD(head_s, node) head_t;
 
-void fill_queue(head_t*head,const char*string){
+//TAILQ_HEAD(head_s,node) head_t=TAILQ_HEAD_INITIALIZER(head_t);
+//struct head_s*pu;
+
+void fill_queue( head_t*head,const char*string){
 int c=0;
 for(c=0;c<strlen(string);++c){
 	struct node*e=malloc(sizeof(struct node));

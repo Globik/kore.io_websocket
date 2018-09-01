@@ -1,0 +1,130 @@
+###########################
+WEBRTC peer-connection.exe 1
+Hello! Press 'Start' when you're ready.
+(index):150 Starting with role: Answering
+(index):150 Negotiation needed
+(index):150 Setting remote description
+(index):150 Remote description: RTCSessionDescription {type: "offer", sdp: "v=0
+↵o=- 360747372 1 IN IP4 127.0.0.1
+↵s=-
+↵t=0 0
+…sctp-dc
+↵a=sctpmap:5000 webrtc-datachannel 1024
+↵"}
+(index):150 Remote description complete
+(index):150  Creating answer
+(index):150 Local description: RTCSessionDescription {type: "answer", sdp: "v=0
+↵o=- 8850400171827061112 2 IN IP4 127.0.0.1
+↵s…sctp-dc
+↵a=sctpmap:5000 webrtc-datachannel 1024
+↵"}
+(index):150 ICE connection state: checking
+(index):150 ICE gathering state: gathering
+(index):150 Local ICE candidate: RTCIceCandidate {foundation: "2265994613", component: 1, protocol: "udp", priority: 2122260223, ip: "10.34.34.86", …}
+(index):150 ICE gathering state: complete
+(index):150 Local ICE candidate: null
+(index):150 Closing signalling channel
+(index):150 Local description complete
+(index):150 ICE connection state: connected
+(index):150 cat-noises open
+(index):150 cat-noises outgoing message (16384 bytes)
+(index):150 Incoming data channel: bear-noises
+(index):150 bear-noises open
+(index):150 cat-noises incoming message (8192 bytes)
+(index):150 dinosaur-noises open
+(index):150 dinosaur-noises outgoing message (16384 bytes)
+(index):150 bear-noises incoming message (16384 bytes)
+(index):150 bear-noises closed
+
+#########################
+
+FROM RIGHT
+
+###########################
+ICE connection state: disconnected 
+bear-noises closed 
+bear-noises incoming message (16384 bytes) 
+dinosaur-noises outgoing message (16384 bytes) 
+dinosaur-noises open 
+cat-noises incoming message (8192 bytes) 
+bear-noises open 
+Incoming data channel: bear-noises 
+cat-noises outgoing message (16384 bytes) 
+cat-noises open 
+ICE connection state: connected 
+Local description complete 
+Closing signalling channel 
+Local ICE candidate: null 
+ICE gathering state: complete 
+Local ICE candidate: {
+  "candidate": "candidate:2265994613 1 udp 2122260223 10.34.34.86 48361 typ host generation 0 ufrag vmKN network-id 1 network-cost 50",
+  "sdpMid": "rawrtc-sctp-dc",
+  "sdpMLineIndex": 0,
+  "usernameFragment": "vmKN"
+} 
+ICE gathering state: gathering 
+ICE connection state: checking 
+Local description: {
+  "type": "answer",
+  "sdp": "v=0\r\no=- 8850400171827061112 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE rawrtc-sctp-dc\r\na=msid-semantic: WMS\r\nm=application 9 DTLS/SCTP 5000\r\nc=IN IP4 0.0.0.0\r\nb=AS:30\r\na=ice-ufrag:vmKN\r\na=ice-pwd:bi+1Nl/ZtJBwRryYLzeGI6hp\r\na=ice-options:trickle\r\na=fingerprint:sha-256 03:AC:90:61:90:01:AE:05:DB:FF:A6:77:36:4B:76:EF:E0:36:1B:F1:E1:CD:EE:A1:38:10:03:55:C6:59:19:50\r\na=setup:active\r\na=mid:rawrtc-sctp-dc\r\na=sctpmap:5000 webrtc-datachannel 1024\r\n"
+} 
+ Creating answer 
+Remote description complete 
+Remote description: {
+  "type": "offer",
+  "sdp": "v=0\r\no=- 360747372 1 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE rawrtc-sctp-dc\r\na=msid-semantic: WMS\r\nm=application 29391 DTLS/SCTP 5000\r\nc=IN IP4 217.118.83.203\r\na=candidate:0a222256 1 udp 1 10.34.34.86 60089 typ host generation 0\r\na=candidate:d97653ca 1 udp 1 217.118.83.203 29391 typ srflx raddr 10.34.34.86 rport 60089 generation 0\r\na=ice-ufrag:MhRl5dXe3SfjNgBX\r\na=ice-pwd:TYFQAfm4kjfGxNPmUPewGKB8BKWnDwRi\r\na=ice-options:trickle\r\na=fingerprint:sha-256 5A:03:B2:AB:C5:8B:24:F1:5E:B3:B6:A3:7F:43:F4:86:0F:28:51:A7:C1:18:DB:97:94:74:30:A9:32:34:81:69\r\na=setup:actpass\r\na=mid:rawrtc-sctp-dc\r\na=sctpmap:5000 webrtc-datachannel 1024\r\n"
+} 
+Setting remote description 
+Negotiation needed 
+Starting with role: Answering 
+Hello! Press 'Start' when you're ready. 
+
+############################################
+
+From terminal console:
+
+##########################################
+
+[000000000] peer-connection-app: Init
+[000000601] helper-handler: (A) Negotiation needed
+[000000602] helper-handler: (A) ICE gatherer state: gathering
+[000000603] (A) ICE candidate: foundation=0a222256, protocol=udp, priority=1, ip=10.34.34.86, port=60089, type=host, tcp-type=n/a, related-address=n/a, related-port=0; URL: n/a; mid=rawrtc-sctp-dc, media_line_index=0, username_fragment=MhRl5dXe3SfjNgBX; enabled
+[000000603] helper-handler: (A) Signaling state change: have-local-offer
+[000001069] (A) ICE candidate: foundation=d97653ca, protocol=udp, priority=1, ip=217.118.83.203, port=29391, type=srflx, tcp-type=n/a, related-address=10.34.34.86, related-port=60089; URL: stun:stun1.l.google.com:19302; mid=rawrtc-sctp-dc, media_line_index=0, username_fragment=MhRl5dXe3SfjNgBX; enabled
+[000001070] ice-gatherer: TODO: Gather relay candidates using server 5.148.189.204:443 (turn:turn.threema.ch:443)
+[000001439] helper-common: (A) ICE gatherer last local candidate
+[000001439] peer-connection-app: Local Description:
+{"type":"offer","sdp":"v=0\r\no=sdpartanic-rawrtc-0.2.2 360747372 1 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=ice-options:trickle\r\na=group:BUNDLE rawrtc-sctp-dc\r\nm=application 9 DTLS\/SCTP 5000\r\nc=IN IP4 0.0.0.0\r\na=mid:rawrtc-sctp-dc\r\na=sendrecv\r\na=ice-ufrag:MhRl5dXe3SfjNgBX\r\na=ice-pwd:TYFQAfm4kjfGxNPmUPewGKB8BKWnDwRi\r\na=setup:actpass\r\na=fingerprint:sha-256 5A:03:B2:AB:C5:8B:24:F1:5E:B3:B6:A3:7F:43:F4:86:0F:28:51:A7:C1:18:DB:97:94:74:30:A9:32:34:81:69\r\na=tls-id:Lr6OUmkFsr4v0Y14oJcc7LLvaVGWoOE5\r\na=sctpmap:5000 webrtc-datachannel 65535\r\na=max-message-size:0\r\na=candidate:0a222256 1 udp 1 10.34.34.86 60089 typ host\r\na=candidate:d97653ca 1 udp 1 217.118.83.203 29391 typ srflx raddr 10.34.34.86 rport 60089\r\na=end-of-candidates\r\n"}
+[000001440] helper-handler: (A) ICE gatherer state: complete
+{"type":"answer","sdp":"v=0\r\no=- 8850400171827061112 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE rawrtc-sctp-dc\r\na=msid-semantic: WMS\r\nm=application 48361 DTLS/SCTP 5000\r\nc=IN IP4 10.34.34.86\r\nb=AS:30\r\na=candidate:2265994613 1 udp 2122260223 10.34.34.86 48361 typ host generation 0 network-id 1 network-cost 50\r\na=ice-ufrag:vmKN\r\na=ice-pwd:bi+1Nl/ZtJBwRryYLzeGI6hp\r\na=ice-options:trickle\r\na=fingerprint:sha-256 03:AC:90:61:90:01:AE:05:DB:FF:A6:77:36:4B:76:EF:E0:36:1B:F1:E1:CD:EE:A1:38:10:03:55:C6:59:19:50\r\na=setup:active\r\na=mid:rawrtc-sctp-dc\r\na=sctpmap:5000 webrtc-datachannel 1024\r\n"}
+[000150339] peer-connection-app: Applying remote description
+[000150341] helper-handler: (A) ICE transport state: checking
+[000150341] helper-handler: (A) Peer connection state change: connecting
+[000150360] helper-handler: (A) Signaling state change: stable
+[000150361] helper-handler: (A) ICE transport state: connected
+[000150383] helper-handler: (A) Peer connection state change: connected
+[000150406] helper-handler: (A) Data channel open: cat-noises
+[000150407] peer-connection-app: (A) Sending 8192 bytes
+[000150407] helper-handler: (A) Data channel open: bear-noises
+[000150438] helper-handler: (A) Data channel buffered amount low: cat-noises
+[000150438] helper-handler: (A) Data channel buffered amount low: bear-noises
+[000150457] helper-handler: (A) Incoming message for data channel cat-noises: 16384 bytes
+[000151430] helper-handler: (A) New data channel instance: dinosaur-noises
+[000151443] helper-handler: (A) Data channel buffered amount low: cat-noises
+[000151443] helper-handler: (A) Data channel buffered amount low: bear-noises
+[000151465] sctp-transport: No message handler, message of 16384 bytes has been discarded
+dd
+[000163665] helper-utils: 'type' missing
+[000163665] helper-utils: 'sdp' missing
+[000163665] peer-connection-app: Invalid remote description
+[000180407] peer-connection-app: (A) Sending 16384 bytes
+[000180408] peer-connection-app: (A) Closing channel
+[000180415] helper-handler: (A) Data channel buffered amount low: cat-noises
+[000180416] helper-handler: (A) Data channel buffered amount low: bear-noises
+
+^C[000538751] helper-handler: Got signal: 2, terminating...
+[000538751] helper-handler: (A) Signaling state change: closed
+[000538751] helper-handler: (A) Peer connection state change: closed
+[000538751] helper-handler: (A) Data channel closed: cat-noises
+[000538751] helper-handler: (A) Data channel closed: bear-noises
+
