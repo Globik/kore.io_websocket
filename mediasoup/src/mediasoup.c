@@ -274,15 +274,19 @@ kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 suka(chl);// it's a Loop loop(channel)
 m_destroy();
 kore_task_channel_write(t,"mama\0",5);
-kore_log(LOG_NOTICE,"Bye. *******\n");
+kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
 m_exit();
+//usleep(100000);
 kore_task_channel_write(t,"papa\0",5);
-
+//usleep(100000);
 //kore_log(LOG_NOTICE,"Bye. *******\n");
 return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
-if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");return;}
+if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");
+	//_exit(0);
+	return;
+	}
    u_int8_t buf[BUFSIZ];
    size_t len=kore_task_channel_read(t,buf,sizeof(buf));
    if(len>sizeof(buf)) kore_log(LOG_WARNING,"truncated data message from task.");
@@ -297,8 +301,8 @@ void m_init()
 	//rtc_room_classini
 }
 void m_exit(){
-usleep(100000);
-kore_log(LOG_INFO,"SUCCESS: And exit with success status.");
+//usleep(100000);
+//kore_log(LOG_INFO,"***SUCCESS: And exit with success status.");
 _exit(0);
 }
 void m_destroy(){

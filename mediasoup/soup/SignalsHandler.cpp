@@ -15,6 +15,7 @@ inline static void onSignal(uv_signal_t* handle, int signum)
 
 inline static void onClose(uv_handle_t* handle)
 {
+	printf("on close sig handler\n");
 	delete handle;
 }
 
@@ -53,7 +54,7 @@ void SignalsHandler::AddSignal(int signum, const std::string& name)
 void SignalsHandler::Destroy()
 {
 	MS_TRACE();
-
+printf("signal destroy\n");
 	for (auto uvHandle : uvHandles)
 	{
 		uv_close(reinterpret_cast<uv_handle_t*>(uvHandle), static_cast<uv_close_cb>(onClose));

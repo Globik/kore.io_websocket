@@ -35,6 +35,11 @@
 #include "RTC/TcpServer.hpp"
 #include "RTC/UdpSocket.hpp"
 #include "RTC/Room.hpp"
+
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
 struct media*medias=NULL;
 //ee_t*ee=NULL;
 //const char*event_hello="hello";
@@ -76,16 +81,12 @@ const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",
 void han(){
 //int rc=uv_callback_fire(&stop_worker,NULL,NULL);
 //kore_log(LOG_NOTICE,"rc stop_worker fire %d",rc);
-	if(atexit(han) !=0){
-printf("UNAIBLE SET THE ATEXIT33333333333333333333!!!!!!!!!!!\n");
-}
-usleep(20000);
-kore_log(LOG_NOTICE,"at exit han() ************************** 888888888888888888888888888885\n");
+
 kore_log(LOG_INFO,"AT EXIT ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 }
 void kore_worker_configure(){
 kore_log(LOG_NOTICE,"worker configure");
-atexit(han);
+//atexit(han);
 }
 void notify(struct media*m, char*s){}
 void on_new_Room(struct media*m, char*s){kore_log(LOG_INFO,"On new room event");}
@@ -101,9 +102,11 @@ if(medias==NULL){
 kore_log(LOG_INFO,"Media is NULL");	
 	//exit(1);
 }
+/*
 if(atexit(han) !=0){
 printf("UNAIBLE SET THE ATEXIT!!!!!!!!!!!\n");
 }
+*/ 
 return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
@@ -131,10 +134,10 @@ uv_stop(((uv_handle_t*)handle)->loop);
 return NULL;
 }
 void*on_from_cpp(uv_callback_t*handle,void*data){
-if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
+if(data==NULL){kore_log(LOG_INFO,red "DATA IS NULL!" rst);return NULL;}
 
 	//struct pupkin vasja=(struct pupkin)data;
-kore_log(LOG_INFO,"ON_FROM_CPP data came: %s",(char*)data);
+kore_log(LOG_INFO,green "ON_FROM_CPP data came: %s" rst,(char*)data);
 	
 //struct pupkin*vasja=(struct pupkin*)data;
 //kore_log(LOG_INFO,"ON_FROM_CPP data came: vasja->mu: %s int vasja->n: %d",vasja->suka,vasja->n);
@@ -157,7 +160,7 @@ if(!strcmp(s,"exit")){
 //if(!strcmp(s,"exit")){
 //free(s);
 pidor=1;
-printf("EXIT!!!\n");
+printf(red "EXIT!!!\n rst");
 //usleep(100000);
 uv_stop(get_loop());	
 	//free(vasja);
@@ -165,7 +168,7 @@ uv_stop(get_loop());
 	usleep(500000);
 	printf("should be after\n");
 	return NULL;
-}
+}else{printf(yellow "no exit\n" rst);}
 	//delete[] data;
 //	data=NULL;
 	//free((char*)data);
@@ -301,9 +304,10 @@ kore_log(LOG_INFO,"websocket disconnected: %p",c);
 
 int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
-if(atexit(han) !=0){
+/*if(atexit(han) !=0){
 printf("UNAIBLE SET THE ATEXIT!!!!!!!!!!!\n");
 }
+*/ 
 kore_task_channel_write(t,"mama\0",5);
 char*l_id = "345678";
 class_init();
@@ -329,14 +333,17 @@ set_loop_channel(channel);
 	//uv_run_loop(g
 m_destroy();
 	//uv_stop(get_loop());
-//kore_log(LOG_NOTICE,"Bye. *******\n");
+kore_log(LOG_NOTICE,"** Me Bye. *******\n");
 m_exit();
 
 
 return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
-if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");return;}
+if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");
+	//exit(0);
+	return;
+	}
    u_int8_t buf[BUFSIZ];
    size_t len=kore_task_channel_read(t,buf,sizeof(buf));
    if(len>sizeof(buf)) kore_log(LOG_WARNING,"truncated data message from task.");
@@ -358,9 +365,6 @@ rtc_srtp_session_class_init();
 rtc_room_class_init();
 }
 void m_exit(){
-	
-	 //atexit(han);
-//usleep(100000);
 kore_log(LOG_INFO,"SUCCESS: And exit with success status.");
 _exit(0);
 }
@@ -368,18 +372,18 @@ void m_destroy(){
 	usleep(100000);
 kore_log(LOG_INFO,"Destroy m_destroy().");
 rtc_dtls_transport_class_destroy();
-	kore_log(LOG_INFO,"De111111111111111111111");
+//	kore_log(LOG_INFO,"De111111111111111111111");
 utils_crypto_class_destroy();
-	kore_log(LOG_INFO,"De2222222222222");
+//	kore_log(LOG_INFO,"De2222222222222");
 class_destroy();
-	kore_log(LOG_INFO,"De3333333333333333333");
+	//kore_log(LOG_INFO,"De3333333333333333333");
 	
 depopenssl_class_destroy();//??
-	kore_log(LOG_INFO,"De4444444444444444444444");
+	//kore_log(LOG_INFO,"De4444444444444444444444");
 deplibsrtp_class_destroy();
-	kore_log(LOG_INFO,"Destroy m_destroy().555555555555555555555555555555555555");
+	//kore_log(LOG_INFO,"Destroy m_destroy().555555555555555555555555555555555555");
 if(medias !=NULL){j_refcount_dec(&medias->ref);}else{printf("MEDIAS IS NULL\n");}
-	kore_log(LOG_INFO,"Destroy m_destroy().6666666666666666666666666666666666");
+	kore_log(LOG_INFO,yellow "end of m_destroy" rst);
 }
 
 json_t *load_json(const char*text,size_t buflen){

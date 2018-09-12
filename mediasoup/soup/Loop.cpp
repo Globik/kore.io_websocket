@@ -74,10 +74,12 @@ std::printf("Loop::Close() entered.\n");
 		it = this->rooms.erase(it);
 		room->Destroy();
 	}
-
-	// the f knows why I do it explicitly. 
+if (this->channel != nullptr){
+	std::printf(" the f knows why I do it explicitly***\n"); 
 	this->channel->~UnixStreamSocket();
 	// Delete the Notifier.
+	//delete this->channel;
+	}
 	delete this->notifier;
 }
 

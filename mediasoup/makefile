@@ -1,6 +1,8 @@
 INC = -I ./soup/channel -I ./soup
-INC_CPPJSON=-I /home/globik/.local/share/Trash/files/deps.2/jsoncpp/jsoncpp/include
+#INC_CPPJSON=-I /home/globik/.local/share/Trash/files/deps.2/jsoncpp/jsoncpp/include
 # /home/globik/kore.io_websocket/uv3/libuv_callback.so
+# /home/globik/alikon/node_modules/mediasoup/worker/deps/jsoncpp/jsoncpp/include/json/json.h
+INC_CPPJSON=-I /home/globik/alikon/node_modules/mediasoup/worker/deps/jsoncpp/jsoncpp/include
 CBINC = -I /home/globik/kore.io_websocket/uv3
 I=$(INC) $(INC_CPPJSON) $(CBINC) `pkg-config --cflags libuv`
 CBLIB = -Wl,-rpath /home/globik/kore.io_websocket/uv3 -L /home/globik/kore.io_websocket/uv3 -luv_callback

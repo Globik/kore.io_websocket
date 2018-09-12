@@ -1,7 +1,9 @@
 #ifndef MS_DEP_LIBSRTP_HPP
 #define MS_DEP_LIBSRTP_HPP
 
-#include <srtp.h>
+//#include <srtp.h>
+#include "/home/globik/alikon/node_modules/mediasoup/worker/deps/openssl/openssl/ssl/srtp.h"
+
 #ifdef __cplusplus
 #include <vector>
 

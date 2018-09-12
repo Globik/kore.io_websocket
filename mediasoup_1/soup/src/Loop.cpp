@@ -44,6 +44,7 @@ Loop::~Loop()
 {
 	std::printf("look ma, ~Loop() destructor.\n");
 	MS_TRACE();
+	
 }
 
 void Loop::Close()
@@ -82,11 +83,13 @@ std::printf("ALREADY CLOSED\n");
 	//uv_stop(DepLibUV::GetLoop());
 	if (this->channel != nullptr){
 	//this->channel->Destroy();
-	std::printf("by me. the f knows why I do it explicitly.\n"); 
-		//this->channel->UserOnUnixStreamSocketClosed(false);
+	std::printf("*** by me. the f knows why I do it explicitly.FUCK fuck***\n"); 
+	this->channel->UserOnUnixStreamSocketClosed(false);
 		//usleep(1000000);
 	this->channel->~UnixStreamSocket();
+	
 	}
+
 }
 
 RTC::Room* Loop::GetRoomFromRequest(Channel::Request* request, uint32_t* roomId)
@@ -125,14 +128,14 @@ void Loop::OnSignal(SignalsHandler* /*signalsHandler*/, int signum)
 			MS_DEBUG_DEV("signal INT received, exiting");
 			std::printf("signal INT received, exiting.\n");
 		//	usleep(1000000);
-			usleep(100000);
+			//usleep(100000);
 			Close();
 			break;
 
 		case SIGTERM:
 			MS_DEBUG_DEV("signal TERM received, exiting");
 			std::printf("signal TERM received, exiting.\n");
-			usleep(100);
+			//usleep(100);
 			Close();
 			break;
 

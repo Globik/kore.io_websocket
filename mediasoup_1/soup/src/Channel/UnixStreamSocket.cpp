@@ -17,6 +17,7 @@
 #include <unistd.h> //usleep
 #include <memory.h>
 #include <string.h>
+//#include <uv.h>
 // ebm
 /*
 extern "C" {
@@ -81,31 +82,31 @@ std::printf("uv_callback_t &cb_result init: %d\n",rc);
 void on_walk(uv_handle_t*handle,void*arg){
 	std::printf("ON_WALK\n");
 //uv_close(handle,NULL);
+//uv closing or uv closed not 0, 8192, 6
+//ON_WALK
+//uv closing or uv closed not 0, 24576, 1
+
+//!(((handle)->flags & (UV_CLOSING | UV_CLOSED)) != 0)' failed.
+
+if(((handle)->flags) != 0){printf("uv closing or uv closed not 0, %d, %d\n",(handle)->flags,handle->type);}
+if((handle)->flags==8192){printf("flag close handle\n");uv_close(handle,NULL);}
+if((handle)->flags==24576){printf("flag close handle\n");uv_close(handle,NULL);}
 	uv_stop(DepLibUV::GetLoop());
-	//void*mother=uv_loop_get_data(DepLibUV::GetLoop());
-	//free(mother);
-	//uv_run(DepLibUV::GetLoop(),UV_RUN_DEFAULT);
 }
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-		//usleep(1000000);
 		//MS_TRACE_STD();
-	//	uv_stop(DepLibUV::GetLoop());
 		
 //int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
 //std::printf("uv_callback_t &from_cpp fire ON EXIT IN ~UnixStreamSocket: %d\n",r);
-	//usleep(100000);
-		//uv_stop(DepLibUV::GetLoop());
+
 		uv_walk(DepLibUV::GetLoop(),on_walk,NULL);
-		//uv_run(DepLibUV::GetLoop(),UV_RUN_DEFAULT);
 		void*mother=uv_loop_get_data(DepLibUV::GetLoop());
 	free(mother);
+	printf("LOOK MA ~unixstream socket!\n");
 		delete this->jsonReader;
 		delete this->jsonWriter;
-	//	delete this->channel;
-		//delete this;
-		//uv_stop(DepLibUV::GetLoop());
-		//usleep(1000000);
+	
 	}
 
 void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
@@ -439,10 +440,10 @@ std::string text2=(char*)data;
 		MS_TRACE_STD();
 std::printf("Entering ::UserOnUnixStreamSocketClosed(bool).\n");
 		this->closed = true;
-
+//this->listener->OnChannelUnixStreamSocketRemotelyClosed(this);
 		if (isClosedByPeer)
 		{
-			// Notify the listener.
+			std::printf("Notify the listener.\n");
 			this->listener->OnChannelUnixStreamSocketRemotelyClosed(this);
 		}
 	}

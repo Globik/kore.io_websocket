@@ -1,9 +1,12 @@
 # catch  gyp  jsoncpp  libsrtp  libuv  netstring  openssl
 #libjsoncpp.a    libopenssl.a  libuv.a           obj.target
 #libnetstring.a  libsrtp.a     mediasoup-worker
+#/home/globik/alikon/node_modules/mediasoup/worker/deps/openssl/openssl/ssl/srtp.h
+#/home/globik/alikon/node_modules/mediasoup/worker/deps/jsoncpp/jsoncpp/include/json/json.h
 
 D = -DMS_LITTLE_ENDIAN
-BASE_INC = /home/globik/.local/share/Trash/files/deps.2
+#BASE_INC = /home/globik/.local/share/Trash/files/deps.2
+BASE_INC =/home/globik/alikon/node_modules/mediasoup/worker/deps
 BASE_LIB_DIR = /home/globik/alikon/node_modules/mediasoup/worker/out/Release
 INC = -I ./include
 INC_JSONCPP=-I $(BASE_INC)/jsoncpp/jsoncpp/include
