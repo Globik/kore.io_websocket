@@ -22,7 +22,7 @@
 #include "Loop.hpp"
 #include "Channel/UnixStreamSocket.hpp"
 #include "Room.hpp"
-
+int my_test = 1;
 int init(int);
 int page(struct http_request*);
 int page2(struct http_request*);
@@ -101,54 +101,9 @@ return NULL;
 void*on_from_cpp(uv_callback_t*handle,void*data){
 if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
 
-	//struct pupkin vasja=(struct pupkin)data;
 kore_log(LOG_INFO,"ON_FROM_CPP data came: %s",(char*)data);
-	
-//struct pupkin*vasja=(struct pupkin*)data;
-//kore_log(LOG_INFO,"ON_FROM_CPP data came: vasja->mu: %s int vasja->n: %d",vasja->suka,vasja->n);
-//kore_log(LOG_INFO,"kor memm: %p",vasja);
-	//kore_log(LOG_INFO,"ADDITIES: %s and Size: %d",vasja->out,vasja->size);
-//kore_log(LOG_INFO,"FUKA: %s",vasja->fuka);
-//free(vasja->fuka);
-	//free(data);
-// should be came from libuv.cpp class. As a "notification" mechanism from libuv's world to the kore's world.
-// TODO: check if two way(bidirectional) communication callbacks are blocking each other in the libuv loop thread
-	
-//kore_log(LOG_NOTICE,"ON_FROM_CPP data came. %s\n",(char*)data);
-//char*s=vasja->suka;
-	char*s=(char*)data;
-//	kore_log(LOG_INFO,"MEMM of DATA: %p",(char*)data);
-//char*s=(char*)vasja->suka;
-//kore_log(LOG_INFO,"SUUUKA!: %s and: %zu",s,sizeof(vasja));
-if(!strcmp(s,"exit")){
-//if(!strcmp(s,"exit")){
-//free(s);
-printf("EXIT!!!\n");
-uv_stop(get_loopi());	
-	//free(vasja);
-	return NULL;
-}
-	//delete[] data;
-//	data=NULL;
-	//free((char*)data);
-	//data=NULL;
-	//free(data);
-	//data=NULL;
-	//kore_log(LOG_INFO,"After:: %s :: %p %s",data,data);
-	//free((void*)vasja->suka);
-	//free(s);
-	//s=0;
-	//if(vasja->n !=0){vasja->n=0;free(vasja->suka);vasja->suka=NULL;}
-	//free(vasja->out);
-	//free(vasja);
-	//free(data);
-	
-	//kore_log(LOG_INFO,"After kor memm: %p %zu",vasja,sizeof(struct pupkin));
-	
-	//kore_log(LOG_INFO,"After SUKA: %s",vasja->suka);
-	
+char*s=(char*)data;
 
-	//free((void*)vasja->mu);
 	
 json_t * duri=load_json_str(data);
 	if(duri){
@@ -170,12 +125,13 @@ kore_log(LOG_INFO,"SIZE: %d",size);
 
 //kore_log(LOG_INFO,"BUFFER JSON: %s",buf);
 kore_log(LOG_INFO,"Here must be kore_websocket_send();");
-kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
-//kore_log(LOG_INFO,"ADRESS OF VOID*DATA: %p OF (CHAR*)DATA: %p",data,(char*)data);
-if(duri)free(data);
+kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,/*WEBSOCKET_BROADCAST_GLOBAL*/59);
+
+//if(duri)free(data);
 data=NULL;
 
-return NULL;
+//return NULL;
+return "saka";
 }
 int page_ws_connect(struct http_request*req){
 kore_log(LOG_INFO,"path: %s, http_request: %p",req->path,req);
@@ -225,12 +181,18 @@ size_t size=json_dumpb(repli,NULL,0,0);
 	if(size==0)return;
 	char*buf=alloca(size);
 	size=json_dumpb(repli,buf,size,0);
-int rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
+	int rc;
+//rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
+//rc=uv_callback_fire(&to_cpp,"{\"me\":\"too\"}", NULL);
+char*resp=NULL;
+
+ rc=uv_callback_fire_sync(&to_cpp,"{\"data\":\"too\"}",(void**)&resp,10000);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
+kore_log(LOG_INFO,"The result is: %s",resp);
 send_to_clients=1;
 }else if(!strcmp(type_str,"delete_room")){
 kore_log(LOG_INFO,"type 'delete_room'");
-char*d="{\"id\":3444444333,\"method\":\"room.close\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
+char*d="{\"id\":3444444333,\"method\":\"room.close\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}\0xe0";
 
 int rc=uv_callback_fire(&to_cpp,(void*)d, NULL);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);

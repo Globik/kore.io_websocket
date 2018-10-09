@@ -47,7 +47,7 @@ namespace Channel
 
 		/* Pure virtual methods inherited from ::UnixStreamSocket. */
 	public:
-		void UserOnUnixStreamRead(char*k);// override;
+		void UserOnUnixStreamRead(void*data);// override;
 		void UserOnUnixStreamSocketClosed(bool isClosedByPeer);//override;
 char * me{nullptr};
 		void bfree();

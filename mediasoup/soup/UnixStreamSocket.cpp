@@ -40,9 +40,9 @@ namespace Channel
 		//uv_loop_set_data(mloop,(void*)"some_data");
 		uv_loop_set_data(mloop,(void*)this);
 		
-int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_COALESCE);
+int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT);
 		std::printf("uv_callback_t &to_cpp init: %d\n",rc);
-rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
+rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 		std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 		//rc=uv_callback_init(mloop,&stop_w,UnixStreamSocket::close_work,UV_DEFAULT);
 		//std::printf("dummy uv_callback_t stop_w init: %d\n",rc);
@@ -75,46 +75,57 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp,UV_DEFAULT);
 			this->jsonWriter = builder.newStreamWriter();
 		}
 	}
-
+void on_walk(uv_handle_t*handle, void * arg){
+/*
+signal destroy
+ 24576 1
+ 8192 6
+ 24576 1
+ 8193 16
+*/
+if(((handle)->flags) !=0){
+printf(" %d %d\n",(handle)->flags, handle->type);
+if((handle)->flags==8192){		
+uv_close(handle,NULL);
+}
+if((handle)->flags==24576){uv_close(handle,NULL);}
+}
+uv_stop(deplibuv::getloop());	
+}
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-		//const 
-		//char*exi="exit";
-		//mili->suka=(void*)exi;
-		/*struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
-		if(mili==NULL){std::printf("mili is nULL\n");}
-		mili->n=0;
-		mili->suka=(char*)"exit";
-		*/
-		int r=uv_callback_fire(&from_cpp,(void*)"exit",NULL);
-		//int r=uv_callback_fire(&from_cpp,mili,NULL);
-		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-		//std::printf("MEMM of in destructor: %p\n",mili);
-MS_TRACE_STD();
+		
 	
+MS_TRACE_STD();
+	uv_walk(deplibuv::getloop(), on_walk,NULL);
+	void * motherdata=uv_loop_get_data(deplibuv::getloop());
+	free(motherdata);
 std::printf("Look ma, ~UnixStreamSocket() destructor!\n");
-		//delete mili;
+
 		delete this->jsonReader;
 		delete this->jsonWriter;
-		//delete mili;
 	}
-/*
-void * UnixStreamSocket::close_work(uv_callback_t*callback,void*data){
-	std::printf("on stop work occured\n");
-uv_stop(((uv_handle_t*)callback)->loop);
-	return nullptr;
-}
-*/
+
 	
 void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
 {
-	
+	if(data==NULL)return nullptr;
 std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
 	//char * gu=(char*)((uv_handle_t*)callback)->loop->data;
 void*bu=uv_loop_get_data(deplibuv::getloop());
 	//static_cast<UnixStreamSocket*>(bu)->listener->mfuck();
 	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
-	static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead((char*)data);
+	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead(data);
+	
+	//for test
+	
+	int r=uv_callback_fire(&from_cpp,(void*)"{\"test_test_test\":\"aha\"}",NULL);
+	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+	
+	
+	//end for test
+	
+	
 return nullptr;
 }
 
@@ -327,14 +338,16 @@ std::printf("Entering UnixStreamSocket::SendBinary(const uint8_t* nsPayload, siz
 		//Write((const uint8_t*)"papa\0", 5);
 	}
 
-void UnixStreamSocket::UserOnUnixStreamRead(char* k)
+void UnixStreamSocket::UserOnUnixStreamRead(void*data)
 	{
 MS_TRACE_STD();
-std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",k);
+std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",(char*)data);
 //this->listener->mfuck();
 // Be ready to parse more than a single message in a single TCP chunk.
 std::string text="{\"mama\":\"papa\"}";
-std::string text2=k;
+std::string text2=(char*)data;
+free(data);
+data=NULL;
 		
 	//	while (true){
 			//if (IsClosing())return;
