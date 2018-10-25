@@ -115,12 +115,12 @@ std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)da
 void*bu=uv_loop_get_data(deplibuv::getloop());
 	//static_cast<UnixStreamSocket*>(bu)->listener->mfuck();
 	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
-	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead(data);
+	static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead(data);
 	
 	//for test
 	
-	int r=uv_callback_fire(&from_cpp,(void*)"{\"test_test_test\":\"aha\"}",NULL);
-	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+	//int r=uv_callback_fire(&from_cpp,(void*)"{\"test_test_test\":\"aha\"}",NULL);
+	//std::printf("uv_callback_t &from_cpp fire: %d\n",r);
 	
 	
 	//end for test

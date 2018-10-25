@@ -22,6 +22,9 @@
 #include "Loop.hpp"
 #include "Channel/UnixStreamSocket.hpp"
 #include "Room.hpp"
+
+#include "soup_server.h"
+
 int my_test = 1;
 int init(int);
 int page(struct http_request*);
@@ -127,7 +130,7 @@ kore_log(LOG_INFO,"SIZE: %d",size);
 kore_log(LOG_INFO,"Here must be kore_websocket_send();");
 kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,/*WEBSOCKET_BROADCAST_GLOBAL*/59);
 
-//if(duri)free(data);
+if(duri)free(data);
 data=NULL;
 
 //return NULL;
@@ -182,13 +185,13 @@ size_t size=json_dumpb(repli,NULL,0,0);
 	char*buf=alloca(size);
 	size=json_dumpb(repli,buf,size,0);
 	int rc;
-//rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
+rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
 //rc=uv_callback_fire(&to_cpp,"{\"me\":\"too\"}", NULL);
 char*resp=NULL;
 
- rc=uv_callback_fire_sync(&to_cpp,"{\"data\":\"too\"}",(void**)&resp,10000);
-kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
-kore_log(LOG_INFO,"The result is: %s",resp);
+//rc=uv_callback_fire_sync(&to_cpp,"{\"data\":\"too\"}",(void**)&resp,10000);//no effect with result
+//kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
+//kore_log(LOG_INFO,"The result is: %s",resp);
 send_to_clients=1;
 }else if(!strcmp(type_str,"delete_room")){
 kore_log(LOG_INFO,"type 'delete_room'");
