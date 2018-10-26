@@ -36,6 +36,9 @@ void * stop_worker_cb(uv_callback_t*,void*);
 //void * on_bus(uv_callback_t*, void*);
 void * on_from_cpp(uv_callback_t*,void*);
 
+void connection_del(struct connection*);
+void we_can_work_it_out(struct soup*,void*);
+
 void han(void);
 
 void m_init(void);
@@ -51,6 +54,8 @@ json_t *load_json_str(const char*);
 
 
 struct kore_task pipe_task;
+
+struct server*md_server=NULL;
 
 struct pizda{
 char*msg;
@@ -75,6 +80,7 @@ if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 kore_task_create(&pipe_task,libuv_task);
 kore_task_bind_callback(&pipe_task, pipe_data_available);
 kore_task_run(&pipe_task);
+
 return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
@@ -101,6 +107,7 @@ uv_stop(((uv_handle_t*)handle)->loop);
 // s
 return NULL;
 }
+/*
 void*on_from_cpp(uv_callback_t*handle,void*data){
 if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
 
@@ -128,7 +135,7 @@ kore_log(LOG_INFO,"SIZE: %d",size);
 
 //kore_log(LOG_INFO,"BUFFER JSON: %s",buf);
 kore_log(LOG_INFO,"Here must be kore_websocket_send();");
-kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,/*WEBSOCKET_BROADCAST_GLOBAL*/59);
+kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
 
 if(duri)free(data);
 data=NULL;
@@ -136,6 +143,7 @@ data=NULL;
 //return NULL;
 return "saka";
 }
+*/
 int page_ws_connect(struct http_request*req){
 kore_log(LOG_INFO,"path: %s, http_request: %p",req->path,req);
 kore_websocket_handshake(req,"websocket_connect","websocket_message","websocket_disconnect");
@@ -152,6 +160,28 @@ if(size==0) return;
 char *buf=alloca(size);
 size=json_dumpb(reply,buf,size,0);
 kore_websocket_send(c,1,buf,size);
+struct soup*soupi=kore_calloc(1, sizeof(*soupi));
+if(soupi==NULL){kore_log(LOG_INFO, "soupi is NULL");}
+soup_init(soupi, md_server);//?
+c->disconnect=connection_del;
+c->state=CONN_STATE_ESTABLISHED;
+soup_bind_callback(soupi, we_can_work_it_out, c);
+c->hdlr_extra=soupi;
+int ra=make_room(soupi,"make_room");
+printf("make room: %d\n", ra);
+}
+void connection_del(struct connection*c){
+	kore_log(LOG_INFO,"connection_del() occured.");
+	if(c->hdlr_extra !=NULL)
+	{
+		//free soupi
+		kore_free(c->hdlr_extra);
+	c->hdlr_extra=NULL;
+}
+}
+void we_can_work_it_out(struct soup *soupi,void *arg){
+kore_log(LOG_INFO,"we_can_work_it_out() occured.");
+	
 }
 void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
 if(data==NULL)return;
@@ -192,6 +222,16 @@ char*resp=NULL;
 //rc=uv_callback_fire_sync(&to_cpp,"{\"data\":\"too\"}",(void**)&resp,10000);//no effect with result
 //kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 //kore_log(LOG_INFO,"The result is: %s",resp);
+
+
+
+
+
+
+
+
+
+
 send_to_clients=1;
 }else if(!strcmp(type_str,"delete_room")){
 kore_log(LOG_INFO,"type 'delete_room'");
@@ -236,10 +276,12 @@ usleep(1000);
  rc=uv_callback_fire(&to_cpp,(void*)d, NULL);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 	*/
+md_server=server_new();
 suka(chl);// it's a Loop loop(channel)
 m_destroy();
 kore_task_channel_write(t,"mama\0",5);
 kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
+if(md_server){md_server->destroy(md_server);}
 m_exit();
 //usleep(100000);
 kore_task_channel_write(t,"papa\0",5);

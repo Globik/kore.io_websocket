@@ -13,16 +13,17 @@ LIST_HEAD(,db) strings;
 	
 static void channel_send(struct channel*, char*,on_ersti_cb);
 static void invoke_for_dummy(struct channel*);
-static void on_erst_data(void*);
+//static void on_erst_data(void*);
 static const char*erste_data="erste_data";
 static const char*zweite_data="zweite_data";
 
+/*
 unsigned long time_ms(void){
 struct timespec tp;
 clock_gettime(CLOCK_MONOTONIC, &tp);
 return (tp.tv_sec*1000+tp.tv_nsec/1000000);	
 }
-
+*/
 
 
 struct channel*channel_new(){
@@ -38,13 +39,18 @@ return ch;
 
 void channel_send(struct channel*ch, char*str,on_ersti_cb ersti_cb){
 printf("channel_send occured\n");
-unsigned long start=time_ms();
-long timeout=3000;
+//unsigned long start=time_ms();
+//long timeout=3000;
 //ee_once(ch->ee, erste_data, on_erst_data);
 ch->on_ersti=ersti_cb;
 //method to store - str or number code
 // if str==create_room code 1
 // or if code==1 "create_room"
+char*mumu="{\"a\":\"b\"}";
+char *dubu=strdup(mumu);
+int rc=uv_callback_fire(&to_cpp,(void*)dubu, NULL);
+printf("fire to_cpp: %d\n", rc);
+
 
 struct db*db;
 db=malloc(sizeof(struct db));
@@ -55,9 +61,9 @@ db->cb=NULL;//ersti_cb;
 db->cb=ch;
 LIST_INSERT_HEAD(&strings,db,rlist);
 //sleep(5);
-if((time_ms()-start) > timeout){printf("TIMEOUT_FAILED\n");}
+//if((time_ms()-start) > timeout){printf("TIMEOUT_FAILED\n");}
 
-invoke_for_dummy(ch);
+//invoke_for_dummy(ch);
 }
 /*
 void ersti_cb(struct channel*ch, char*str){
@@ -102,4 +108,12 @@ LIST_REMOVE(du,rlist);
 if(du->name){printf("check du->name: %s\n",du->name);free(du->name);}
 free(du);	
 }
+}
+
+void * on_from_cpp(uv_callback_t*handle,void*data){
+if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
+kore_log(LOG_INFO,"ON_FROM_CPP data came: %s",(char*)data);
+char*s=(char*)data;
+free(data);
+return "a";
 }
