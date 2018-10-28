@@ -7,7 +7,7 @@
 const char*zweite_data="zweite_data";
 static void closi(struct server*);
 
-int create_room(struct server*,int);
+int create_room(struct server*, int, struct soup*);
 void on_zweite_data(void*);
 int on_funi(void *);
 void md_destroy(struct server*);
@@ -18,13 +18,14 @@ printf("on_funi=> %s\n", (char*)s);
 //instance for room: room_on_close, on_new_listener
 return 0;	
 }
-
+/*
 void on_zweite_data(void*data){
 printf("on_zweite_data: %s\n",(char*)data);
 //here create a room instance
 on_funi("me too");//??
 }
-
+*/
+/*
 void ersti_cb(struct channel*ch, void*str){
 printf("ersti cb occured.\n");
 struct responsi *resp=(struct responsi*)str;
@@ -32,11 +33,13 @@ printf("here data: %s\n",(char*)resp->data);
 //ch->on_ersti=NULL;
 on_funi(resp->data);
 }
-
-int create_room(struct server * server, int a){
+*/
+int create_room(struct server * serv, int a, struct soup* soupi){
 printf("in create_room()\n");
-//ee_once(server->ch->ee, zweite_data, on_zweite_data);//on accepted with data if any, rejected
-server->ch->request(server->ch,"create_room", ersti_cb);
+//ee_once(server->ch->ee, zweite_data, on_zweite_data);//on .  a ccepted with data if any, rejected
+serv->name=strdup("worker.createRoom");//??
+
+serv->ch->request(serv->ch, "create_room", soupi);
 return 0;
 }
 
@@ -45,8 +48,10 @@ ee_emit(server->ee, str, data);
 }
 
 void md_destroy(struct server*serv){
-	printf("md_destroy occured\n");
+	printf("md_destroy occured for mediasoup client.\n");
 	if(serv->ee)ee_destroy(serv->ee);
+	if(serv->ch){printf("looks like serv->ch still there\n");free(serv->ch);serv->ch=NULL;}
+	if(serv->name){printf("looks like serv->name still there.\n");free(serv->name);serv->name=NULL;}
 	free(serv);
 }
 
@@ -67,6 +72,7 @@ return NULL;
 }
 obj->ch->ee=obj->ee;
 obj->emit=emiti;
+obj->name=NULL;
 obj->close=closi;
 obj->create_room = create_room;
 obj->destroy=md_destroy;
@@ -84,17 +90,19 @@ void soup_init(struct soup*s,struct server*serv){
 memset(s, 0, sizeof(*s));
 s->state=0;	
 s->conn=serv;
+s->name=NULL;
 }
-void soup_bind_callback(struct soup*s, void (*cb)(struct soup*,void*),void*arg){
+void soup_bind_callback(struct soup*soupi, void (*cb)(struct soup*,void*),void*arg){
 //if(s->cb !=NULL) //fatal error : already bound
-s->cb=cb;
-s->arg=arg;
+soupi->cb=cb;
+soupi->arg=arg;
 }
 int make_room(struct soup*soupi, char*method){
 if(!soupi)return 0;
 if(!method)return 0;
 if(soupi->conn==NULL) return 0;	
-soupi->conn->create_room(soupi->conn,2);
+soupi->name=strdup("worker.createRoom");
+soupi->conn->create_room(soupi->conn, 2, soupi);
 return 1;
 }
 

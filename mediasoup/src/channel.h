@@ -1,14 +1,14 @@
 #pragma once
 #include "soup_server.h"
 #include "uv_callback.h"
-struct channel;
+//struct channel;
 //typedef void(*on_ersti_cb)(struct channel*,void*);
-typedef void(*on_channel_send)(struct channel*, char*, on_ersti_cb);
-
+//typedef void(*on_channel_send)(struct channel*, char*, on_ersti_cb);//d
+struct soup;
 struct channel{
 ee_t*ee;
-on_channel_send request;
-on_ersti_cb on_ersti;
+void (*request)(struct channel*,char*,struct soup*);
+//on_ersti_cb on_ersti;
 
 };
 struct channel * channel_new(void);

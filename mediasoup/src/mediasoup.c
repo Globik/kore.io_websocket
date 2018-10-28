@@ -25,6 +25,12 @@
 
 #include "soup_server.h"
 
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
+
+
 int my_test = 1;
 int init(int);
 int page(struct http_request*);
@@ -217,7 +223,7 @@ size_t size=json_dumpb(repli,NULL,0,0);
 	int rc;
 rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
 //rc=uv_callback_fire(&to_cpp,"{\"me\":\"too\"}", NULL);
-char*resp=NULL;
+//char*resp=NULL;
 
 //rc=uv_callback_fire_sync(&to_cpp,"{\"data\":\"too\"}",(void**)&resp,10000);//no effect with result
 //kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
@@ -264,7 +270,7 @@ kore_task_channel_write(t,"mama\0",5);
 class_init();
 void*chl=set_channel();
 m_init();
-int rc;
+//int rc;
 //char*s="{\"mama\":\"papa\"}";
 	/*
 char*s="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
@@ -277,14 +283,16 @@ usleep(1000);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 	*/
 md_server=server_new();
+if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
 suka(chl);// it's a Loop loop(channel)
 m_destroy();
 kore_task_channel_write(t,"mama\0",5);
 kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
-if(md_server){md_server->destroy(md_server);}
+if(md_server){md_server->destroy(md_server);md_server=NULL;}
+kore_task_channel_write(t,"papa\0",5);
 m_exit();
 //usleep(100000);
-kore_task_channel_write(t,"papa\0",5);
+
 //usleep(100000);
 //kore_log(LOG_NOTICE,"Bye. *******\n");
 return (KORE_RESULT_OK);
