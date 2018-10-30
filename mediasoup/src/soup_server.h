@@ -38,7 +38,8 @@ struct server*conn;
 int state;
 char*name;
 void *arg;
-void (*cb)(struct soup *, void*);	
+void (*cb)(struct soup *, void*);
+char*result;	
 };
 
 struct server *server_new(void);

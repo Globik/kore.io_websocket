@@ -90,7 +90,8 @@ void soup_init(struct soup*s,struct server*serv){
 memset(s, 0, sizeof(*s));
 s->state=0;	
 s->conn=serv;
-s->name=NULL;
+//s->name=NULL;
+//s->result=NULL;
 }
 void soup_bind_callback(struct soup*soupi, void (*cb)(struct soup*,void*),void*arg){
 //if(s->cb !=NULL) //fatal error : already bound
@@ -98,10 +99,12 @@ soupi->cb=cb;
 soupi->arg=arg;
 }
 int make_room(struct soup*soupi, char*method){
+	printf("make room occured.\n");
 if(!soupi)return 0;
 if(!method)return 0;
 if(soupi->conn==NULL) return 0;	
 soupi->name=strdup("worker.createRoom");
+
 soupi->conn->create_room(soupi->conn, 2, soupi);
 return 1;
 }

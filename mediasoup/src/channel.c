@@ -14,7 +14,7 @@ LIST_HEAD(,db) strings;
 	
 static void channel_send(struct channel*, char*,struct soup*/*,on_ersti_cb*/);
 //static void invoke_for_dummy(struct channel*);
-static void invoke_for_dummy(void);
+static void invoke_for_dummy(char*);
 //static void on_erst_data(void*);
 //static const char*erste_data="erste_data";
 //static const char*zweite_data="zweite_data";
@@ -37,8 +37,8 @@ printf("channel_send occured\n");
 
 char*mumu="{\"a\":\"b\"}";
 char *dubu=strdup(mumu);
-int rc=uv_callback_fire(&to_cpp,(void*)dubu, NULL);
-printf("fire to_cpp: %d\n", rc);
+//int rc=uv_callback_fire(&to_cpp,(void*)dubu, NULL);
+//printf("fire to_cpp: %d\n", rc);
 
 
 struct db*db;
@@ -48,8 +48,13 @@ if(db==NULL){printf("db is null, memory fails\n");}
 //db->name=strdup("worker.createRoom");
 db->a=77;
 db->soupi=NULL;
+//soupi->result=NULL;
 db->soupi=soupi;
+
 LIST_INSERT_HEAD(&strings,db,rlist);
+int rc=uv_callback_fire(&to_cpp,(void*)dubu, NULL);
+printf("fire to_cpp: %d\n", rc);
+
 
 //invoke_for_dummy(ch);
 }
@@ -67,7 +72,7 @@ printf("here data: %s\n",(char*)resp->data);
 //ee_emit(resp->ch->ee, zweite_data, "accepted with data if any");
 }
 */
-void invoke_for_dummy(/*struct channel*ch*/){
+void invoke_for_dummy(/*struct channel*ch*/char*data){
 	printf("invoke_for_dummy occured.\n");
 //struct responsi resp;
 //resp.ch=ch;
@@ -76,36 +81,58 @@ void invoke_for_dummy(/*struct channel*ch*/){
 //ch->on_ersti=NULL;
 //ee_emit(ch->ee, erste_data, (void*)&resp);
 struct db *du=NULL; 
-//struct db*dtmp;
-LIST_FOREACH(du,&strings,rlist){
+struct db*dtmp;
+/*
+LIST_FOREACH(du, &strings, rlist){
 printf("foreach_1 : %d\n", du->a);	
 //if(!strcmp(du->name,"vadik"))du->cb->on_ersti(ch,(void*)&resp);
 if(du->a==77){
 if(du->soupi){
 printf("there is a du->soupi\n");
-if(du->soupi->cb)du->soupi->cb(du->soupi, du->soupi->arg);	
+if(du->soupi->cb){
+//du->soupi->result=data;	// crash
+printf("making callback for work it out.\n");du->soupi->cb(du->soupi, du->soupi->arg);	}
 }
 }
 }
-/*
+*/
+printf("ANY DATA? %s\n",data);
 for(du=LIST_FIRST(&strings); du !=NULL; du=dtmp){
 	dtmp=LIST_NEXT(du,rlist);
+	printf("within LIST_FIRST\n");
 	//du->a=88;
 	//free(du->name);
 	//du->name=strdup("suchara");
+	
+	
+if(du->a==77){
+if(du->soupi){
+printf("there is a du->soupi\n");
+if(du->soupi->cb){
+du->soupi->result=data;	
+if(du->soupi->arg)printf("ok for du->soupi->arg\n");
+if(du->soupi->cb)printf("ok for du->soupi->cb\n");
+printf("making callback for work it out.\n");du->soupi->cb(du->soupi, du->soupi->arg);	}
+}
+}
+
+	
 	}
-	*/ 
+	
+	/*
 LIST_FOREACH(du,&strings,rlist){
 printf("foreach_2  : %d\n", du->a);	
 }
 
-
+*/
 
 
 while(!LIST_EMPTY(&strings)){
+	printf("within list_empty for &strings\n");
 du=LIST_FIRST(&strings);
-LIST_REMOVE(du,rlist);
+LIST_REMOVE(du, rlist);
 //if(du->name){printf("check du->name: %s\n",du->name);free(du->name);}
+//du->soupi=NULL;
 free(du);	
 }
 }
@@ -114,8 +141,8 @@ void * on_from_cpp(uv_callback_t*handle, void*data){
 if(data==NULL){printf("DATA IS NULL!\n");return NULL;}
 printf("ON_FROM_CPP data came: %s \n",(char*)data);
 
-char*s=(char*)data;
-invoke_for_dummy();
-free(s);
+//char*s=(char*)data;
+invoke_for_dummy(data);
+//free(s);
 return "a";
 }

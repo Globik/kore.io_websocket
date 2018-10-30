@@ -76,6 +76,7 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 		}
 	}
 void on_walk(uv_handle_t*handle, void * arg){
+	printf("on_walk unixstream socket\n");
 /*
 signal destroy
  24576 1
@@ -83,6 +84,7 @@ signal destroy
  24576 1
  8193 16
 */
+/*
 if(((handle)->flags) !=0){
 printf(" %d %d\n",(handle)->flags, handle->type);
 if((handle)->flags==8192){		
@@ -90,6 +92,7 @@ uv_close(handle,NULL);
 }
 if((handle)->flags==24576){uv_close(handle,NULL);}
 }
+*/ 
 uv_stop(deplibuv::getloop());	
 }
 	UnixStreamSocket::~UnixStreamSocket()
