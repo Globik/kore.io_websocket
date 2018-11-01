@@ -96,7 +96,7 @@ printf("making callback for work it out.\n");du->soupi->cb(du->soupi, du->soupi-
 }
 }
 */
-printf("ANY DATA? %s\n",data);
+printf("ANY DATA? %s [%s]\n",data,__FILE__);
 for(du=LIST_FIRST(&strings); du !=NULL; du=dtmp){
 	dtmp=LIST_NEXT(du,rlist);
 	printf("within LIST_FIRST\n");
@@ -109,7 +109,7 @@ if(du->a==77){
 if(du->soupi){
 printf("there is a du->soupi\n");
 if(du->soupi->cb){
-du->soupi->result=data;	
+du->soupi->result=strdup(data);	
 if(du->soupi->arg)printf("ok for du->soupi->arg\n");
 if(du->soupi->cb)printf("ok for du->soupi->cb\n");
 printf("making callback for work it out.\n");du->soupi->cb(du->soupi, du->soupi->arg);	}
@@ -143,6 +143,6 @@ printf("ON_FROM_CPP data came: %s \n",(char*)data);
 
 //char*s=(char*)data;
 invoke_for_dummy(data);
-//free(s);
+free(data);
 return "a";
 }

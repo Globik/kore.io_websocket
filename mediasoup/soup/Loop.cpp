@@ -13,6 +13,11 @@
 #include <string>
 #include <utility> // std::pair()
 #include <unistd.h>//usleep
+
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
 /* Instance methods. */
 
 Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
@@ -30,17 +35,17 @@ Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
 	this->signalsHandler = new SignalsHandler(this);
 //this->closed=0;
 	// Add signals to handle.
-	this->signalsHandler->AddSignal(SIGINT, "INT");
-	this->signalsHandler->AddSignal(SIGTERM, "TERM");
+	//this->signalsHandler->AddSignal(SIGINT, "INT");
+	//this->signalsHandler->AddSignal(SIGTERM, "TERM");
 
 	std::printf("Hello libuv's loop!\n");
 	deplibuv::runloop();
-std::printf("Good bye, libuv's loop!\n");
+std::printf(green "Good bye, libuv's loop!\n" rst);
 }
 
 Loop::~Loop()
 {
-	std::printf("Look ma, ~Loop() destructor.\n");
+	std::printf(yellow "Look ma, ~Loop() destructor.\n" rst);
 	MS_TRACE();
 }
 
@@ -50,8 +55,9 @@ MS_TRACE();
 std::printf("Loop::Close() entered.\n");
 	if (this->closed)
 	{
+		//by me. send_log
 		MS_ERROR("already closed");
-
+printf(red "already closed!\n" rst);
 		return;
 	}
 
@@ -61,6 +67,7 @@ std::printf("Loop::Close() entered.\n");
 	if (this->signalsHandler != nullptr){
 		std::printf("Closing signalsHandler.\n");
 		this->signalsHandler->Destroy();
+		
 	}
 
 	// Close all the Rooms.
@@ -75,12 +82,12 @@ std::printf("Loop::Close() entered.\n");
 		room->Destroy();
 	}
 if (this->channel != nullptr){
-	std::printf(" the f knows why I do it explicitly***\n"); 
+	std::printf(yellow "*** The f knows why I do it explicitly in [ %s] ***\n" rst, __FILE__); 
 	this->channel->~UnixStreamSocket();
-	// Delete the Notifier.
-	//delete this->channel;
+	this->channel=nullptr;
 	}
 	delete this->notifier;
+
 }
 
 RTC::Room* Loop::GetRoomFromRequest(Channel::Request* request, uint32_t* roomId)
@@ -127,11 +134,13 @@ void Loop::OnSignal(SignalsHandler* /*signalsHandler*/, int signum)
 
 		default:
 			std::printf("Received a signal (with signum %d) for which there is no handling code.\n", signum);
+			Close();
 	}
 }
 void Loop::mfuck(){
 // just a dummy method for testing purposes while developing
 std::printf("A dummy method: loop::mfuck()\n");
+Close();
 }
 
 void Loop::OnChannelRequest(Channel::UnixStreamSocket* channel, Channel::Request* request)
@@ -284,6 +293,8 @@ std::printf("Room created roomId:%" PRIu32 "]\n",roomId);
 	}
 }
 
+
+
 void Loop::OnChannelUnixStreamSocketRemotelyClosed(Channel::UnixStreamSocket* /*socket*/)
 {
 	MS_TRACE_STD();
@@ -304,8 +315,17 @@ void Loop::OnRoomClosed(RTC::Room* room)
 std::printf("Entering OnRoomClosed(room)\n");
 	this->rooms.erase(room->roomId);
 }
+void Loop::dclose(){printf("within loop::dclose()\n");Close();}
 
 void suka(void*fi){
 Loop loop(static_cast<Channel::UnixStreamSocket*>(fi));
-std::printf("The loop should be ending now!\n");
+}
+
+void Close_soup(){
+	
+	//maka.dclose();
+//saka.dclose();
+//Loop*l=Loop();
+//Loop->Close();
+//Loop->Close();
 }

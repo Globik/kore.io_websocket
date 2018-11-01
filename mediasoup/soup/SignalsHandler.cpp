@@ -29,7 +29,7 @@ SignalsHandler::SignalsHandler(Listener* listener) : listener(listener)
 void SignalsHandler::AddSignal(int signum, const std::string& name)
 {
 	MS_TRACE();
-
+printf("adding signal\n");
 	int err;
 
 	auto uvHandle  = new uv_signal_t;
@@ -55,12 +55,14 @@ void SignalsHandler::Destroy()
 {
 	MS_TRACE();
 printf("signal destroy\n");
+//by me => a fake signal 4 :)
+this->listener->OnSignal(this, 4);
 	for (auto uvHandle : uvHandles)
 	{
 		uv_close(reinterpret_cast<uv_handle_t*>(uvHandle), static_cast<uv_close_cb>(onClose));
 	}
 
-	// And delete this.
+	printf("And delete this signal\n");
 	delete this;
 }
 

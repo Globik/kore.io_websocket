@@ -17,7 +17,11 @@ class Loop : public SignalsHandler::Listener,
 {
 public:
 	explicit Loop(Channel::UnixStreamSocket* channel);
+	//explicit Loop();
 	~Loop();// override;
+	//Loop get_loop();
+	void dclose();
+	//void Close();
 	
 
 private:
@@ -27,6 +31,7 @@ private:
 	/* Methods inherited from SignalsHandler::Listener. */
 public:
 	void OnSignal(SignalsHandler* signalsHandler, int signum) override;
+	
 
 	/* Methods inherited from Channel::lUnixStreamSocket::Listener. */
 public:
@@ -46,9 +51,11 @@ private:
 	SignalsHandler* signalsHandler{ nullptr };
 	// Others.
 	bool closed{ false };
+	//void Bose();
 	std::unordered_map<uint32_t, RTC::Room*> rooms;
+	Loop*faka{nullptr};
 };
-
+//inline void dclose(){Loop*l=this;l->Close();}
 #endif
 
 	
@@ -60,6 +67,7 @@ extern "C"
 #endif
 
 void suka(void*);
+void Close_soup(void);
 	
 #ifdef __cplusplus
 }

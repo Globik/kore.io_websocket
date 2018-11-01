@@ -14,11 +14,17 @@
 #include <unistd.h> //usleep
 #include <memory.h>
 #include <string.h>
+
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
 extern "C" {
 //#include <netstring.h>
 }
 uv_callback_t from_cpp;//stop_w;
 //struct pupkin*mili={nullptr};
+
 namespace Channel
 {
 	/* Static. */
@@ -75,6 +81,16 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 			this->jsonWriter = builder.newStreamWriter();
 		}
 	}
+	
+	void on_clo(uv_handle_t*client){
+		printf("On_clo() occurred.\n");
+
+		if(client->data){
+			printf(red "%s\n" rst, (char*)client->data);
+			}
+		
+		}
+	
 void on_walk(uv_handle_t*handle, void * arg){
 	printf("on_walk unixstream socket\n");
 /*
@@ -93,23 +109,42 @@ uv_close(handle,NULL);
 if((handle)->flags==24576){uv_close(handle,NULL);}
 }
 */ 
-uv_stop(deplibuv::getloop());	
+//printf("*** DATA %s\n", (char*)handle->data);
+uv_close(handle, on_clo);
+//uv_stop(handle->loop);
+//delete handle;
+//deplibuv::classdestroy();
+//uv_stop(deplibuv::getloop());	
 }
 	UnixStreamSocket::~UnixStreamSocket()
 	{
 		
 	
 MS_TRACE_STD();
-	uv_walk(deplibuv::getloop(), on_walk,NULL);
+	uv_walk(deplibuv::getloop(), on_walk, NULL);
+	//usleep(50);
 	void * motherdata=uv_loop_get_data(deplibuv::getloop());
 	free(motherdata);
 std::printf("Look ma, ~UnixStreamSocket() destructor!\n");
 
 		delete this->jsonReader;
 		delete this->jsonWriter;
+		
+		//deplibuv::classdestroy();
 	}
 
-	
+	void UnixStreamSocket::durak(){
+		printf("durak\n");
+		void*bu=uv_loop_get_data(deplibuv::getloop());
+	static_cast<UnixStreamSocket*>(bu)->do_mfuck();
+		}
+		
+void UnixStreamSocket::do_mfuck(){
+	printf("do_mfuck occured.\n");
+	this->listener->mfuck();
+}		
+
+
 void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
 {
 	if(data==NULL)return nullptr;
@@ -127,7 +162,8 @@ void*bu=uv_loop_get_data(deplibuv::getloop());
 	
 	
 	//end for test
-	
+	//static_cast<UnixStreamSocket*>(bu)->mfuck();
+	//this->listener->mfuck();
 	
 return nullptr;
 }
@@ -144,205 +180,49 @@ this->listener = listener;
 	{
 		std::printf("Entering UnixStreamSocket::Send(Json)\n");
 		std::cout << msg << std::endl;
-		//struct pupkin * mili=new pupkin;
-		//mili->n=4;
-		//int r=uv_callback_fire(&from_cpp,(void*)"HALLO from cpp!!!",NULL);
-	//	int r=uv_callback_fire(&from_cpp,(void*)"msg",NULL);
-	//	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-		//if (this->closed)return;
 
 		 MS_TRACE_STD();
 
 		std::ostringstream stream;
-		// std::string nsPayload;
 		size_t nsPayloadLen;
 		size_t nsNumLen;
 		size_t nsLen;
 
 		this->jsonWriter->write(msg, &stream);
-		//nsPayload    = stream.str();
-		//nsPayloadLen = nsPayload.length();
-		//static 
+	
 		const std::string tmp=stream.str();
 		char*wl=strdup(tmp.c_str());
-		//const char*ws=tmp.c_str();
 		
-		//delete [] ws;
-	//	ws=new char[stream.str().size()+1];
-		//ws[stream.str().size()+1];
-		//ws=(char*)malloc(sizeof(char)*stream.str().size()+1);
-		/*
-		this->me=(char*)malloc(sizeof(char)*stream.str().size()+1);
-		memcpy(this->me,stream.str().c_str(),stream.str().size()+1);
-		*/
-		//ws=(char*)malloc(sizeof(char)*stream.str().size()+1);
-		//ws=(char*)malloc(((stream.str().size())+1)*sizeof(char));
-		//memcpy(ws,stream.str().c_str(),stream.str().size()+1);
 		
-		//strcpy(ws,stream.str().c_str());
-		/*
-		std::cout << "nsPayload: " << nsPayload << std::endl;
-		std::cout << "nsPayloadLen: " << nsPayloadLen << std::endl;
-		
-		std::printf("char  nsPayload: %s\n",nsPayload.c_str());
-		std::printf("len nsPayloadLen %d\n",nsPayloadLen);
-		*/
-		//char*d=reinterpret_cast<char*>nsPayload.c_str();
-		//const char *er=nsPayload.c_str();
-		//char * d=strdup(er);
-		/*
-		struct pupkin*mili=(struct pupkin*)malloc(sizeof(struct pupkin));
-		//mili->n=0;
-		//mili->suka=(void*)nsPayload.c_str();
-		//std::printf("INTEGER: %d and memm: %p\n",mili->n,mili);
-		mili->suka=NULL;
-		//mili->suka=(char*)malloc(sizeof(mili->suka)*nsPayloadLen);
-		//memcpy(mili->suka,nsPayload.c_str(),nsPayloadLen);
-		mili->n=nsPayloadLen;
-		mili->suka=const_cast<char*>(nsPayload.c_str());
-		*/
-		//mili->size=nsPayloadLen;
-		
-		/*
-		struct pupkin mili;
-		mili.suka=(void*)nsPayload.c_str();
-		mili.n=20;
-		mili.fuka[nsPayloadLen]='0';//(char*)nsPayload.c_str();
-		//memcpy(mili.fuka,nsPayload.c_str(),nsPayloadLen);
-		*/
-		//int r=uv_callback_fire(&from_cpp,(void*)nsPayload.c_str(),NULL);
-		//int r=uv_callback_fire(&from_cpp,(void*)ws,NULL);
-		//int r=uv_callback_fire(&from_cpp,mili,NULL);
-		
-		int r=uv_callback_fire(&from_cpp,wl,NULL);
+		int r=uv_callback_fire(&from_cpp, wl,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-		//free(wl);
-		//std::printf(" and memm_2: %p\n",ws);
-		//free(ws);
-		//std::printf("WSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS %s\n",ws);
-		//free(this->me);
-		//free(mili);
-		//r=uv_callback_fire(&from_cpp,mili,NULL);
-		//std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-		//free(mili.fuka);
-		//free((void*)d);
-		//free(mili);
-/*
+		
+
 		if (nsPayloadLen > MessageMaxSize)
 		{
 			std::printf("mesage too big*************************************************************************************\n");
 
-			return;
+			//return;
 		}
-		*/
-/*
-		if (nsPayloadLen == 0)
-		{
-			nsNumLen       = 1;
-			WriteBuffer[0] = '0';
-			WriteBuffer[1] = ':';
-			WriteBuffer[2] = ',';
-		}
-		else
-		{
-			nsNumLen = static_cast<size_t>(std::ceil(std::log10(static_cast<double>(nsPayloadLen) + 1)));
-			std::sprintf(reinterpret_cast<char*>(WriteBuffer), "%zu:", nsPayloadLen);
-			std::memcpy(WriteBuffer + nsNumLen + 1, nsPayload.c_str(), nsPayloadLen);
-			WriteBuffer[nsNumLen + nsPayloadLen + 1] = ',';
-		}
-
-		nsLen = nsNumLen + nsPayloadLen + 2;
-*/
-		//Write((const uint8_t*)"mama\0", 5);
+		
 	}
 	
 	void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
-		std::printf("Entering UnixStreamSocket::SendLog(char, size_t).\n");
 		std::printf("SENDLOG: %s\n",nsPayload);
-		int r=uv_callback_fire(&from_cpp,(void*)nsPayload,NULL);
-		//int r=uv_callback_fire(&from_cpp,mili,NULL);
+		char*wl=strdup(nsPayload);
+		int r=uv_callback_fire(&from_cpp, wl, NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-	//this->closed=true;
-		/*if (this->closed){
-		std::printf("send log is closed.\n");
-			//return;
-		}
-		*/
-		
-
-		// MS_TRACE_STD();
-/*
-		size_t nsNumLen;
-		size_t nsLen;
-
-		if (nsPayloadLen > MessageMaxSize)
-		{
-			MS_ERROR_STD("mesage too big");
-
-			return;
-		}
-
-		if (nsPayloadLen == 0)
-		{
-			nsNumLen       = 1;
-			WriteBuffer[0] = '0';
-			WriteBuffer[1] = ':';
-			WriteBuffer[2] = ',';
-		}
-		else
-		{
-			nsNumLen = static_cast<size_t>(std::ceil(std::log10(static_cast<double>(nsPayloadLen) + 1)));
-			std::sprintf(reinterpret_cast<char*>(WriteBuffer), "%zu:", nsPayloadLen);
-			std::memcpy(WriteBuffer + nsNumLen + 1, nsPayload, nsPayloadLen);
-			WriteBuffer[nsNumLen + nsPayloadLen + 1] = ',';
-		}
-
-		nsLen = nsNumLen + nsPayloadLen + 2;
-
-		Write(WriteBuffer, nsLen);
-		*/
 	}
 
 	void UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen)
 	{
 std::printf("Entering UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen).\n");
-		//if (this->closed)return;
-		//if(this->closed){std::printf("SendBinary() occured, but this-closed is closed.\n");}
-/*
-		size_t nsNumLen;
-		size_t nsLen;
-
-		if (nsPayloadLen > MessageMaxSize)
-		{
-			MS_ERROR_STD("mesage too big");
-
-			return;
-		}
-
-		if (nsPayloadLen == 0)
-		{
-			nsNumLen       = 1;
-			WriteBuffer[0] = '0';
-			WriteBuffer[1] = ':';
-			WriteBuffer[2] = ',';
-		}
-		else
-		{
-			nsNumLen = static_cast<size_t>(std::ceil(std::log10(static_cast<double>(nsPayloadLen) + 1)));
-			std::sprintf(reinterpret_cast<char*>(WriteBuffer), "%zu:", nsPayloadLen);
-			std::memcpy(WriteBuffer + nsNumLen + 1, nsPayload, nsPayloadLen);
-			WriteBuffer[nsNumLen + nsPayloadLen + 1] = ',';
-		}
-
-		nsLen = nsNumLen + nsPayloadLen + 2;
-		*/
-
-		//Write((const uint8_t*)"papa\0", 5);
 	}
 
 void UnixStreamSocket::UserOnUnixStreamRead(void*data)
 	{
+
 MS_TRACE_STD();
 std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",(char*)data);
 //this->listener->mfuck();
@@ -449,6 +329,10 @@ void*set_channel(){
 auto* chl = new Channel::UnixStreamSocket(3);
 return chl;
 }
+void burak(){
+	printf("burak occured.\n");
+	Channel::UnixStreamSocket::durak();
+	}
 /*
 ----------------
 	without uv_stop()

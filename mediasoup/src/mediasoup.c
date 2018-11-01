@@ -30,12 +30,14 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 
-
+int Putin=0;
+int need_exit=0;
 int my_test = 1;
 int init(int);
 int page(struct http_request*);
 int page2(struct http_request*);
 int libuv_task(struct kore_task*);
+int was(struct kore_task*);
 void pipe_data_available(struct kore_task*);
 
 void * stop_worker_cb(uv_callback_t*,void*);
@@ -46,6 +48,8 @@ void connection_del(struct connection*);
 void we_can_work_it_out(struct soup*,void*);
 
 void han(void);
+struct kore_timer*tim=NULL;
+void tick(void*,u_int64_t);
 
 void m_init(void);
 void m_exit(void);
@@ -68,26 +72,60 @@ char*msg;
 };
 
 uv_callback_t stop_worker, to_cpp;
+
 const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
+
+
 
 void han(){
 //int rc=uv_callback_fire(&stop_worker,NULL,NULL);
 //kore_log(LOG_NOTICE,"rc stop_worker fire %d",rc);
 //usleep(20000);
+need_exit=1;
 kore_log(LOG_NOTICE,yellow "at exit han()" rst);
+if(need_exit){
+if(Putin==1){return;}
+burak();
+usleep(900000);
+//m_destroy();
+//if(md_server){md_server->destroy(md_server);md_server=NULL;}
+
+//uv_walk(get_loopi(), on_walk, NULL);
+
+
+
+}
+/*
+if(tim !=NULL){
+	kore_timer_remove(tim);
+	tim=NULL;
+	}
+	*/ 
 }
 void kore_worker_configure(){
 kore_log(LOG_NOTICE,"worker configure");
 atexit(han);
 }
+
+void tick(void*unused,u_int64_t now){
+	kore_log(LOG_INFO, green " a tick occured." rst);
+	if(Putin==0){burak();Putin=1;
+	//	kore_timer_remove(tim); tim=NULL;
+	}
+	//Close_soup();
+
+	}
 int init(int state){
+	
 	
 if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 	//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
 kore_task_create(&pipe_task,libuv_task);
+//kore_task_create(&pipe_task, was);
 kore_task_bind_callback(&pipe_task, pipe_data_available);
 kore_task_run(&pipe_task);
-
+//tim=kore_timer_add(tick,2000,NULL,1);
+//tim=kore_timer_add(tick,10000,NULL,1);
 return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
@@ -167,7 +205,7 @@ if(size==0) return;
 char *buf=alloca(size);
 size=json_dumpb(reply,buf,size,0);
 kore_websocket_send(c,1,buf,size);
-/*
+
 struct soup*soupi=kore_calloc(1, sizeof(*soupi));
 if(soupi==NULL){kore_log(LOG_INFO, "soupi is NULL");}
 soup_init(soupi, md_server);//?
@@ -177,9 +215,7 @@ soup_bind_callback(soupi, we_can_work_it_out, c);
 c->hdlr_extra=soupi;
 int ra=make_room(soupi,"make_room");
 printf("make room: %d\n", ra);
-*/ 
 
-//c->disconnect=connection_del;
 }
 void connection_del(struct connection*c){
 	kore_log(LOG_INFO, red "connection_del() occured." rst);
@@ -202,6 +238,7 @@ kore_log(LOG_INFO, yellow "name: %s" rst, soupi->name);
 struct connection *c=arg;
 kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
 //soupi->conn=NULL;
+if(soupi->result){printf(green "free soupi->result\n" rst);free(soupi->result);}
 if(soupi->name){free(soupi->name);}
 	
 }
@@ -287,10 +324,13 @@ if(c->hdlr_extra !=NULL)
 	//free(c);
 }
 }
-
+int was(struct kore_task*t){
+	sleep(5);
+return (KORE_RESULT_OK);	
+}
 int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
-atexit(han);
+//atexit(han);
 //kore_task_channel_write(t,"mama\0",5);
 
 class_init();
@@ -313,7 +353,7 @@ if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
 suka(chl);// it's a Loop loop(channel)
 m_destroy();
 //kore_task_channel_write(t,"mama\0",5);
-kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
+//kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
 if(md_server){md_server->destroy(md_server);md_server=NULL;}
 //kore_task_channel_write(t,"papa\0",5);
 //m_exit();
@@ -321,13 +361,17 @@ if(md_server){md_server->destroy(md_server);md_server=NULL;}
 
 //usleep(100000);
 kore_log(LOG_NOTICE,"Bye. *******\n");
+if(md_server==NULL){
+if(need_exit)exit(0);
+}
 return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
+	//return;
 if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");
 	//sleep(1);
 	//_exit(0);
-	sleep(1);
+	//sleep(1);
 	return;
 	}
    u_int8_t buf[BUFSIZ];
@@ -349,8 +393,13 @@ void m_exit(){
 _exit(0);
 }
 void m_destroy(){
-kore_log(LOG_INFO,"Destroy m_destroy().");
+kore_log(LOG_INFO,red "Destroy m_destroy()." rst);
+//usleep(10000);
+//usleep(10);
 class_destroy();
+//if(md_server){md_server->destroy(md_server);md_server=NULL;}
+//usleep(1000000);
+//usleep(1);
 }
 
 json_t *load_json(const char*text,size_t buflen){

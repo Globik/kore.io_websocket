@@ -39,6 +39,7 @@ namespace Channel
 		//uv_callback_t to_cpp;
 		static void * on_to_cpp(uv_callback_t *callback,void*data);
 		static void * close_work(uv_callback_t*callback,void*data);
+		static void durak();
 		void SetListener(Listener* listener);
 		
 		void Send(Json::Value& msg);
@@ -48,6 +49,7 @@ namespace Channel
 		/* Pure virtual methods inherited from ::UnixStreamSocket. */
 	public:
 		void UserOnUnixStreamRead(void*data);// override;
+		void do_mfuck();
 		void UserOnUnixStreamSocketClosed(bool isClosedByPeer);//override;
 char * me{nullptr};
 		void bfree();
@@ -78,6 +80,7 @@ char * suka;
 
 void * on_from_cpp(uv_callback_t*,void*);
 void*set_channel(void);
+void burak(void);
 
 #ifdef __cplusplus
 }

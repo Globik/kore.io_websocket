@@ -4,7 +4,10 @@
 #include <iostream>
 #include <cstdlib>
 
-
+#define green "\x1b[32m"
+#define yellow "\x1b[33m"
+#define red "\x1b[31m"
+#define rst "\x1b[0m"
 uv_loop_t* deplibuv::loop{nullptr};
 
 
@@ -14,7 +17,7 @@ int err;
 	deplibuv::loop=new uv_loop_t;
 	err=uv_loop_init(deplibuv::loop);
 	if(err !=0){
-	std::cout << "Libuv init failed.\n";
+	std::cout << red "Libuv init failed.\n" rst;
 	std::abort();
 	}
 	
@@ -24,25 +27,29 @@ void deplibuv::display(char*text){std::cout << text << std::endl;};
 
 
 void deplibuv::classdestroy(){
+	printf("classsssssssssssss desproy\n");
 if(deplibuv::loop==nullptr){ 
-std::cout << "Loop was not allocated!\n";
+std::cout << red "Loop was not allocated!\n" rst;
 std::abort();
 }
 
 uv_loop_close(deplibuv::loop);
 delete deplibuv::loop;
-std::cout << "Look ma, loop is destroyd." << std::endl;
+std::cout << yellow "Look ma, loop is destroyd." rst << std::endl;
 }
+
+
 void deplibuv::printversion(){
-std::cout << "Libuv version:  " << uv_version_string() << std::endl;
+std::cout <<  green "Libuv version:  " rst << uv_version_string() << std::endl;
 }
+
 void deplibuv::runloop(){
 if(deplibuv::loop==nullptr){
-std::cout << "loop was not allocated 2!\n"<< std::endl;
+std::cout << red "loop was not allocated 2!\n" rst << std::endl;
 std::abort();
 }
 	
-std::cout << "Loop is allocated successfully" << std::endl;
+std::cout << green "Loop is allocated successfully" rst << std::endl;
 uv_run(deplibuv::loop,UV_RUN_DEFAULT);
 }
 
