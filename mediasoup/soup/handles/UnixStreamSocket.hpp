@@ -34,7 +34,7 @@ public:
 	void Write(const std::string& data);
 	uv_callback_t to_cpp;
 	//static 
-		void * on_to_cpp(uv_callback_t *callback,void*data);
+	//	void * on_to_cpp(uv_callback_t *callback,void*data);
 	//char*dt;
 
 	/* Callbacks fired by UV events. */
@@ -51,18 +51,18 @@ public:
 	/* Pure virtual methods that must be implemented by the subclass. */
 protected:
 	//virtual
-		void UserOnUnixStreamRead();//                            = 0;
+	void UserOnUnixStreamRead();//                            = 0;
 	virtual void UserOnUnixStreamSocketClosed(bool isClosedByPeer) = 0;
 
 private:
 	// Allocated by this.
 	uv_pipe_t* uvHandle{ nullptr };
-	//struct fucker*mina{ nullptr };
+	
 	// Others.
-	bool isClosing{ false };
-	bool isClosedByPeer{ false };
-	bool hasError{ false };
-	//uv_callback_t to_cpp;
+	//bool isClosing{ false };
+	//bool isClosedByPeer{ false };
+	//bool hasError{ false };
+
 
 protected:
 	// Passed by argument.

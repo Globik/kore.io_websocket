@@ -20,7 +20,7 @@ namespace Channel
 		public:
 			virtual void OnChannelRequest(Channel::UnixStreamSocket* channel, Channel::Request* request) = 0;
 			virtual void OnChannelUnixStreamSocketRemotelyClosed(Channel::UnixStreamSocket* channel) = 0;
-		virtual void mfuck() = 0;
+		virtual void soup_ending() = 0;
 		};
 
 	public:
@@ -32,26 +32,32 @@ namespace Channel
 
 	//private:
 	//protected:
-		virtual ~UnixStreamSocket();
+		//virtual 
+		~UnixStreamSocket();
 		//virtual ~Loop();
 
 	public:
 		//uv_callback_t to_cpp;
 		static void * on_to_cpp(uv_callback_t *callback,void*data);
 		static void * close_work(uv_callback_t*callback,void*data);
-		static void durak();
+		static void Soup_Shutdown();
 		void SetListener(Listener* listener);
 		
 		void Send(Json::Value& msg);
 		void SendLog(char* nsPayload, size_t nsPayloadLen);
 		void SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen);
+		
+		//by me
+		
+		//bool IsClosing() const;
+		//int if_closing();
+		void destroy();
 
 		/* Pure virtual methods inherited from ::UnixStreamSocket. */
 	public:
 		void UserOnUnixStreamRead(void*data);// override;
-		void do_mfuck();
+		void about_soup_ending();
 		void UserOnUnixStreamSocketClosed(bool isClosedByPeer);//override;
-char * me{nullptr};
 		void bfree();
 	private:
 		// Passed by argument.
@@ -62,25 +68,18 @@ char * me{nullptr};
 		size_t msgStart{ 0 }; // Where the latest message starts.
 		bool closed{ false };
 	};
+	
 } // namespace Channel
-//void * on_from_cpp(uv_callback_t *,void*);
 
 #endif
-//uv_callback_t to_cpp;
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-struct pupkin{
-size_t n;
-char * suka;
-};
-//char*out;
-//size_t size;
 
 void * on_from_cpp(uv_callback_t*,void*);
 void*set_channel(void);
-void burak(void);
+void soup_shutdown(void);
 
 #ifdef __cplusplus
 }

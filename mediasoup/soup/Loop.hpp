@@ -8,10 +8,10 @@
 #include "Channel/UnixStreamSocket.hpp"
 
 #include "Room.hpp"
-#include "handles/SignalsHandler.hpp"
+//#include "handles/SignalsHandler.hpp"
 #include <unordered_map>
 // from kore.io_websocket/mediasoup
-class Loop : public SignalsHandler::Listener,
+class Loop : /*public SignalsHandler::Listener,*/
              public Channel::UnixStreamSocket::Listener,
              public RTC::Room::Listener
 {
@@ -19,9 +19,6 @@ public:
 	explicit Loop(Channel::UnixStreamSocket* channel);
 	//explicit Loop();
 	~Loop();// override;
-	//Loop get_loop();
-	void dclose();
-	//void Close();
 	
 
 private:
@@ -30,14 +27,14 @@ private:
 
 	/* Methods inherited from SignalsHandler::Listener. */
 public:
-	void OnSignal(SignalsHandler* signalsHandler, int signum) override;
+	//void OnSignal(SignalsHandler* signalsHandler, int signum) override;
 	
 
 	/* Methods inherited from Channel::lUnixStreamSocket::Listener. */
 public:
 	void OnChannelRequest(Channel::UnixStreamSocket* channel, Channel::Request* request) override;
 	void OnChannelUnixStreamSocketRemotelyClosed(Channel::UnixStreamSocket* channel) override;
-	void mfuck() override;
+	void soup_ending() override;
 
 	/* Methods inherited from RTC::Room::Listener. */
 public:
@@ -48,14 +45,13 @@ private:
 	Channel::UnixStreamSocket* channel{ nullptr };
 	// Allocated by this.
 	Channel::Notifier* notifier{ nullptr };
-	SignalsHandler* signalsHandler{ nullptr };
+	//SignalsHandler* signalsHandler{ nullptr };
 	// Others.
 	bool closed{ false };
-	//void Bose();
+	
 	std::unordered_map<uint32_t, RTC::Room*> rooms;
-	Loop*faka{nullptr};
+	
 };
-//inline void dclose(){Loop*l=this;l->Close();}
 #endif
 
 	
@@ -66,8 +62,7 @@ extern "C"
 {
 #endif
 
-void suka(void*);
-void Close_soup(void);
+void set_soup_loop(void*);
 	
 #ifdef __cplusplus
 }

@@ -6,6 +6,7 @@
 #include "deplibuv.hpp"
 #include "Logger.hpp"
 #include "MediaSoupError.hpp"
+//#include "Loop.hpp"
 #include <cmath>   // std::ceil()
 #include <cstdio>  // sprintf()
 #include <cstring> // std::memmove()
@@ -22,9 +23,7 @@
 extern "C" {
 //#include <netstring.h>
 }
-uv_callback_t from_cpp;//stop_w;
-//struct pupkin*mili={nullptr};
-
+uv_callback_t from_cpp;
 namespace Channel
 {
 	/* Static. */
@@ -82,66 +81,47 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 		}
 	}
 	
-	void on_clo(uv_handle_t*client){
-		printf("On_clo() occurred.\n");
-
-		if(client->data){
-			printf(red "%s\n" rst, (char*)client->data);
-			}
-		
-		}
+void on_clo_unx(uv_handle_t*client){
+printf("On_clo() occurred.\n");
+if(client->data){printf(red "%s\n" rst, (char*)client->data);}
+}
 	
 void on_walk(uv_handle_t*handle, void * arg){
-	printf("on_walk unixstream socket\n");
-/*
-signal destroy
- 24576 1
- 8192 6
- 24576 1
- 8193 16
-*/
-/*
-if(((handle)->flags) !=0){
-printf(" %d %d\n",(handle)->flags, handle->type);
-if((handle)->flags==8192){		
-uv_close(handle,NULL);
+printf("on_walk unixstream socket\n");
+uv_close(handle, on_clo_unx);
+//uv_close(handle, NULL);
+
 }
-if((handle)->flags==24576){uv_close(handle,NULL);}
-}
-*/ 
-//printf("*** DATA %s\n", (char*)handle->data);
-uv_close(handle, on_clo);
-//uv_stop(handle->loop);
-//delete handle;
-//deplibuv::classdestroy();
-//uv_stop(deplibuv::getloop());	
-}
+
+void UnixStreamSocket::destroy(){
+	printf("achieved destroy()\n");
+	// data is null, just so, let the loop to get rid of two uv_callbacks at shutdown
+	int r=uv_callback_fire(&from_cpp, NULL,NULL);
+		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+		uv_walk(deplibuv::getloop(), on_walk, NULL);
+void * loop_data=uv_loop_get_data(deplibuv::getloop());
+	free(loop_data);
+	// no idea how destructor in C++ supposed to be work, but does not work and i should manually call destructor
+	this->~UnixStreamSocket();
+	}
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-		
-	
 MS_TRACE_STD();
-	uv_walk(deplibuv::getloop(), on_walk, NULL);
-	//usleep(50);
-	void * motherdata=uv_loop_get_data(deplibuv::getloop());
-	free(motherdata);
-std::printf("Look ma, ~UnixStreamSocket() destructor!\n");
 
 		delete this->jsonReader;
 		delete this->jsonWriter;
-		
-		//deplibuv::classdestroy();
+		std::printf(yellow "Look ma, ~UnixStreamSocket() destructor!\n" rst);
 	}
 
-	void UnixStreamSocket::durak(){
-		printf("durak\n");
+	void UnixStreamSocket::Soup_Shutdown(){
+	printf("Soup::Shutdown()\n");
 		void*bu=uv_loop_get_data(deplibuv::getloop());
-	static_cast<UnixStreamSocket*>(bu)->do_mfuck();
+	static_cast<UnixStreamSocket*>(bu)->about_soup_ending();
 		}
 		
-void UnixStreamSocket::do_mfuck(){
-	printf("do_mfuck occured.\n");
-	this->listener->mfuck();
+void UnixStreamSocket::about_soup_ending(){
+	printf("::about_soup_ending()\n");
+	this->listener->soup_ending();
 }		
 
 
@@ -149,22 +129,10 @@ void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
 {
 	if(data==NULL)return nullptr;
 std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
-	//char * gu=(char*)((uv_handle_t*)callback)->loop->data;
-void*bu=uv_loop_get_data(deplibuv::getloop());
-	//static_cast<UnixStreamSocket*>(bu)->listener->mfuck();
-	//static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
-	static_cast<UnixStreamSocket*>(bu)->UserOnUnixStreamRead(data);
-	
-	//for test
-	
-	//int r=uv_callback_fire(&from_cpp,(void*)"{\"test_test_test\":\"aha\"}",NULL);
-	//std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-	
-	
-	//end for test
-	//static_cast<UnixStreamSocket*>(bu)->mfuck();
-	//this->listener->mfuck();
-	
+	//char * loop_data=(char*)((uv_handle_t*)callback)->loop->data;
+void*loop_data=uv_loop_get_data(deplibuv::getloop());
+	//static_cast<UnixStreamSocket*>(loop_data)->UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
+	static_cast<UnixStreamSocket*>(loop_data)->UserOnUnixStreamRead(data);
 return nullptr;
 }
 
@@ -173,7 +141,6 @@ void UnixStreamSocket::SetListener(Listener* listener)
 		MS_TRACE_STD();
 		std::printf("Entering UnixStreamSocket::SetListener(listener)\n");
 this->listener = listener;
-//this->listener->mfuck();
 	}
 
 	void UnixStreamSocket::Send(Json::Value& msg)
@@ -209,6 +176,7 @@ this->listener = listener;
 	
 	void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
+		//if(suchara==1){printf(red "yes\n" rst);return;}else{printf(red "no\n" rst);}
 		std::printf("SENDLOG: %s\n",nsPayload);
 		char*wl=strdup(nsPayload);
 		int r=uv_callback_fire(&from_cpp, wl, NULL);
@@ -225,9 +193,8 @@ void UnixStreamSocket::UserOnUnixStreamRead(void*data)
 
 MS_TRACE_STD();
 std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",(char*)data);
-//this->listener->mfuck();
 // Be ready to parse more than a single message in a single TCP chunk.
-std::string text="{\"mama\":\"papa\"}";
+//std::string text="{\"mama\":\"papa\"}";
 std::string text2=(char*)data;
 free(data);
 data=NULL;
@@ -279,28 +246,6 @@ size_t jsonLen;
 			{
 				MS_ERROR_STD("JSON parsing error: %s", jsonParseError.c_str());
 			}
-
-			// If there is no more space available in the buffer and that is because
-			// the latest parsed message filled it, then empty the full buffer.
-			/*
-			if ((this->msgStart + readLen) == this->bufferSize)
-			{
-				this->msgStart      = 0;
-				this->bufferDataLen = 0;
-			}
-			// If there is still space in the buffer, set the beginning of the next
-			// parsing to the next position after the parsed message.
-			else
-			{
-				this->msgStart += readLen;
-			}
-*/
-			// If there is more data in the buffer after the parsed message
-			// then parse again. Otherwise break here and wait for more data.
-			//if (this->bufferDataLen > this->msgStart){continue;}
-
-		//	break;
-	//	}
 		
 		
 	}
@@ -329,54 +274,7 @@ void*set_channel(){
 auto* chl = new Channel::UnixStreamSocket(3);
 return chl;
 }
-void burak(){
-	printf("burak occured.\n");
-	Channel::UnixStreamSocket::durak();
+void soup_shutdown(){
+	printf("soup_shutdown()\n");
+	Channel::UnixStreamSocket::Soup_Shutdown();
 	}
-/*
-----------------
-	without uv_stop()
---------------------
-Csignal INT received, exiting
-loop::close() occured
-room::destroy()
-Notifier::Emit(uint32_t targetId, const std::string& event, Json::Value& data) occured.
-UnixStreamSocket::Send(Json) occured
-{
-	"data" : 
-	{
-		"class" : "Room"
-	},
-	"event" : "close",
-	"targetId" : 35
-}
-rc fire from_cpp: 0
-ON room CLOSED
-Room() destructed?
-What the fuck in destractor in unixstreamsocket?jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
-on_from_cpp occurred!!! => HALLO from cpp!!!
-
-	------
-	here with uv_stop(loop);
-	-------
-Csignal INT received, exiting
-loop::close() occured
-room::destroy()
-Notifier::Emit(uint32_t targetId, const std::string& event, Json::Value& data) occured.
-UnixStreamSocket::Send(Json) occured
-{
-	"data" : 
-	{
-		"class" : "Room"
-	},
-	"event" : "close",
-	"targetId" : 35
-}
-rc fire from_cpp: 0
-ON room CLOSED
-Room() destructed?
-What the fuck in destractor in unixstreamsocket?jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
-libuv loop ended
-destroy()
-Loop was destroyd?
-*/

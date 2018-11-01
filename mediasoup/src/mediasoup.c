@@ -37,7 +37,7 @@ int init(int);
 int page(struct http_request*);
 int page2(struct http_request*);
 int libuv_task(struct kore_task*);
-int was(struct kore_task*);
+
 void pipe_data_available(struct kore_task*);
 
 void * stop_worker_cb(uv_callback_t*,void*);
@@ -48,12 +48,15 @@ void connection_del(struct connection*);
 void we_can_work_it_out(struct soup*,void*);
 
 void han(void);
-struct kore_timer*tim=NULL;
+
 void tick(void*,u_int64_t);
 
 void m_init(void);
 void m_exit(void);
 void m_destroy(void);
+void libuv_task_init(void);
+
+void im_down(void);
 
 int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
@@ -75,57 +78,55 @@ uv_callback_t stop_worker, to_cpp;
 
 const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 
-
-
-void han(){
-//int rc=uv_callback_fire(&stop_worker,NULL,NULL);
-//kore_log(LOG_NOTICE,"rc stop_worker fire %d",rc);
-//usleep(20000);
-need_exit=1;
-kore_log(LOG_NOTICE,yellow "at exit han()" rst);
-if(need_exit){
-if(Putin==1){return;}
-burak();
-usleep(900000);
-//m_destroy();
-//if(md_server){md_server->destroy(md_server);md_server=NULL;}
-
-//uv_walk(get_loopi(), on_walk, NULL);
-
-
-
-}
-/*
-if(tim !=NULL){
-	kore_timer_remove(tim);
-	tim=NULL;
-	}
-	*/ 
-}
-void kore_worker_configure(){
-kore_log(LOG_NOTICE,"worker configure");
-atexit(han);
-}
-
-void tick(void*unused,u_int64_t now){
-	kore_log(LOG_INFO, green " a tick occured." rst);
-	if(Putin==0){burak();Putin=1;
-	//	kore_timer_remove(tim); tim=NULL;
-	}
-	//Close_soup();
-
-	}
-int init(int state){
-	
-	
-if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
-	//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
+void libuv_task_init(){
+//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
+//struct kore_timer*tim=NULL;
 kore_task_create(&pipe_task,libuv_task);
-//kore_task_create(&pipe_task, was);
 kore_task_bind_callback(&pipe_task, pipe_data_available);
 kore_task_run(&pipe_task);
 //tim=kore_timer_add(tick,2000,NULL,1);
 //tim=kore_timer_add(tick,10000,NULL,1);
+}
+
+void im_down(){
+kore_log(LOG_INFO,"im_down()");
+need_exit=1;	
+if(need_exit){
+if(Putin==1){return;}
+soup_shutdown();
+//usleep(900000);
+usleep(9000);	
+}
+}
+
+void han(){
+kore_log(LOG_INFO, yellow "at_exit()" rst);
+//im_down();
+}
+
+void kore_parent_teardown(){
+kore_log(LOG_INFO, red "kore_parent_teardown()" rst);	
+}
+
+void kore_worker_configure(){
+kore_log(LOG_NOTICE,red "worker configure" rst);
+libuv_task_init();
+atexit(han);
+}
+
+void kore_worker_teardown(){
+kore_log(LOG_INFO, red "kore_worker_teardown occured." rst);
+im_down();	
+}
+
+void tick(void*unused,u_int64_t now){
+	kore_log(LOG_INFO, green " a tick occured." rst);
+	if(Putin==0){
+	soup_shutdown();Putin=1;
+	}
+	}
+int init(int state){
+if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
@@ -275,6 +276,7 @@ size_t size=json_dumpb(repli,NULL,0,0);
 	size=json_dumpb(repli,buf,size,0);
 	int rc;
 rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
+kore_log(LOG_INFO,"rc: %d",rc);
 //rc=uv_callback_fire(&to_cpp,"{\"me\":\"too\"}", NULL);
 //char*resp=NULL;
 
@@ -324,10 +326,7 @@ if(c->hdlr_extra !=NULL)
 	//free(c);
 }
 }
-int was(struct kore_task*t){
-	sleep(5);
-return (KORE_RESULT_OK);	
-}
+
 int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
 //atexit(han);
@@ -350,7 +349,7 @@ kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
 	*/
 md_server=server_new();
 if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
-suka(chl);// it's a Loop loop(channel)
+set_soup_loop(chl);// it's a Loop loop(channel)
 m_destroy();
 //kore_task_channel_write(t,"mama\0",5);
 //kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
@@ -362,13 +361,14 @@ if(md_server){md_server->destroy(md_server);md_server=NULL;}
 //usleep(100000);
 kore_log(LOG_NOTICE,"Bye. *******\n");
 if(md_server==NULL){
-if(need_exit)exit(0);
+//if(need_exit)exit(0);
 }
 return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
-	//return;
-if(kore_task_finished(t)){kore_log(LOG_WARNING,"a task is finished.");
+	kore_log(LOG_INFO, yellow "pipe_data_available" rst);
+if(kore_task_finished(t)){
+	kore_log(LOG_INFO, green "a task is finished." rst);
 	//sleep(1);
 	//_exit(0);
 	//sleep(1);

@@ -32,8 +32,8 @@ Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
 	this->notifier = new Channel::Notifier(this->channel);
 
 	// Set the signals handler.
-	this->signalsHandler = new SignalsHandler(this);
-//this->closed=0;
+	//this->signalsHandler = new SignalsHandler(this);
+
 	// Add signals to handle.
 	//this->signalsHandler->AddSignal(SIGINT, "INT");
 	//this->signalsHandler->AddSignal(SIGTERM, "TERM");
@@ -53,6 +53,7 @@ void Loop::Close()
 {
 MS_TRACE();
 std::printf("Loop::Close() entered.\n");
+
 	if (this->closed)
 	{
 		//by me. send_log
@@ -61,14 +62,11 @@ printf(red "already closed!\n" rst);
 		return;
 	}
 
-	this->closed = true;
+//this->channel->if_closing();
+this->closed = true;
 
 	// Close the SignalsHandler.
-	if (this->signalsHandler != nullptr){
-		std::printf("Closing signalsHandler.\n");
-		this->signalsHandler->Destroy();
-		
-	}
+	//if (this->signalsHandler != nullptr){std::printf("Closing signalsHandler.\n");this->signalsHandler->Destroy();}
 
 	// Close all the Rooms.
 	// NOTE: Upon Room closure the onRoomClosed() method is called which
@@ -81,12 +79,17 @@ printf(red "already closed!\n" rst);
 		it = this->rooms.erase(it);
 		room->Destroy();
 	}
-if (this->channel != nullptr){
-	std::printf(yellow "*** The f knows why I do it explicitly in [ %s] ***\n" rst, __FILE__); 
-	this->channel->~UnixStreamSocket();
-	this->channel=nullptr;
-	}
+
 	delete this->notifier;
+	
+	if (this->channel != nullptr){
+	//std::printf(yellow "*** The f knows why I do it explicitly in [ %s] ***\n" rst, __FILE__); 
+	
+	//this->channel->~UnixStreamSocket();
+	this->channel->destroy();
+	this->channel=nullptr;
+	delete this->channel;
+	}
 
 }
 
@@ -116,7 +119,8 @@ std::printf("No room found.\n");
 	return nullptr;
 }
 
-void Loop::OnSignal(SignalsHandler* /*signalsHandler*/, int signum)
+/*
+void Loop::OnSignal(SignalsHandler* , int signum)
 {
 	MS_TRACE();
 
@@ -137,9 +141,8 @@ void Loop::OnSignal(SignalsHandler* /*signalsHandler*/, int signum)
 			Close();
 	}
 }
-void Loop::mfuck(){
-// just a dummy method for testing purposes while developing
-std::printf("A dummy method: loop::mfuck()\n");
+*/ 
+void Loop::soup_ending(){
 Close();
 }
 
@@ -315,17 +318,8 @@ void Loop::OnRoomClosed(RTC::Room* room)
 std::printf("Entering OnRoomClosed(room)\n");
 	this->rooms.erase(room->roomId);
 }
-void Loop::dclose(){printf("within loop::dclose()\n");Close();}
 
-void suka(void*fi){
+
+void set_soup_loop(void*fi){
 Loop loop(static_cast<Channel::UnixStreamSocket*>(fi));
-}
-
-void Close_soup(){
-	
-	//maka.dclose();
-//saka.dclose();
-//Loop*l=Loop();
-//Loop->Close();
-//Loop->Close();
 }

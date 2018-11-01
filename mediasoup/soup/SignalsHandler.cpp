@@ -8,13 +8,16 @@
 
 /* Static methods for UV callbacks. */
 
+// to hell with sigint. wegen sigint the main process of kore.c no more works and wan't to shutdown gracefully
+// so I decided to remove signalshandler from a subthread 
+
 inline static void onSignal(uv_signal_t* handle, int signum)
-{
+{//unused
 	static_cast<SignalsHandler*>(handle->data)->OnUvSignal(signum);
 }
 
 inline static void onClose(uv_handle_t* handle)
-{
+{//unused
 	printf("on close sig handler\n");
 	delete handle;
 }
@@ -28,6 +31,7 @@ SignalsHandler::SignalsHandler(Listener* listener) : listener(listener)
 
 void SignalsHandler::AddSignal(int signum, const std::string& name)
 {
+	//unused
 	MS_TRACE();
 printf("adding signal\n");
 	int err;
@@ -53,21 +57,24 @@ printf("adding signal\n");
 
 void SignalsHandler::Destroy()
 {
+	//unused
 	MS_TRACE();
 printf("signal destroy\n");
 //by me => a fake signal 4 :)
-this->listener->OnSignal(this, 4);
+this->listener->OnSignal(this, 1);
 	for (auto uvHandle : uvHandles)
 	{
+		//unused
 		uv_close(reinterpret_cast<uv_handle_t*>(uvHandle), static_cast<uv_close_cb>(onClose));
 	}
 
 	printf("And delete this signal\n");
-	delete this;
+	delete this;//??? wegen das this->closed is undefined in a function SendLog, in uv_callback, at shutdown, last data is not freed.
 }
 
 inline void SignalsHandler::OnUvSignal(int signum)
 {
+	// by me unused
 	MS_TRACE();
 
 	// Notify the listener.
