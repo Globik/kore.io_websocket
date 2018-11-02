@@ -6,7 +6,6 @@
 #include "deplibuv.hpp"
 #include "Logger.hpp"
 #include "MediaSoupError.hpp"
-//#include "Loop.hpp"
 #include <cmath>   // std::ceil()
 #include <cstdio>  // sprintf()
 #include <cstring> // std::memmove()
@@ -39,18 +38,13 @@ namespace Channel
 	UnixStreamSocket::UnixStreamSocket(int fd) //: ::UnixStreamSocket::UnixStreamSocket(fd, MaxSize)
 	{
 		MS_TRACE_STD();
-	//mili=new pupkin;
-		//this->closed=0;
 		uv_loop_t*mloop=deplibuv::getloop();
-		//uv_loop_set_data(mloop,(void*)"some_data");
 		uv_loop_set_data(mloop,(void*)this);
 		
 int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT);
-		std::printf("uv_callback_t &to_cpp init: %d\n",rc);
+std::printf("uv_callback_t &to_cpp init: %d\n",rc);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
-		std::printf("uv_callback_t &from_cpp init: %d\n",rc);
-		//rc=uv_callback_init(mloop,&stop_w,UnixStreamSocket::close_work,UV_DEFAULT);
-		//std::printf("dummy uv_callback_t stop_w init: %d\n",rc);
+std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 		
 		// Create the JSON reader.
 		{
@@ -83,7 +77,7 @@ rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 	
 void on_clo_unx(uv_handle_t*client){
 printf("On_clo() occurred.\n");
-if(client->data){printf(red "%s\n" rst, (char*)client->data);}
+//if(client->data){printf(red "%s\n" rst, (char*)client->data);}
 }
 	
 void on_walk(uv_handle_t*handle, void * arg){

@@ -32,7 +32,7 @@
 
 int Putin=0;
 int need_exit=0;
-int my_test = 1;
+
 int init(int);
 int page(struct http_request*);
 int page2(struct http_request*);
@@ -40,11 +40,9 @@ int libuv_task(struct kore_task*);
 
 void pipe_data_available(struct kore_task*);
 
-void * stop_worker_cb(uv_callback_t*,void*);
-//void * on_bus(uv_callback_t*, void*);
+
 void * on_from_cpp(uv_callback_t*,void*);
 
-void connection_del(struct connection*);
 void we_can_work_it_out(struct soup*,void*);
 
 void han(void);
@@ -79,12 +77,12 @@ uv_callback_t stop_worker, to_cpp;
 const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 
 void libuv_task_init(){
-//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers great than 1 comment it out for a dedicated task
+//if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers greater than 1 just comment it out for a dedicated task
 //struct kore_timer*tim=NULL;
 kore_task_create(&pipe_task,libuv_task);
 kore_task_bind_callback(&pipe_task, pipe_data_available);
-kore_task_run(&pipe_task);
-//tim=kore_timer_add(tick,2000,NULL,1);
+kore_task_run(&pipe_task, 0);
+//tim=kore_timer_add(tick, 2000, NULL, 1);
 //tim=kore_timer_add(tick,10000,NULL,1);
 }
 
@@ -94,8 +92,11 @@ need_exit=1;
 if(need_exit){
 if(Putin==1){return;}
 soup_shutdown();
-//usleep(900000);
-usleep(9000);	
+usleep(900000);
+//usleep(9000);	
+//usleep(1000);
+//just in case
+if(md_server !=NULL){md_server->destroy(md_server);md_server=NULL;}
 }
 }
 
@@ -131,28 +132,17 @@ return (KORE_RESULT_OK);
 }
 int page(struct http_request*req){
 http_response_header(req,"content-type","text/html");
-// Fire callback to trans a message to libuv.cpp class and check if it blocks kore workflow
-// as a "request" mechanism from the kore's world to the libuv.cpp class.
-//int rc=uv_callback_fire(&to_cpp,(void*)"CPP IS OK?", NULL);
-// if 0 then OK
-//kore_log(LOG_NOTICE,"rc to_cpp fire: %d\n",rc);
 http_response(req,200,asset_frontend_html,asset_len_frontend_html);
 kore_log(LOG_NOTICE,"http request should be sent");
 return (KORE_RESULT_OK);
 }
 int page2(struct http_request*req){
-// open front2[html] in a new browser's tab to check if the uv_loop blocks the frontend_html
 http_response_header(req,"content-type","text/html");
 http_response(req,200,asset_front2_html,asset_len_front2_html);
 kore_log(LOG_NOTICE,"front2.html");
 return (KORE_RESULT_OK);
 }
-void * stop_worker_cb(uv_callback_t*handle,void*arg){
-kore_log(LOG_NOTICE,"\n on stop worker cb\n");
-uv_stop(((uv_handle_t*)handle)->loop);
-// s
-return NULL;
-}
+
 /*
 void*on_from_cpp(uv_callback_t*handle,void*data){
 if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
@@ -210,37 +200,28 @@ kore_websocket_send(c,1,buf,size);
 struct soup*soupi=kore_calloc(1, sizeof(*soupi));
 if(soupi==NULL){kore_log(LOG_INFO, "soupi is NULL");}
 soup_init(soupi, md_server);//?
-//c->disconnect=connection_del;
-//c->state=CONN_STATE_ESTABLISHED;
 soup_bind_callback(soupi, we_can_work_it_out, c);
 c->hdlr_extra=soupi;
 int ra=make_room(soupi,"make_room");
 printf("make room: %d\n", ra);
 
 }
-void connection_del(struct connection*c){
-	kore_log(LOG_INFO, red "connection_del() occured." rst);
-	if(c->hdlr_extra !=NULL)
-	{
-		//free soupi
-		printf(yellow "free c->hdlr_extra\n" rst);
-		//c->hdlr_extra->conn=NULL;
-		kore_free(c->hdlr_extra);
-	c->hdlr_extra=NULL;
-	//free(c);
-}
-}
+
 void we_can_work_it_out(struct soup *soupi,void *arg){
 kore_log(LOG_INFO,"we_can_work_it_out() occured.");
 kore_log(LOG_INFO, green "mem of soupi: %p" rst, (void*)soupi);
 kore_log(LOG_INFO, yellow "mem of arg %p" rst, arg);
-kore_log(LOG_INFO, green "data: %s" rst, soupi->result);
-kore_log(LOG_INFO, yellow "name: %s" rst, soupi->name);
+if(soupi->result){kore_log(LOG_INFO, green "data: %s" rst, soupi->result);}
+if(soupi->name){kore_log(LOG_INFO, yellow "name: %s" rst, soupi->name);}
 struct connection *c=arg;
 kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
 //soupi->conn=NULL;
 if(soupi->result){printf(green "free soupi->result\n" rst);free(soupi->result);}
-if(soupi->name){free(soupi->name);}
+if(soupi->name){
+printf(green "free soupi->name\n" rst);
+free(soupi->name);
+soupi->name=NULL;
+}
 	
 }
 void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
@@ -277,18 +258,6 @@ size_t size=json_dumpb(repli,NULL,0,0);
 	int rc;
 rc=uv_callback_fire(&to_cpp,(void*)buf, NULL);
 kore_log(LOG_INFO,"rc: %d",rc);
-//rc=uv_callback_fire(&to_cpp,"{\"me\":\"too\"}", NULL);
-//char*resp=NULL;
-
-//rc=uv_callback_fire_sync(&to_cpp,"{\"data\":\"too\"}",(void**)&resp,10000);//no effect with result
-//kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
-//kore_log(LOG_INFO,"The result is: %s",resp);
-
-
-
-
-
-
 
 
 
@@ -330,7 +299,7 @@ if(c->hdlr_extra !=NULL)
 int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
 //atexit(han);
-//kore_task_channel_write(t,"mama\0",5);
+kore_task_channel_write(t,"mama\0",5);
 
 class_init();
 void*chl=set_channel();
@@ -354,7 +323,7 @@ m_destroy();
 //kore_task_channel_write(t,"mama\0",5);
 //kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
 if(md_server){md_server->destroy(md_server);md_server=NULL;}
-//kore_task_channel_write(t,"papa\0",5);
+kore_task_channel_write(t,"papa\0",5);
 //m_exit();
 //usleep(100000);
 
