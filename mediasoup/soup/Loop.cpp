@@ -87,8 +87,8 @@ this->closed = true;
 	
 	//this->channel->~UnixStreamSocket();
 	this->channel->destroy();
-	this->channel=nullptr;
-	delete this->channel;
+	//this->channel=nullptr;
+	//delete this->channel;
 	}
 
 }

@@ -4,36 +4,15 @@
 
 #include "soup_server.h"
 
-const char*zweite_data="zweite_data";
+
 static void closi(struct server*);
 
 int create_room(struct server*, int, struct soup*);
-void on_zweite_data(void*);
-int on_funi(void *);
+
+//int on_funi(void *);
+
 void md_destroy(struct server*);
 
-int on_funi(void*s){
-printf("on_funi=> %s\n", (char*)s);
-//create_room(d,
-//instance for room: room_on_close, on_new_listener
-return 0;	
-}
-/*
-void on_zweite_data(void*data){
-printf("on_zweite_data: %s\n",(char*)data);
-//here create a room instance
-on_funi("me too");//??
-}
-*/
-/*
-void ersti_cb(struct channel*ch, void*str){
-printf("ersti cb occured.\n");
-struct responsi *resp=(struct responsi*)str;
-printf("here data: %s\n",(char*)resp->data);
-//ch->on_ersti=NULL;
-on_funi(resp->data);
-}
-*/
 int create_room(struct server * serv, int a, struct soup* soupi){
 printf("in create_room()\n");
 //ee_once(server->ch->ee, zweite_data, on_zweite_data);//on .  a ccepted with data if any, rejected
@@ -49,9 +28,10 @@ ee_emit(server->ee, str, data);
 
 void md_destroy(struct server*serv){
 	printf("md_destroy occured for mediasoup client.\n");
-	if(serv->ee)ee_destroy(serv->ee);
+	
 	if(serv->ch){printf("looks like serv->ch still there\n");free(serv->ch);serv->ch=NULL;}
 	if(serv->name){printf("looks like serv->name still there.\n");free(serv->name);serv->name=NULL;}
+	if(serv->ee)ee_destroy(serv->ee);
 	free(serv);
 }
 
@@ -85,13 +65,14 @@ struct out_data data;
 data.str="someone closes the server.";
 obj->emit(obj,"close",(void*)&data);
 }
+
 void soup_init(struct soup*s,struct server*serv){
 	//if serv == NULL return;
 memset(s, 0, sizeof(*s));
 s->state=0;	
 s->conn=serv;
-//s->name=NULL;
-//s->result=NULL;
+//s->name=NULL;//?? by memset scenario causes the segfault
+//s->result=NULL;//?? by memset scenario is segfault
 }
 void soup_bind_callback(struct soup*soupi, void (*cb)(struct soup*,void*),void*arg){
 //if(s->cb !=NULL) //fatal error : already bound

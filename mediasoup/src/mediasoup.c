@@ -92,11 +92,11 @@ need_exit=1;
 if(need_exit){
 if(Putin==1){return;}
 soup_shutdown();
-usleep(900000);
+//usleep(900000);
 //usleep(9000);	
-//usleep(1000);
+usleep(1000);
 //just in case
-if(md_server !=NULL){md_server->destroy(md_server);md_server=NULL;}
+if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
 }
 }
 

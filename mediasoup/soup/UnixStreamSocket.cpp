@@ -45,6 +45,8 @@ int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT)
 std::printf("uv_callback_t &to_cpp init: %d\n",rc);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 std::printf("uv_callback_t &from_cpp init: %d\n",rc);
+//rc=uv_callback_init(mloop,&stop_cpp,to_stop_cpp, UV_DEFAULT);
+//std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 		
 		// Create the JSON reader.
 		{
@@ -79,12 +81,13 @@ void on_clo_unx(uv_handle_t*client){
 printf("On_clo() occurred.\n");
 //if(client->data){printf(red "%s\n" rst, (char*)client->data);}
 }
-	
+int af=0;
 void on_walk(uv_handle_t*handle, void * arg){
 printf("on_walk unixstream socket\n");
-uv_close(handle, on_clo_unx);
-//uv_close(handle, NULL);
-
+//uv_close(handle, on_clo_unx);
+af++;
+uv_close(handle, NULL);
+if(af==2){}
 }
 
 void UnixStreamSocket::destroy(){
@@ -93,10 +96,12 @@ void UnixStreamSocket::destroy(){
 	int r=uv_callback_fire(&from_cpp, NULL,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
 		uv_walk(deplibuv::getloop(), on_walk, NULL);
-void * loop_data=uv_loop_get_data(deplibuv::getloop());
-	free(loop_data);
+//void * loop_data=uv_loop_get_data(deplibuv::getloop());
+	//free(loop_data);
 	// no idea how destructor in C++ supposed to be work, but does not work and i should manually call destructor
-	this->~UnixStreamSocket();
+	if(af==2){printf(red " af is %d\n" rst, af);
+		this->~UnixStreamSocket();
+		}
 	}
 	UnixStreamSocket::~UnixStreamSocket()
 	{
