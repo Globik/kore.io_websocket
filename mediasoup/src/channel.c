@@ -12,7 +12,6 @@
 
 
 struct postman{
-//char*name;
 int a;
 struct soup*soupi;
 struct kore_timer * timer;
@@ -44,15 +43,13 @@ return ch;
 
 static void on_timeout(void* arg, u_int64_t now){
 	if(arg==NULL){printf(red "arg is NULL in on_timeout" rst); return;}
-	printf(yellow "timeout!\n" rst);
-	
+	//printf(yellow "timeout!\n" rst);
 	struct soup *s = (struct soup*)arg;
-	//s->error=
 	soup_set_error(s, "***TIMEOUT!***");
 	s->cb(s, s->arg);
 }
 void channel_close(struct channel* ch){
-	printf("channel_close()\n");
+	//printf("channel_close()\n");
 	int a=pending_close();
 	printf("is it OK pending_close? %d\n", a);//0 is OK
 	if(ch->ee !=NULL)ch->ee=NULL;
@@ -71,8 +68,7 @@ printf("db is null, memory fails\n");
 free(dubu);
 return;
 }
-//db->name=strdup(str);
-//db->name=strdup("worker.createRoom");
+
 db->a=77;
 db->soupi=NULL;
 //soupi->result=NULL;
@@ -80,8 +76,7 @@ soupi->state=SOUP_STATE_WAIT;
 db->soupi=soupi;
 
 db->timer=kore_timer_add(on_timeout, 13000, soupi, 1);
-//struct kore_timer*ftimer=kore_timer_add(on_timeout, 3000, NULL, 1);
-//kore_timer_remove(ftimer);
+
 if(db->timer==NULL){kore_log(LOG_INFO, red "*** db->timer is NULL! in channel_send ***" rst);}
 LIST_INSERT_HEAD(&letters, db, rlist);
 /*
@@ -101,7 +96,6 @@ soupi->cb(soupi, soupi->arg);
 }
 
 static void invoke_for_dummy(char* data){
-	printf("invoke_for_dummy occured.\n");
 //struct responsi resp;
 //resp.ch=ch;
 //resp.data="room_created";
@@ -110,39 +104,19 @@ static void invoke_for_dummy(char* data){
 //ee_emit(ch->ee, erste_data, (void*)&resp);
 struct postman *du = NULL; 
 struct postman *dtmp;
-/*
-LIST_FOREACH(du, &letters, rlist){
-printf("foreach_1 : %d\n", du->a);	
-//if(!strcmp(du->name,"vadik"))du->cb->on_ersti(ch,(void*)&resp);
-if(du->a==77){
-if(du->soupi){
-printf("there is a du->soupi\n");
-if(du->soupi->cb){
-//du->soupi->result=data;	// crash
-printf("making callback for work it out.\n");du->soupi->cb(du->soupi, du->soupi->arg);	}
-}
-}
-}
-*/
-printf("ANY DATA? %s [%s]\n",data,__FILE__);
-int vOK=0;
+
+printf("ANY DATA? %s [%s]\n",data, __FILE__);
 for(du=LIST_FIRST(&letters); du !=NULL; du=dtmp){
-dtmp=LIST_NEXT(du,rlist);
-printf("within LIST_FIRST\n");
+dtmp=LIST_NEXT(du, rlist);
 
 if(du->a==77){
 
-	
 if(du->soupi){
-printf("there is a du->soupi\n");
-if(du->soupi->cb){
-du->soupi->result=strdup(data);	
-if(du->soupi->arg)printf("ok for du->soupi->arg\n");
-if(du->soupi->cb)printf("ok for du->soupi->cb\n");
+du->soupi->result=kore_strdup(data);	
 kore_timer_remove(du->timer);
 du->timer=NULL;
 du->soupi->state=SOUP_STATE_RESULT;
-printf("making callback for work it out.\n");du->soupi->cb(du->soupi, du->soupi->arg);	}
+if(du->soupi->cb !=NULL)du->soupi->cb(du->soupi, du->soupi->arg);	
 
 LIST_REMOVE(du, rlist);
 du->soupi=NULL;
@@ -150,39 +124,32 @@ free(du);
 du=NULL;
 
 }
-vOK=1;
+
 break;
 }
-}
-if(vOK==0){printf(red "NOT FOUND\n" rst);}	
-	/*
-LIST_FOREACH(du,&letters,rlist){
-printf("foreach_2  : %d\n", du->a);	
+if(du==NULL){
+printf("not found\n");
+//return;
 }
 
-*/
+}
+	
 }
 static int pending_close(){
 printf("pending_close()\n");	
 struct postman*du;
 while(!LIST_EMPTY(&letters)){
-printf("within list_empty for &strings\n");
 du=LIST_FIRST(&letters);
 LIST_REMOVE(du, rlist);
 
 if(du->soupi){
-printf("there is a du->soupi_2\n");
-if(du->soupi->cb){
-//du->soupi->error=
-du->soupi->result=NULL;//strdup("fucking result");
+if(du->soupi->cb !=NULL){
+
 soup_set_error(du->soupi, "channel closed.");	
-if(du->soupi->arg)printf("ok for du->soupi->arg_2\n");
-if(du->soupi->cb)printf("ok for du->soupi->cb_2\n");
 kore_timer_remove(du->timer);
 du->timer=NULL;
-printf("making callback for work it out_2.\n");du->soupi->cb(du->soupi, du->soupi->arg);	}
-
-LIST_REMOVE(du, rlist);
+du->soupi->cb(du->soupi, du->soupi->arg);	
+}
 du->soupi=NULL;
 free(du);
 du=NULL;
@@ -198,7 +165,7 @@ printf("ON_FROM_CPP data came: %s \n",(char*)data);
 //char*s=(char*)data;
 invoke_for_dummy(data);
 free(data);
-return "a";
+return (NULL);
 }
 
 static void soup_set_error(struct soup *s, const char *msg){

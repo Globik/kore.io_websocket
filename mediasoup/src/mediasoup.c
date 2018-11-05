@@ -5,6 +5,13 @@
 #include <signal.h>
 
 #include <unistd.h>// getpid(), usleep()
+
+//#include <stdio.h>
+#include <inttypes.h>
+//#include <stdlib.h>
+#include <stdint.h>
+
+
 #include <sys/types.h>
 #include <pwd.h>
 
@@ -20,6 +27,7 @@
 
 #include "deplibuv.hpp"
 #include "Loop.hpp"
+#include "Utils.hpp"
 #include "Channel/UnixStreamSocket.hpp"
 #include "Room.hpp"
 
@@ -64,6 +72,8 @@ void websocket_message(struct connection*, u_int8_t,void*,size_t);
 json_t *load_json(const char*,size_t);
 json_t *load_json_str(const char*);
 
+uint32_t random_u32(void);
+
 
 struct kore_task pipe_task;
 
@@ -72,6 +82,8 @@ struct server*md_server=NULL;
 struct pizda{
 char*msg;
 };
+
+ee_t* ev=NULL;
 
 uv_callback_t stop_worker, to_cpp;
 
@@ -92,6 +104,7 @@ kore_log(LOG_INFO,"im_down()");
 need_exit=1;	
 if(need_exit){
 if(Putin==1){return;}
+if(md_server==NULL){printf(red "md_server is NULL, returning\n" rst);return;}
 soup_shutdown();
 //usleep(900000);
 //usleep(9000);	
@@ -102,10 +115,33 @@ if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
 }
 }
 
+void on_string(void*);
+
+void on_string(void*arg){
+printf(red "on_string occured! %s\n" rst,(char*)arg);	
+	}
 void han(){
 kore_log(LOG_INFO, yellow "at_exit()" rst);
 //im_down();
+if(ev !=NULL)ee_destroy(ev);
 }
+
+
+uint32_t random_u32(void);
+uint32_t rand32(uint32_t,uint32_t);
+uint32_t rand32(uint32_t begin,uint32_t end){
+uint32_t range=(end-begin)+1;
+	uint32_t limit=((uint64_t)RAND_MAX+1)-(((uint64_t)RAND_MAX+1)%range);
+	uint32_t randVal=rand();
+	while(randVal >=limit) randVal=rand();
+	return ((randVal%range)+begin);
+}
+uint32_t random_u32(void){
+	uint32_t a=rand32(10000000,99999999);
+	//printf("a: %"PRIu32"\n",a);
+return (a);
+}
+
 
 void kore_parent_teardown(){
 kore_log(LOG_INFO, red "kore_parent_teardown()" rst);	
@@ -115,6 +151,28 @@ void kore_worker_configure(){
 kore_log(LOG_NOTICE,red "worker configure" rst);
 libuv_task_init();
 atexit(han);
+uint32_t a=random_u32();
+kore_log(LOG_INFO, red "random uint32_t : %"PRIu32"" rst, a);
+char stri[9];
+snprintf(stri, sizeof stri,"%" PRIu32, a);
+kore_log(LOG_INFO, red "stri: %s" rst, stri);
+
+ev=ee_new();
+ee_once(ev, stri, on_string);
+//ee_emit(server->ee, str, data);	
+//14289383
+ee_emit(ev, "14289383","hi_string!");
+
+json_t*reply=json_object();
+json_object_set_new(reply,"type",json_string("ku ku a string!"));
+json_object_set_new(reply,"msg_id",json_integer(a));
+char*suki=json_dumps(reply,0);
+json_decref(reply);
+printf("%s\n",suki);
+free(suki);
+uint32_t bugi=get_random32u();
+printf("bugi=> %"PRIu32"\n", bugi);
+//10158188
 }
 
 void kore_worker_teardown(){
@@ -297,7 +355,7 @@ kore_log(LOG_INFO,"type 'create_room'");
 	//char*s1="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 */
 json_auto_t*repli=json_object();
-json_object_set_new(repli,"id",json_integer(3444444333));
+json_object_set_new(repli,"id",json_integer(344444433));
 json_object_set_new(repli,"method",json_string("worker.createRoom"));
 	
 json_t*repli_internal=json_object();
@@ -323,7 +381,7 @@ kore_log(LOG_INFO,"rc: %d",rc);
 send_to_clients=1;
 }else if(!strcmp(type_str,"delete_room")){
 kore_log(LOG_INFO,"type 'delete_room'");
-char*d="{\"id\":3444444333,\"method\":\"room.close\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}\0xe0";
+char*d="{\"id\":344444433,\"method\":\"room.close\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}\0xe0";
 
 int rc=uv_callback_fire(&to_cpp,(void*)d, NULL);
 kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
@@ -406,6 +464,8 @@ if(kore_task_finished(t)){
 void m_init()
 {
 	deplibuv_printversion();
+	utils_crypto_class_init();
+
 	rtc_room_classinit();
 	//rtc_room_classini
 }
@@ -418,6 +478,7 @@ void m_destroy(){
 kore_log(LOG_INFO,red "Destroy m_destroy()." rst);
 //usleep(10000);
 //usleep(10);
+utils_crypto_class_destroy();
 class_destroy();
 //if(md_server){md_server->destroy(md_server);md_server=NULL;}
 //usleep(1000000);

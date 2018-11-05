@@ -34,6 +34,8 @@ f: $(SRC_PATH)deplibuv.cpp
 	g++ -std=c++11 $(I) -c $(SRC_PATH)deplibuv.cpp
 g: $(SRC_PATH)UnixStreamSocket.cpp
 	g++ -fpic -std=c++11 $(I) -c $(SRC_PATH)UnixStreamSocket.cpp
+utils: $(SRC_PATH)Crypto.cpp
+	g++ -fpic -std=c++11 $(I) -c $(SRC_PATH)Crypto.cpp
 # h
 i: $(SRC_PATH)Logger.cpp
 	g++ -std=c++11 $(I) -c $(SRC_PATH)Logger.cpp

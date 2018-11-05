@@ -73,7 +73,7 @@ obj->emit(obj,"close",(void*)&data);
 void soup_init(struct soup*s,struct server*serv){
 	//if serv == NULL return;
 memset(s, 0, sizeof(*s));
-s->state=0;	
+s->state= SOUP_STATE_INIT;	
 s->conn=serv;
 //s->name=NULL;//?? by memset scenario causes the segfault
 //s->result=NULL;//?? by memset scenario is segfault
