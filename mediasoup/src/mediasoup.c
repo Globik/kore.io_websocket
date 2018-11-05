@@ -33,6 +33,7 @@
 int Putin=0;
 int need_exit=0;
 
+
 int init(int);
 int page(struct http_request*);
 int page2(struct http_request*);
@@ -94,7 +95,8 @@ if(Putin==1){return;}
 soup_shutdown();
 //usleep(900000);
 //usleep(9000);	
-usleep(1000);
+usleep(5000);
+
 //just in case
 if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
 }
@@ -211,18 +213,74 @@ void we_can_work_it_out(struct soup *soupi,void *arg){
 kore_log(LOG_INFO,"we_can_work_it_out() occured.");
 kore_log(LOG_INFO, green "mem of soupi: %p" rst, (void*)soupi);
 kore_log(LOG_INFO, yellow "mem of arg %p" rst, arg);
-if(soupi->result){kore_log(LOG_INFO, green "data: %s" rst, soupi->result);}
-if(soupi->name){kore_log(LOG_INFO, yellow "name: %s" rst, soupi->name);}
+kore_log(LOG_INFO, green "soupi->state: %d" rst, soupi->state);
+//if(soupi->result){kore_log(LOG_INFO, green "data: %s" rst, soupi->result);}
+//if(soupi->name){kore_log(LOG_INFO, yellow "name: %s" rst, soupi->name);}
 struct connection *c=arg;
+
+switch(soupi->state){
+case SOUP_STATE_INIT:
+case SOUP_STATE_WAIT:
+kore_log(LOG_INFO, green "SOUP_STATE_INIT or wait" rst);
+break;
+case SOUP_STATE_RESULT:
+if(soupi->result !=NULL){
+kore_log(LOG_INFO, green "SOUP_STATE_RESULT\n" rst);
+if(soupi->name){kore_log(LOG_INFO, green "name: %s" rst, soupi->name);}
 kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
-//soupi->conn=NULL;
-if(soupi->result){printf(green "free soupi->result\n" rst);free(soupi->result);}
+//free(soupi->result);
+//soupi->result=NULL;
+}
+soupi->state=SOUP_STATE_DONE;
+break;
+case SOUP_STATE_DONE:
+kore_log(LOG_INFO, green "SOUP_STATE_DONE" rst);
+break;
+case SOUP_STATE_COMPLETE:
+kore_log(LOG_INFO, green "SOUP_STATE_COMPLETE" rst);
+break;
+case SOUP_STATE_ERROR:
+kore_log(LOG_INFO, red "SOUP_STATE_ERROR" rst);
+if(soupi->error !=NULL){
+kore_log(LOG_INFO, red "it's soupi->error: %s" rst, soupi->error);
+kore_websocket_send(c,1,soupi->error,strlen(soupi->error));
+//kore_free(soupi->error);
+//soupi->error=NULL;
+	
+}
+soupi->state=SOUP_STATE_DONE;//?
+break;
+default:
+kore_log(LOG_INFO, green "SOUP_STATE_DEFAULT" rst);
+//soup_continue(soupi);
+}
+
+/*
+
+if(soupi->result !=NULL){
+printf(green "free soupi->result\n" rst);
+kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
+free(soupi->result);
+soupi->result=NULL;
+}
+*/
+/* 
 if(soupi->name){
 printf(green "free soupi->name\n" rst);
 free(soupi->name);
 soupi->name=NULL;
 }
-	
+ */
+/*
+if(soupi->error){
+kore_log(LOG_INFO, red "it's soupi->error %s" rst, soupi->error);
+kore_websocket_send(c,1,soupi->error,strlen(soupi->error));
+kore_free(soupi->error);
+soupi->error=NULL;	
+}
+*/ 
+	printf("SOME AFTER DEFAULT MUST BE??\n");
+	soup_continue(soupi);
 }
 void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
 if(data==NULL)return;
@@ -323,12 +381,10 @@ m_destroy();
 //kore_task_channel_write(t,"mama\0",5);
 //kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
 if(md_server){md_server->destroy(md_server);md_server=NULL;}
-kore_task_channel_write(t,"papa\0",5);
 //m_exit();
-//usleep(100000);
 
-//usleep(100000);
 kore_log(LOG_NOTICE,"Bye. *******\n");
+
 if(md_server==NULL){
 //if(need_exit)exit(0);
 }
@@ -338,9 +394,6 @@ void pipe_data_available(struct kore_task*t){
 	kore_log(LOG_INFO, yellow "pipe_data_available" rst);
 if(kore_task_finished(t)){
 	kore_log(LOG_INFO, green "a task is finished." rst);
-	//sleep(1);
-	//_exit(0);
-	//sleep(1);
 	return;
 	}
    u_int8_t buf[BUFSIZ];
@@ -359,7 +412,7 @@ void m_init()
 void m_exit(){
 //usleep(100000);
 //kore_log(LOG_INFO,"***SUCCESS: And exit with success status.");
-_exit(0);
+//_exit(0);
 }
 void m_destroy(){
 kore_log(LOG_INFO,red "Destroy m_destroy()." rst);

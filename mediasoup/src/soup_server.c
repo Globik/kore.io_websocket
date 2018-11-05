@@ -1,7 +1,7 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <kore/kore.h>
 #include "soup_server.h"
 
 
@@ -9,7 +9,6 @@ static void closi(struct server*);
 
 int create_room(struct server*, int, struct soup*);
 
-//int on_funi(void *);
 
 void md_destroy(struct server*);
 
@@ -27,21 +26,26 @@ ee_emit(server->ee, str, data);
 }
 
 void md_destroy(struct server*serv){
+	if(serv==NULL){printf("serv is NULL.\n");return;}
 	printf("md_destroy occured for mediasoup client.\n");
 	
-	if(serv->ch){printf("looks like serv->ch still there\n");free(serv->ch);serv->ch=NULL;}
+	if(serv->ch){
+	printf("looks like serv->ch still there\n");
+	serv->ch->close(serv->ch);//free channel
+	serv->ch=NULL;
+	}
 	if(serv->name){printf("looks like serv->name still there.\n");free(serv->name);serv->name=NULL;}
 	if(serv->ee)ee_destroy(serv->ee);
 	free(serv);
+	serv=NULL;//?
 }
 
 struct server*server_new(){
-//if(ch==NULL)return NULL;
 struct server*obj=NULL;
 obj=malloc(sizeof(struct server));
 if(obj==NULL)return NULL;
 ee_t*ee=ee_new();
-if(ee==NULL)return NULL;
+if(ee==NULL){printf("ee is null\n");return NULL;}
 obj->ee=ee;
 obj->ch=channel_new();
 if(obj->ch==NULL){
@@ -84,7 +88,7 @@ int make_room(struct soup*soupi, char*method){
 if(!soupi)return 0;
 if(!method)return 0;
 if(soupi->conn==NULL) return 0;	
-soupi->name=strdup("worker.createRoom");
+soupi->name=kore_strdup("worker.createRoom");
 
 soupi->conn->create_room(soupi->conn, 2, soupi);
 return 1;
