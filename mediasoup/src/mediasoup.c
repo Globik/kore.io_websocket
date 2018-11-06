@@ -146,12 +146,15 @@ return (a);
 void kore_parent_teardown(){
 kore_log(LOG_INFO, red "kore_parent_teardown()" rst);	
 }
+const char*room_options="{\"mediaCodecs\":[{\"kind\":\"audio\",\"name\":\"audio/opus\",\"clockRate\":48000,\"payloadType\":100,\"numChannels\":2},{\"kind\":\"audio\",\"name\":\"audio/PCMU\",\"payloadType\":0,\"clockRate\":8000},{\"kind\":\"video\",\"name\":\"video/vp8\",\"payloadType\":110,\"clockRate\":90000},{\"kind\":\"video\",\"name\":\"video/h264\",\"clockRate\":90000,\"payloadType\":112,\"parameters\":{\"packetizationMode\":1}},{\"kind\":\"depth\",\"name\":\"video/vp8\",\"payloadType\":120,\"clockRate\": 90000}]}";
+
 
 void kore_worker_configure(){
 kore_log(LOG_NOTICE,red "worker configure" rst);
 libuv_task_init();
 atexit(han);
 uint32_t a=random_u32();
+uint32_t ba=random_u32();
 kore_log(LOG_INFO, red "random uint32_t : %"PRIu32"" rst, a);
 char stri[9];
 snprintf(stri, sizeof stri,"%" PRIu32, a);
@@ -164,9 +167,18 @@ ee_once(ev, stri, on_string);
 ee_emit(ev, "14289383","hi_string!");
 
 json_t*reply=json_object();
-json_object_set_new(reply,"type",json_string("ku ku a string!"));
-json_object_set_new(reply,"msg_id",json_integer(a));
+json_object_set_new(reply,"method",json_string("worker.createRoom"));
+json_object_set_new(reply,"id",json_integer(a));
+//internal,data
+json_t*js_internal=json_object();
+json_object_set_new(js_internal,"roomId", json_integer(ba));
+json_object_set_new(reply,"internal", js_internal);
+json_t*js_data = load_json_str(room_options);
+if(js_data==NULL){printf(red "js_data is NULL!\n" rst);}
+json_object_set_new(reply,"data", js_data);
 char*suki=json_dumps(reply,0);
+json_decref(js_data);
+json_decref(js_internal);
 json_decref(reply);
 printf("%s\n",suki);
 free(suki);
