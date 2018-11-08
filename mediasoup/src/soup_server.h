@@ -3,36 +3,21 @@
 #pragma once
 #include <ee.h>
 #include "channel.h"
+#include <jansson.h>
 #include <stdio.h>
 
-//struct server;
+
 struct soup;
-
-//typedef void(*on_emit)(struct server*, const char*, void*);
-//typedef void(*on_close)(struct server*);
-
-//typedef int(*on_funny)(void*);
-//typedef int(*on_create_room)(struct server*, int);
-
-//void ersti_cb(struct channel*,char*);
+//json_t;
 
 struct server{
 	ee_t*ee;
-	char*name;
+	//char*name;
 	struct channel*ch;
-	//on_emit emit;
 	void (*emit)(struct server *, const char*, void*);
-	//on_close close;
 	void (*close)(struct server*);
-	int (*create_room)(struct server*,int, struct soup*);
+	int (*create_room)(struct server*, struct soup*, const char*);
 	void (*destroy)(struct server*);
-	//int state;
-	//void*arg;
-	//void (*cb)(struct server*,void*);
-};
-
-struct out_data{
-const char*str;	
 };
 
 struct soup{
@@ -44,12 +29,20 @@ void *arg;
 void (*cb)(struct soup *, void*);
 char*result;	
 };
-
+struct out_data{char*str;};
 struct server *server_new(void);
 void soup_init(struct soup*, struct server*);
 void soup_bind_callback(struct soup*, void (*cb)(struct soup*,void*), void*);
 void soup_continue(struct soup*);
-int make_room(struct soup*, char*);
+int make_room(struct soup*, const char*);
+json_t *load_json_str(const char*);
+
+uint32_t random_u32(void);
+uint32_t rand32(uint32_t,uint32_t);
+
+
+
+
 #define SOUP_STATE_INIT 1
 #define SOUP_STATE_WAIT 2
 #define SOUP_STATE_RESULT 3

@@ -5,19 +5,24 @@
 #include "soup_server.h"
 
 
+
+
 static void closi(struct server*);
 
-int create_room(struct server*, int, struct soup*);
+int create_room(struct server*, struct soup*, const char*);
 
 
 void md_destroy(struct server*);
 
-int create_room(struct server * serv, int a, struct soup* soupi){
+
+int create_room(struct server * serv, struct soup* soupi, const char* options){
 printf("in create_room()\n");
 //ee_once(server->ch->ee, zweite_data, on_zweite_data);//on .  a ccepted with data if any, rejected
-serv->name=strdup("worker.createRoom");//??
+uint32_t room_id=random_u32();
+json_t * jso_internal = json_object();
+json_object_set_new(jso_internal, "roomId", json_integer(room_id));
 
-serv->ch->request(serv->ch, "create_room", soupi);
+serv->ch->request(serv->ch, soupi, options, jso_internal);
 return 0;
 }
 
@@ -34,7 +39,7 @@ void md_destroy(struct server*serv){
 	serv->ch->close(serv->ch);//free channel
 	serv->ch=NULL;
 	}
-	if(serv->name){printf("looks like serv->name still there.\n");free(serv->name);serv->name=NULL;}
+	//if(serv->name){printf("looks like serv->name still there.\n");free(serv->name);serv->name=NULL;}
 	if(serv->ee)ee_destroy(serv->ee);
 	free(serv);
 	serv=NULL;//?
@@ -56,7 +61,7 @@ return NULL;
 }
 obj->ch->ee=obj->ee;
 obj->emit=emiti;
-obj->name=NULL;
+
 obj->close=closi;
 obj->create_room = create_room;
 obj->destroy=md_destroy;
@@ -64,14 +69,13 @@ return obj;
 }
 
 void closi(struct server*obj){
+	
 printf("closi occured\n");
 struct out_data data;
 data.str="someone closes the server.";
+
 obj->emit(obj,"close",(void*)&data);
 }
-
-const char*room_options_2="{\"mediaCodecs\":[{\"kind\":\"audio\",\"name\":\"audio/opus\",\"clockRate\":48000,\"payloadType\":100,\"numChannels\":2},{\"kind\":\"audio\",\"name\":\"audio/PCMU\",\"payloadType\":0,\"clockRate\":8000},{\"kind\":\"video\",\"name\":\"video/vp8\",\"payloadType\":110,\"clockRate\":90000},{\"kind\":\"video\",\"name\":\"video/h264\",\"clockRate\":90000,\"payloadType\":112,\"parameters\":{\"packetizationMode\":1}},{\"kind\":\"depth\",\"name\":\"video/vp8\",\"payloadType\":120,\"clockRate\": 90000}]}";
-
 
 void soup_init(struct soup*s,struct server*serv){
 	//if serv == NULL return;
@@ -86,14 +90,13 @@ void soup_bind_callback(struct soup*soupi, void (*cb)(struct soup*,void*),void*a
 soupi->cb=cb;
 soupi->arg=arg;
 }
-int make_room(struct soup*soupi, char*method){
+int make_room(struct soup*soupi, const char* room_options){
 	printf("make room occured.\n");
 if(!soupi)return 0;
-if(!method)return 0;
 if(soupi->conn==NULL) return 0;	
 soupi->name=kore_strdup("worker.createRoom");
-
-soupi->conn->create_room(soupi->conn, 2, soupi);
+//char* in_room_opt=kore_strdup(room_options);
+soupi->conn->create_room(soupi->conn, soupi, room_options);
 return 1;
 }
 

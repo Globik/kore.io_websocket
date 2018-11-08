@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-//#include <memory.h>
+
 #include <signal.h>
 
 #include <unistd.h>// getpid(), usleep()
 
-//#include <stdio.h>
+
 #include <inttypes.h>
-//#include <stdlib.h>
+
 #include <stdint.h>
 
 
@@ -23,7 +23,7 @@
 #include "assets.h"
 #include "uv_callback.h"
 #include <uv.h>
-#include <jansson.h>
+//#include <jansson.h>
 
 #include "deplibuv.hpp"
 #include "Loop.hpp"
@@ -127,8 +127,12 @@ if(ev !=NULL)ee_destroy(ev);
 }
 
 
-uint32_t random_u32(void);
-uint32_t rand32(uint32_t,uint32_t);
+
+
+
+//uint32_t random_u32(void);
+//uint32_t rand32(uint32_t,uint32_t);
+
 uint32_t rand32(uint32_t begin,uint32_t end){
 uint32_t range=(end-begin)+1;
 	uint32_t limit=((uint64_t)RAND_MAX+1)-(((uint64_t)RAND_MAX+1)%range);
@@ -141,7 +145,6 @@ uint32_t random_u32(void){
 	//printf("a: %"PRIu32"\n",a);
 return (a);
 }
-
 
 void kore_parent_teardown(){
 kore_log(LOG_INFO, red "kore_parent_teardown()" rst);	
@@ -274,7 +277,7 @@ if(soupi==NULL){kore_log(LOG_INFO, "soupi is NULL");}
 soup_init(soupi, md_server);//?
 soup_bind_callback(soupi, we_can_work_it_out, c);
 c->hdlr_extra=soupi;
-int ra=make_room(soupi,"make_room");
+int ra=make_room(soupi, room_options);
 printf("make room: %d\n", ra);
 
 }
