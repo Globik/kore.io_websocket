@@ -10,10 +10,10 @@
 class deplibuv
 {
 public:
-	static void classinit();
-	static void classdestroy();
+	static int classinit();
+	static int classdestroy();
 	static void printversion();
-	static void runloop();
+	static int runloop();
 	static uv_loop_t* getloop();
 	static uint64_t gettime();
 	void display(char*text);
@@ -34,8 +34,9 @@ extern "C"
 {
 #endif
 void deplibuv_printversion(void);
-void class_init(void);
-void run_loop(void);
+//int class_init(void);
+int class_init(void);
+//void run_loop(void);
 void class_destroy(void);
 uv_loop_t*get_loopi(void);
 #ifdef __cplusplus

@@ -1,6 +1,8 @@
 #ifndef MS_SETTINGS_HPP
 #define MS_SETTINGS_HPP
 
+
+#ifdef __cplusplus
 #include "common.hpp"
 #include "LogLevel.hpp"
 #include "Channel/Request.hpp"
@@ -66,5 +68,18 @@ private:
 	static std::map<std::string, LogLevel> string2LogLevel;
 	static std::map<LogLevel, std::string> logLevel2String;
 };
+
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+void settings_set_configuration(int argc, char*argv[]);
+void settings_print_configuration(void);
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

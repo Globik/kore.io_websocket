@@ -51,7 +51,8 @@ namespace Channel
 	public:
 int a=10;
 		Request(Channel::UnixStreamSocket* channel, Json::Value& json);
-		virtual ~Request();
+		//virtual 
+		~Request();
 
 		void Accept();
 		void Accept(Json::Value& data);

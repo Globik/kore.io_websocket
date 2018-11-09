@@ -25,6 +25,7 @@ namespace Utils
 
 	inline int IP::GetFamily(const std::string& ip)
 	{
+		//return 1;
 		return GetFamily(ip.c_str(), ip.size());
 	}
 

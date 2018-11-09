@@ -28,7 +28,7 @@ namespace Channel
 		UnixStreamSocket(int fd);
 		//UnixStreamSocket& operator=(const UnixStreamSocket&)=delete;
 		//UnixStreamSocket(const UnixStreamSocket&)=delete;
-		
+		int alisa=0;
 
 	//private:
 	//protected:
@@ -59,6 +59,7 @@ namespace Channel
 		void about_soup_ending();
 		void UserOnUnixStreamSocketClosed(bool isClosedByPeer);//override;
 		void bfree();
+		
 	private:
 		// Passed by argument.
 		Listener* listener{ nullptr };

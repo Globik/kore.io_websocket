@@ -39,7 +39,7 @@ Loop::Loop(Channel::UnixStreamSocket* channel) : channel(channel)
 	//this->signalsHandler->AddSignal(SIGTERM, "TERM");
 
 	std::printf("Hello libuv's loop!\n");
-	deplibuv::runloop();
+	if(deplibuv::runloop() ==1){Loop::Close();};
 std::printf(green "Good bye, libuv's loop!\n" rst);
 }
 
@@ -54,10 +54,10 @@ void Loop::Close()
 MS_TRACE();
 std::printf("Loop::Close() entered.\n");
 
-	if (this->closed)
+if (this->closed)
 	{
-		//by me. send_log
-		MS_ERROR("already closed");
+//by me. send_log
+MS_ERROR("already closed");
 printf(red "already closed!\n" rst);
 		return;
 	}
@@ -290,7 +290,7 @@ std::printf("Room created roomId:%" PRIu32 "]\n",roomId);
 		default:
 		{
 			MS_ERROR("unknown method");
-
+printf("UNKNOWN METHOD\n");
 			request->Reject("unknown method");
 		}
 	}

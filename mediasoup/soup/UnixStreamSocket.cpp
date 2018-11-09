@@ -35,14 +35,16 @@ namespace Channel
 
 	/* Instance methods. */
 
-	UnixStreamSocket::UnixStreamSocket(int fd) //: ::UnixStreamSocket::UnixStreamSocket(fd, MaxSize)
-	{
+UnixStreamSocket::UnixStreamSocket(int fd) //: ::UnixStreamSocket::UnixStreamSocket(fd, MaxSize)
+{
 		MS_TRACE_STD();
 		uv_loop_t*mloop=deplibuv::getloop();
 		uv_loop_set_data(mloop,(void*)this);
 		
 int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT);
 std::printf("uv_callback_t &to_cpp init: %d\n",rc);
+//UnixStreamSocket::alisa=2;
+//printf(red "Alisa in unxstrsock is %d\n" rst, UnixStreamSocket::alisa);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 //rc=uv_callback_init(mloop,&stop_cpp,to_stop_cpp, UV_DEFAULT);
@@ -94,8 +96,8 @@ void UnixStreamSocket::destroy(){
 	printf("achieved destroy()\n");
 	// data is null, just so, let the loop to get rid of two uv_callbacks at shutdown
 	int r=uv_callback_fire(&from_cpp, NULL,NULL);
-		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
-		uv_walk(deplibuv::getloop(), on_walk, NULL);
+	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+	uv_walk(deplibuv::getloop(), on_walk, NULL);
 //void * loop_data=uv_loop_get_data(deplibuv::getloop());
 	//free(loop_data);
 	// no idea how destructor in C++ supposed to be work, but does not work and i should manually call destructor
@@ -137,6 +139,7 @@ return nullptr;
 
 void UnixStreamSocket::SetListener(Listener* listener)
 	{
+		
 		MS_TRACE_STD();
 		std::printf("Entering UnixStreamSocket::SetListener(listener)\n");
 this->listener = listener;
@@ -144,7 +147,9 @@ this->listener = listener;
 
 	void UnixStreamSocket::Send(Json::Value& msg)
 	{
+		//return;
 		std::printf("Entering UnixStreamSocket::Send(Json)\n");
+		
 		std::cout << msg << std::endl;
 
 		 MS_TRACE_STD();
@@ -153,28 +158,35 @@ this->listener = listener;
 		size_t nsPayloadLen;
 		size_t nsNumLen;
 		size_t nsLen;
-
+//return;
 		this->jsonWriter->write(msg, &stream);
 	
 		const std::string tmp=stream.str();
 		char*wl=strdup(tmp.c_str());
 		
+		printf("WL: %s\n", wl);
+		
 		
 		int r=uv_callback_fire(&from_cpp, wl,NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
 		
-
+/*
 		if (nsPayloadLen > MessageMaxSize)
 		{
 			std::printf("mesage too big*************************************************************************************\n");
 
 			//return;
 		}
+		*/ 
 		
 	}
 	
-	void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
+void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
+UnixStreamSocket::alisa=2;
+printf(red "Alisa in ::SendLog is %d\n" rst, UnixStreamSocket::alisa);
+		
+		//return;
 		//if(suchara==1){printf(red "yes\n" rst);return;}else{printf(red "no\n" rst);}
 		std::printf("SENDLOG: %s\n",nsPayload);
 		char*wl=strdup(nsPayload);
@@ -227,7 +239,8 @@ size_t jsonLen;
 				}
 				catch (const MediaSoupError& error)
 				{
-					MS_ERROR_STD("discarding wrong Channel request");
+					printf(red " discarding wrong channel request\n");
+					MS_ERROR_STD("discarding wrong Channel request\n" rst);
 				}
 
 				if (request != nullptr)
@@ -270,7 +283,14 @@ std::printf("Entering ::UserOnUnixStreamSocketClosed(bool).\n");
 // C wrapper
 void*set_channel(){
 // dummy integer 3 as a parameter, just for fun
+
 auto* chl = new Channel::UnixStreamSocket(3);
+//Channel::UnixStreamSocket::alisa=10;
+//std::string id=std::string("3");
+//Logger::Init(id,chl);
+
+//chl->alisa="8";
+// printf("SET CHANNEL: %d\n",(int)chl->alisa);
 return chl;
 }
 void soup_shutdown(){

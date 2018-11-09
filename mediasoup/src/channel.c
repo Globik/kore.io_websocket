@@ -139,12 +139,12 @@ db->id = req_id;
 soupi->state=SOUP_STATE_WAIT;
 db->soupi=soupi;
 
-db->timer=kore_timer_add(on_timeout, 6000, soupi, 1);
+db->timer=kore_timer_add(on_timeout, 16000, soupi, 1);
 
 if(db->timer==NULL){kore_log(LOG_INFO, red "*** why db->timer is NULL! in channel_send? ***" rst);}
 LIST_INSERT_HEAD(&letters, db, rlist);
-free(req_string);
-/*
+//free(req_string);
+//char*suki=strdup("{\"id\":45444444}");
 int rc=uv_callback_fire(&to_cpp,(void*)req_string, NULL);
 printf("fire to_cpp: %d\n", rc);//0 is OK
 if(rc !=0){
@@ -159,7 +159,7 @@ soup_set_error(soupi, "data to send failed.");
 soupi->cb(soupi, soupi->arg);
 soupi->id = 0;
 }
-*/ 
+
 }
 
 static void invoke_for_dummy(char* data){
@@ -172,18 +172,26 @@ static void invoke_for_dummy(char* data){
 struct postman *du = NULL; 
 struct postman *dtmp;
 
-printf("ANY DATA? %s [%s]\n",data, __FILE__);
+//printf("ANY DATA? %s [%s]\n",data, __FILE__);
 for(du=LIST_FIRST(&letters); du !=NULL; du=dtmp){
 dtmp=LIST_NEXT(du, rlist);
 
-if(du->id == 77){
-
+if(du->id == du->soupi->id){
+printf("FOUND IN INVOKE FOR DUMMY\n");
 if(du->soupi){
+	//printf(green "it's a du->soupi! %s\n" rst, );
 du->soupi->result=kore_strdup(data);	
+printf(green "it's a du->soupi! %s\n" rst, du->soupi->result);
 kore_timer_remove(du->timer);
 du->timer=NULL;
 du->soupi->state=SOUP_STATE_RESULT;
-if(du->soupi->cb !=NULL)du->soupi->cb(du->soupi, du->soupi->arg);	
+du->soupi->id=0;
+du->id=0;
+if(du->soupi->cb !=NULL){
+	printf(green "du->soupi->cb is HERE!!\n" rst);
+	du->soupi->cb(du->soupi, du->soupi->arg);	}else{
+		printf(red "du->soupi->cb null??\n" rst);
+		}
 
 LIST_REMOVE(du, rlist);
 du->id = 0;

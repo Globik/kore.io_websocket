@@ -60,18 +60,20 @@ std::cout << json << std::endl;
 		static const Json::StaticString JsonStringInternal{ "internal" };
 		static const Json::StaticString JsonStringData{ "data" };
 
-		if (json[JsonStringId].isUInt())
-			this->id = json[JsonStringId].asUInt();
-		else
+		if (json[JsonStringId].isUInt()){
+			this->id = json[JsonStringId].asUInt();}
+		else{
 			MS_THROW_ERROR("json has no numeric .id field");
-			//std::printf("json has no numeric .id field\n");
+			std::printf("json has no numeric .id field\n");
+		}
 
-		if (json[JsonStringMethod].isString())
-			this->method = json[JsonStringMethod].asString();
-		else
+		if (json[JsonStringMethod].isString()){
+			this->method = json[JsonStringMethod].asString();}
+		else{
 			std::printf("json has no string .method field\n");
-			//MS_THROW_ERROR("json has no string .method field");
-
+			MS_THROW_ERROR("json has no string .method field");
+		}
+printf("before auto it loop\n");
 		auto it = Request::string2MethodId.find(this->method);
 
 		if (it != Request::string2MethodId.end())
@@ -97,11 +99,11 @@ std::cout << json << std::endl;
 			this->data = Json::Value(Json::objectValue);
 	}
 
-	Request::~Request()
-	{
-		std::printf("Look ma, ~Request() destructor!\n");
-		MS_TRACE();
-	}
+Request::~Request()
+{
+std::printf("*************************************************************************Look ma, ~Request() destructor!\n***********");
+MS_TRACE();
+}
 
 	void Request::Accept()
 	{
@@ -152,6 +154,7 @@ std::printf("Entering Request::Accept(json)\n");
 	 */
 	void Request::Reject(const char* reason)
 	{
+		std::printf("entering request reject reason str\n");
 		MS_TRACE();
 std::printf("Entering Request::Reject(char*reason)\n");
 		static const Json::StaticString JsonStringId{ "id" };

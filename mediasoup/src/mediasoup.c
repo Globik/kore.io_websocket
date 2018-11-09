@@ -26,10 +26,15 @@
 //#include <jansson.h>
 
 #include "deplibuv.hpp"
+#include "Logger.hpp"
+#include "Settings.hpp"
 #include "Loop.hpp"
 #include "Utils.hpp"
 #include "Channel/UnixStreamSocket.hpp"
 #include "Room.hpp"
+
+
+
 
 #include "soup_server.h"
 
@@ -41,7 +46,7 @@
 int Putin=0;
 int need_exit=0;
 
-
+int soup_unavailable=0;
 int init(int);
 int page(struct http_request*);
 int page2(struct http_request*);
@@ -106,14 +111,18 @@ kore_task_run(&pipe_task, 0);
 
 void im_down(){
 kore_log(LOG_INFO,"im_down()");
+if(soup_unavailable==1){
+kore_log(LOG_INFO, yellow "THE SOUP IS NOT AVAILABLE NOW! %d" rst, soup_unavailable);
+return;	
+}
 need_exit=1;	
 if(need_exit){
 if(Putin==1){return;}
 if(md_server==NULL){printf(red "md_server is NULL, returning\n" rst);return;}
 soup_shutdown();
 //usleep(900000);
-//usleep(9000);	
-usleep(5000);
+usleep(1000);	
+//usleep(5000);
 
 //just in case
 //if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
@@ -237,14 +246,14 @@ printf("make room: %d\n", ra);
 
 }
 
-void we_can_work_it_out(struct soup *soupi,void *arg){
+void we_can_work_it_out(struct soup *soupi,void * const arg2){
 kore_log(LOG_INFO,"we_can_work_it_out() occured.");
 kore_log(LOG_INFO, green "mem of soupi: %p" rst, (void*)soupi);
-kore_log(LOG_INFO, yellow "mem of arg %p" rst, arg);
+kore_log(LOG_INFO, yellow "mem of arg2 %p" rst, arg2);
 kore_log(LOG_INFO, green "soupi->state: %d" rst, soupi->state);
 //if(soupi->result){kore_log(LOG_INFO, green "data: %s" rst, soupi->result);}
 //if(soupi->name){kore_log(LOG_INFO, yellow "name: %s" rst, soupi->name);}
-struct connection *c=arg;
+struct connection *c=arg2;
 
 switch(soupi->state){
 case SOUP_STATE_INIT:
@@ -252,13 +261,17 @@ case SOUP_STATE_WAIT:
 kore_log(LOG_INFO, green "SOUP_STATE_INIT or wait" rst);
 break;
 case SOUP_STATE_RESULT:
-if(soupi->result !=NULL){
+//if(soupi->result !=NULL){
 kore_log(LOG_INFO, green "SOUP_STATE_RESULT\n" rst);
-if(soupi->name){kore_log(LOG_INFO, green "name: %s" rst, soupi->name);}
+printf(red "RESULT IN WS: %s\n" rst, soupi->result);
+printf(yellow "result str lenght: %d\n" rst, strlen(soupi->result));
+// char*sik=strdup(soupi->result);
+size_t lk=strlen(soupi->result);
+//if(soupi->name){kore_log(LOG_INFO, green "name: %s" rst, soupi->name);}
+kore_websocket_send(c,1, soupi->result, lk+1);
+//free(sik);
+//kore_websocket_send(c,1, soupi->result, sizeof(soupi->result));
 
-
-kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
-}
 soupi->state=SOUP_STATE_DONE;
 break;
 case SOUP_STATE_DONE:
@@ -362,14 +375,24 @@ int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
 //atexit(han)
 kore_task_channel_write(t,"mama\0",5);
-
-class_init();
-void*chl=set_channel();
+char * LL_id="3";
+//int sk=class_init2();
+if(class_init()==1){
+printf(red " sk is 1\n" rst);
+soup_unavailable=1;
+class_destroy();//by idea must be fatal be,  exit with error
+return (KORE_RESULT_OK);
+}
+void * soup_channel=set_channel();
+logger_init(LL_id, soup_channel);
+char* vli[1]={"a"};
+settings_set_configuration(1, vli);
+//settings_print_configuration();
 m_init();
 
 //md_server=server_new();
 //if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
-set_soup_loop(chl);// it's a Loop loop(channel)
+set_soup_loop(soup_channel);// it's a Loop loop(channel)
 m_destroy();
 //if(md_server){md_server->destroy(md_server);md_server=NULL;}
 
