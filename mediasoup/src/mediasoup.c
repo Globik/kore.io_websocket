@@ -72,6 +72,8 @@ void websocket_message(struct connection*, u_int8_t,void*,size_t);
 json_t *load_json(const char*,size_t);
 json_t *load_json_str(const char*);
 
+void signal_handler(int);
+
 uint32_t random_u32(void);
 
 
@@ -83,7 +85,7 @@ struct pizda{
 char*msg;
 };
 
-ee_t* ev=NULL;
+//ee_t* ev=NULL;
 
 uv_callback_t stop_worker, to_cpp;
 
@@ -92,7 +94,10 @@ const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",
 void libuv_task_init(){
 //if(worker->id !=1) return (KORE_RESULT_OK); //if  cpu workers greater than 1 just comment it out for a dedicated task
 //struct kore_timer*tim=NULL;
+md_server=server_new();
+if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
 kore_task_create(&pipe_task,libuv_task);
+
 kore_task_bind_callback(&pipe_task, pipe_data_available);
 kore_task_run(&pipe_task, 0);
 //tim=kore_timer_add(tick, 2000, NULL, 1);
@@ -111,7 +116,7 @@ soup_shutdown();
 usleep(5000);
 
 //just in case
-if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
+//if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
 }
 }
 
@@ -123,7 +128,8 @@ printf(red "on_string occured! %s\n" rst,(char*)arg);
 void han(){
 kore_log(LOG_INFO, yellow "at_exit()" rst);
 //im_down();
-if(ev !=NULL)ee_destroy(ev);
+//if(ev !=NULL)ee_destroy(ev);
+if(md_server){md_server->destroy(md_server);md_server=NULL;}
 }
 
 
@@ -154,40 +160,26 @@ const char*room_options="{\"mediaCodecs\":[{\"kind\":\"audio\",\"name\":\"audio/
 
 void kore_worker_configure(){
 kore_log(LOG_NOTICE,red "worker configure" rst);
+
+struct sigaction sa;
+memset(&sa,0,sizeof(sa));
+sa.sa_handler=signal_handler;
+if(sigfillset(&sa.sa_mask)==-1){
+	printf(red "fillset: %s\n" rst, errno_s);
+	}
+	
+if(sigaction(SIGHUP, &sa, NULL)==-1)printf(red "sigaction: %s\n" rst, errno_s);
+
+
 libuv_task_init();
 atexit(han);
 uint32_t a=random_u32();
-uint32_t ba=random_u32();
+
 kore_log(LOG_INFO, red "random uint32_t : %"PRIu32"" rst, a);
 char stri[9];
 snprintf(stri, sizeof stri,"%" PRIu32, a);
 kore_log(LOG_INFO, red "stri: %s" rst, stri);
 
-ev=ee_new();
-ee_once(ev, stri, on_string);
-//ee_emit(server->ee, str, data);	
-//14289383
-ee_emit(ev, "14289383","hi_string!");
-
-json_t*reply=json_object();
-json_object_set_new(reply,"method",json_string("worker.createRoom"));
-json_object_set_new(reply,"id",json_integer(a));
-//internal,data
-json_t*js_internal=json_object();
-json_object_set_new(js_internal,"roomId", json_integer(ba));
-json_object_set_new(reply,"internal", js_internal);
-json_t*js_data = load_json_str(room_options);
-if(js_data==NULL){printf(red "js_data is NULL!\n" rst);}
-json_object_set_new(reply,"data", js_data);
-char*suki=json_dumps(reply,0);
-json_decref(js_data);
-json_decref(js_internal);
-json_decref(reply);
-printf("%s\n",suki);
-free(suki);
-uint32_t bugi=get_random32u();
-printf("bugi=> %"PRIu32"\n", bugi);
-//10158188
 }
 
 void kore_worker_teardown(){
@@ -218,43 +210,6 @@ kore_log(LOG_NOTICE,"front2.html");
 return (KORE_RESULT_OK);
 }
 
-/*
-void*on_from_cpp(uv_callback_t*handle,void*data){
-if(data==NULL){kore_log(LOG_INFO,"DATA IS NULL!");return NULL;}
-
-kore_log(LOG_INFO,"ON_FROM_CPP data came: %s",(char*)data);
-char*s=(char*)data;
-
-	
-json_t * duri=load_json_str(data);
-	if(duri){
-	kore_log(LOG_INFO,"json root is ok");
-	json_decref(duri);
-	}else{
-	kore_log(LOG_INFO,"json root is not ok.");
-	}
-	
-
-json_auto_t*reply=json_object();
-json_object_set_new(reply,"type",json_string("on_result"));
-json_object_set_new(reply,"msg",json_string(s));
-size_t size=json_dumpb(reply,NULL,0,0);
-if(size==0) {return NULL;}
-char *buf=alloca(size);
-size=json_dumpb(reply,buf,size,0);
-kore_log(LOG_INFO,"SIZE: %d",size);
-
-//kore_log(LOG_INFO,"BUFFER JSON: %s",buf);
-kore_log(LOG_INFO,"Here must be kore_websocket_send();");
-kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,size,WEBSOCKET_BROADCAST_GLOBAL);
-
-if(duri)free(data);
-data=NULL;
-
-//return NULL;
-return "saka";
-}
-*/
 int page_ws_connect(struct http_request*req){
 kore_log(LOG_INFO,"path: %s, http_request: %p",req->path,req);
 kore_websocket_handshake(req,"websocket_connect","websocket_message","websocket_disconnect");
@@ -272,7 +227,7 @@ char *buf=alloca(size);
 size=json_dumpb(reply,buf,size,0);
 kore_websocket_send(c,1,buf,size);
 
-struct soup*soupi=kore_calloc(1, sizeof(*soupi));
+struct soup* soupi=kore_calloc(1, sizeof(*soupi));
 if(soupi==NULL){kore_log(LOG_INFO, "soupi is NULL");}
 soup_init(soupi, md_server);//?
 soup_bind_callback(soupi, we_can_work_it_out, c);
@@ -300,9 +255,9 @@ case SOUP_STATE_RESULT:
 if(soupi->result !=NULL){
 kore_log(LOG_INFO, green "SOUP_STATE_RESULT\n" rst);
 if(soupi->name){kore_log(LOG_INFO, green "name: %s" rst, soupi->name);}
+
+
 kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
-//free(soupi->result);
-//soupi->result=NULL;
 }
 soupi->state=SOUP_STATE_DONE;
 break;
@@ -316,10 +271,7 @@ case SOUP_STATE_ERROR:
 kore_log(LOG_INFO, red "SOUP_STATE_ERROR" rst);
 if(soupi->error !=NULL){
 kore_log(LOG_INFO, red "it's soupi->error: %s" rst, soupi->error);
-kore_websocket_send(c,1,soupi->error,strlen(soupi->error));
-//kore_free(soupi->error);
-//soupi->error=NULL;
-	
+kore_websocket_send(c, 1, soupi->error, strlen(soupi->error));
 }
 soupi->state=SOUP_STATE_DONE;//?
 break;
@@ -328,30 +280,6 @@ kore_log(LOG_INFO, green "SOUP_STATE_DEFAULT" rst);
 //soup_continue(soupi);
 }
 
-/*
-
-if(soupi->result !=NULL){
-printf(green "free soupi->result\n" rst);
-kore_websocket_send(c,1,soupi->result,strlen(soupi->result));
-free(soupi->result);
-soupi->result=NULL;
-}
-*/
-/* 
-if(soupi->name){
-printf(green "free soupi->name\n" rst);
-free(soupi->name);
-soupi->name=NULL;
-}
- */
-/*
-if(soupi->error){
-kore_log(LOG_INFO, red "it's soupi->error %s" rst, soupi->error);
-kore_websocket_send(c,1,soupi->error,strlen(soupi->error));
-kore_free(soupi->error);
-soupi->error=NULL;	
-}
-*/ 
 	printf("SOME AFTER DEFAULT MUST BE??\n");
 	soup_continue(soupi);
 }
@@ -421,46 +349,32 @@ if(c->hdlr_extra !=NULL)
 		//free soupi
 		printf(yellow "free c->hdlr_extra\n" rst);
 		//c->hdlr_extra->conn=NULL;
+		struct soup*s=c->hdlr_extra;
+		s->conn=NULL;
+		printf("c->hdlr_extra->id: %"PRIu32"\n", s->id);
 		kore_free(c->hdlr_extra);
 	c->hdlr_extra=NULL;
-	//free(c);
+	
 }
 }
 
 int libuv_task(struct kore_task*t){
 kore_log(LOG_NOTICE,"A task created");
-//atexit(han);
+//atexit(han)
 kore_task_channel_write(t,"mama\0",5);
 
 class_init();
 void*chl=set_channel();
 m_init();
-//int rc;
-//char*s="{\"mama\":\"papa\"}";
-	/*
-char*s="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 
-rc=uv_callback_fire(&to_cpp,(void*)s, NULL);
-kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
-char*d="{\"id\":3444444333,\"method\":\"room.close\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
-usleep(1000);
- rc=uv_callback_fire(&to_cpp,(void*)d, NULL);
-kore_log(LOG_INFO,"uv_callback_t &to_cpp fire %d",rc);
-	*/
-md_server=server_new();
-if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
+//md_server=server_new();
+//if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
 set_soup_loop(chl);// it's a Loop loop(channel)
 m_destroy();
-//kore_task_channel_write(t,"mama\0",5);
-//kore_log(LOG_NOTICE,"*** MMM Bye. *******\n");
-if(md_server){md_server->destroy(md_server);md_server=NULL;}
-//m_exit();
+//if(md_server){md_server->destroy(md_server);md_server=NULL;}
 
 kore_log(LOG_NOTICE,"Bye. *******\n");
 
-if(md_server==NULL){
-//if(need_exit)exit(0);
-}
 return (KORE_RESULT_OK);
 }
 void pipe_data_available(struct kore_task*t){
@@ -478,26 +392,17 @@ if(kore_task_finished(t)){
 
 void m_init()
 {
-	deplibuv_printversion();
-	utils_crypto_class_init();
-
-	rtc_room_classinit();
-	//rtc_room_classini
+deplibuv_printversion();
+utils_crypto_class_init();
+rtc_room_classinit();
 }
-void m_exit(){
-//usleep(100000);
-//kore_log(LOG_INFO,"***SUCCESS: And exit with success status.");
-//_exit(0);
-}
+void m_exit(){}
 void m_destroy(){
 kore_log(LOG_INFO,red "Destroy m_destroy()." rst);
 //usleep(10000);
 //usleep(10);
 utils_crypto_class_destroy();
 class_destroy();
-//if(md_server){md_server->destroy(md_server);md_server=NULL;}
-//usleep(1000000);
-//usleep(1);
 }
 
 json_t *load_json(const char*text,size_t buflen){
@@ -523,50 +428,7 @@ return (json_t*)0;
 }
 }
 
-/*
- * 
- * 
- * Correct
- * 
- * Signal INT received, exiting.
-[parent]: server shutting down
-Loop::Close() entered.
-[parent]: waiting for workers to drain and shutdown
-Closing signalsHandler.
-signal destroy
-on_walk unixstream socket
-on_walk unixstream socket
-on_walk unixstream socket
-on_walk unixstream socket
-Look ma, ~UnixStreamSocket() destructor!
-on close sig handler
-on close sig handler
-Good bye, libuv's loop!
-The loop should be ending now!
-Look ma, ~Loop() destructor.
-[wrk 0]: Destroy m_destroy().
-Look ma, loop is destroyd.
-[wrk 0]: A message came: mama
-[wrk 0]: *** MMM Bye. *******
+void signal_handler(int a){
+printf(red "*** SIGNAL_HANDLER: %d ***\n" rst, a);	
+}
 
-md_destroy occured for mediasoup client.
-looks like serv->ch still there
-looks like serv->name still there.
-[wrk 0]: A message came: papa
-[wrk 0]: a task is finished.
-[parent]: worker 0 (8690)-> status 0
-[parent]: goodbye
-* 
-* UNcorect
-* 
-*  Signal INT received, exiting.
-Loop::Close() entered.
-Closing signalsHandler.
-signal destroy
-[parent]: server shutting down
-[parent]: waiting for workers to drain and shutdown
-[parent]: worker 0 (8766)-> status 2
-[parent]: goodbye
-
-
- */

@@ -12,16 +12,11 @@
 #define rst "\x1b[0m"
 
 
-struct reqtimeout{
-uint32_t a;
-struct soup* s;
-char*req_str;	
-};
 	
 
 struct postman{
-uint32_t a;
-struct soup*soupi;
+uint32_t id;
+struct soup* soupi;
 struct kore_timer * timer;
 LIST_ENTRY (postman) rlist;	
 };
@@ -29,7 +24,7 @@ LIST_HEAD(, postman) letters;
 
 
 	
-void channel_send(struct channel*, struct soup*, const char*, json_t*);
+void channel_send(struct channel *, struct soup*, const char*, json_t*);
 void channel_close(struct channel*);
 static int pending_close(void);
 
@@ -39,9 +34,11 @@ static void soup_set_error(struct soup *, const char*);
 static void soup_handle(struct soup*);
 static void soup_release(struct soup*);
 
+static int id_lookup(uint32_t);
+
 static void on_timeout(void*, u_int64_t);
 
-struct channel *channel_new(){
+struct channel * channel_new(){
 LIST_INIT(&letters);
 struct channel*ch = NULL;
 ch=malloc(sizeof(struct channel));
@@ -49,82 +46,44 @@ if(ch==NULL)return NULL;
 ch->ee=NULL;
 ch->request=channel_send;
 ch->close=channel_close;
+
 return ch;	
 }
 
-static void on_timeout(void* arg, u_int64_t now){
-	if(arg==NULL){printf(red "arg is NULL in on_timeout" rst); return;}
+static void on_timeout(void* const arg_data, u_int64_t now){
+	//if(arg_data == NULL){printf(red "arg_data is NULL in on_timeout" rst); return;}
 	printf(yellow "timeout!\n" rst);
-	uint32_t tmp_a=0;
-	struct reqtimeout* t = (struct reqtimeout*)arg;
-	tmp_a=t->a;
-	struct soup *s = (struct soup*)t->s;
+	
+	struct soup *s = arg_data;
 	soup_set_error(s, "***TIMEOUT!***");
-	s->cb(s, s->arg);
-	
-	t->s = NULL;
-	free(t->req_str);
-	t->req_str=NULL;
-	free(t);
-	t = NULL;
-	//todo find postman and remove all stuff
-	
+	s->cb(s, s->arg);	
 struct postman *du = NULL; 
 struct postman *dtmp;
 
-
 for(du=LIST_FIRST(&letters); du !=NULL; du=dtmp){
 dtmp=LIST_NEXT(du, rlist);
-
-
-printf("du->a: %"PRIu32"\n",du->a);
-if(du->a==tmp_a){
-if(du->soupi){
-if(du->soupi->result !=NULL){
-printf("not null result\n");kore_free(du->soupi->result);
-du->soupi->result=NULL;
+printf("du->id: %"PRIu32"\n",du->id);
+if(du->id == s->id)break;
 }
-if(du->soupi->error !=NULL){
-	printf("du->soupi->error is not null\n");
-	kore_free(du->soupi->error);
-	du->soupi->error=NULL;
-	}
-	if(du->soupi->name !=NULL){
-	printf("du->soupi->name is not null: %s\n", du->soupi->name);
-	kore_free(du->soupi->name);
-	du->soupi->name=NULL;
-	}
-if(du->timer==NULL){
-	printf("du->timer is null\n");
-	}else{	
-		printf("du->timer is not null\n");
-//kore_timer_remove(du->timer);
 
+if(du == NULL){
+printf(red "du is NULL\n");
+return;
+}else{printf(red "du is NOT NULL\n" rst);}
+
+if(du->timer !=NULL){
+printf(yellow "du->timer is NOT NULL\n" rst);
 du->timer=NULL;
 }
-printf("state: %d\n", du->soupi->state);
-//if(du->soupi->cb !=NULL)du->soupi->cb(du->soupi, du->soupi->arg);	
-
+du->id = 0;
 LIST_REMOVE(du, rlist);
-printf(green "after LIST_REMOVE\n" rst);
+//printf(green "after LIST_REMOVE\n" rst);
 du->soupi=NULL;
 free(du);
 du=NULL;
-
+s->id = 0;
 }
 
-
-break;
-}
-
-
-}
-	if(du==NULL){
-printf("not found\n");
-//return;
-}else{printf(red "du is not null\n" rst);
-	free(du);du->soupi=NULL;du=NULL;}
-}
 void channel_close(struct channel* ch){
 	//printf("channel_close()\n");
 	int a=pending_close();
@@ -133,20 +92,27 @@ void channel_close(struct channel* ch){
 	free(ch);
 }
 
-void channel_send(struct channel*ch, struct soup *soupi, const char* options, json_t* jso_internal){
+void channel_send(struct channel* ch, struct soup *soupi, const char* options, json_t* jso_internal){
 printf("channel_send occured\n");
 
 if(soupi==NULL){printf(red "why soupi is NULL in channel_send()?\n" rst);}
-
+printf("soupi->id: %"PRIu32"\n", soupi->id);
 struct postman *db=malloc(sizeof(struct postman));
-if(db==NULL){
+if(db == NULL){
 printf(red "struct postman memory fails\n" rst);
 return;
 }
 
 
-//uint32_t room_id=random_u32();
-uint32_t req_id=random_u32();
+uint32_t req_id =0;
+if(soupi->id==0){
+while(req_id == 0){
+req_id = random_u32();
+if(id_lookup(req_id) !=0){printf(red "id_lookup(req_id)==0!\n" rst);req_id = 0;}
+printf(green "id_lookup(req_id) = -1\n" rst);	
+}
+}else{printf(red "why soupi->id is not 0??\n" rst);}
+//random_u32();
 //todo check if exists
 
 if(soupi->name==NULL){printf(red "why soupi->name is NULL?\n");}
@@ -166,26 +132,18 @@ json_decref(jso_internal);
 json_decref(jso_request);
 printf("req_string: %s\n", req_string);
 
-
-
-struct reqtimeout* req_timeout=malloc(sizeof(struct reqtimeout));
-
-if(req_timeout == NULL)printf(red "why req_timeout memory fails?\n" rst);
-//time_req->s = NULL;
-req_timeout->s = soupi;
-req_timeout->req_str = req_string;
-req_timeout->a=req_id;
-
-db->a = req_id;
-db->soupi=NULL;
+soupi->id = req_id;
+db->id = req_id;
+//db->soupi=NULL;
 //soupi->result=NULL;
 soupi->state=SOUP_STATE_WAIT;
 db->soupi=soupi;
 
-db->timer=kore_timer_add(on_timeout, 6000, req_timeout, 1);
+db->timer=kore_timer_add(on_timeout, 6000, soupi, 1);
 
 if(db->timer==NULL){kore_log(LOG_INFO, red "*** why db->timer is NULL! in channel_send? ***" rst);}
 LIST_INSERT_HEAD(&letters, db, rlist);
+free(req_string);
 /*
 int rc=uv_callback_fire(&to_cpp,(void*)req_string, NULL);
 printf("fire to_cpp: %d\n", rc);//0 is OK
@@ -194,10 +152,12 @@ LIST_REMOVE(db, rlist);
 kore_timer_remove(db->timer);
 db->timer=NULL;//??
 db->soupi=NULL;//??
+db->id = 0;
 free(db);
 db=NULL;//??
 soup_set_error(soupi, "data to send failed.");
 soupi->cb(soupi, soupi->arg);
+soupi->id = 0;
 }
 */ 
 }
@@ -216,7 +176,7 @@ printf("ANY DATA? %s [%s]\n",data, __FILE__);
 for(du=LIST_FIRST(&letters); du !=NULL; du=dtmp){
 dtmp=LIST_NEXT(du, rlist);
 
-if(du->a==77){
+if(du->id == 77){
 
 if(du->soupi){
 du->soupi->result=kore_strdup(data);	
@@ -226,6 +186,7 @@ du->soupi->state=SOUP_STATE_RESULT;
 if(du->soupi->cb !=NULL)du->soupi->cb(du->soupi, du->soupi->arg);	
 
 LIST_REMOVE(du, rlist);
+du->id = 0;
 du->soupi=NULL;
 free(du);
 du=NULL;
@@ -242,6 +203,18 @@ printf("not found\n");
 }
 	
 }
+
+
+static int id_lookup(uint32_t z_id){
+struct postman *p = NULL;
+LIST_FOREACH(p, &letters, rlist){
+if(p->id == z_id) return -1;
+}
+return 0;	
+}
+
+
+
 static int pending_close(){
 printf("pending_close()\n");	
 struct postman*du;
@@ -249,22 +222,15 @@ while(!LIST_EMPTY(&letters)){
 du=LIST_FIRST(&letters);
 LIST_REMOVE(du, rlist);
 
-if(du->soupi){
-if(du->soupi->cb !=NULL){
-
-soup_set_error(du->soupi, "channel closed.");	
 if(du->timer==NULL){
 printf("du->timer is NULL\n");}else{printf("du->timet is not null\n");
-	//kore_timer_remove(du->timer);
-	}
-du->timer=NULL;
-du->soupi->cb(du->soupi, du->soupi->arg);	
+kore_timer_remove(du->timer);
 }
+du->timer=NULL;
+du->id = 0;
 du->soupi=NULL;
 free(du);
 du=NULL;
-
-}	
 }
 return 0;
 } 

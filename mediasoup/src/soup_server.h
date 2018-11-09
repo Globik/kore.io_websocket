@@ -23,6 +23,7 @@ struct server{
 struct soup{
 struct server*conn;
 u_int8_t state;
+uint32_t id;
 char*error;
 char*name;
 void *arg;
