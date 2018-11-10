@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <kore/kore.h>
+#include "globikCommon.h"
 
 
 #define green "\x1b[32m"
@@ -29,7 +30,7 @@ void channel_close(struct channel*);
 static int pending_close(void);
 
 
-static void invoke_for_dummy(char*);
+static void invoke_for_dummy(json_t * data);
 static void soup_set_error(struct soup *, const char*);
 static void soup_handle(struct soup*);
 static void soup_release(struct soup*);
@@ -161,37 +162,91 @@ soupi->id = 0;
 }
 
 }
+uint32_t js_get_uint32(const json_t * const root, const char*key);
+int if_exist_key(const json_t * const root, const char*key);
 
-static void invoke_for_dummy(char* data){
+int if_exist_key(const json_t * const root, const char*key){
+const json_t * const k = json_object_get(root, key);
+if(k){return 1;}
+return 0;	
+}
+
+
+uint32_t js_get_uint32(const json_t * const root, const char*key){
+const json_t * const res_id = json_object_get(root, key);
+if(res_id && json_is_integer(res_id)){
+uint32_t id = json_integer_value(res_id);
+return id;
+}
+return 0;
+}
+
+static void invoke_for_dummy(json_t * data){
 //struct responsi resp;
 //resp.ch=ch;
 //resp.data="room_created";
 //ch->on_ersti(ch,(void*)&resp);
 //ch->on_ersti=NULL;
 //ee_emit(ch->ee, erste_data, (void*)&resp);
+json_t* root=data;
+//if(!json_is_object(root))bla bla error
+
+if(if_exist_key(root, "id")==1){
+printf("key 'id' exists\n");
+uint32_t res_id=js_get_uint32(root, "id");
+if(res_id==0){printf(red "why id is 0?\n" rst);}
+
 struct postman *du = NULL; 
 struct postman *dtmp;
-
+int found_ok=0;
 //printf("ANY DATA? %s [%s]\n",data, __FILE__);
 for(du=LIST_FIRST(&letters); du !=NULL; du=dtmp){
 dtmp=LIST_NEXT(du, rlist);
 
-if(du->id == du->soupi->id){
+if(du->id == res_id){
 printf("FOUND IN INVOKE FOR DUMMY\n");
 if(du->soupi){
 	//printf(green "it's a du->soupi! %s\n" rst, );
-du->soupi->result=kore_strdup(data);	
-printf(green "it's a du->soupi! %s\n" rst, du->soupi->result);
+	
+if(if_exist_key(root, "accepted")==1){
+if(du->soupi->result !=NULL)kore_free(du->soupi->result);
+json_t* js_data = json_object_get(root, "data");
+char*tmp_data=NULL;
+char* txt_js_data = json_dumps(js_data, 0);
+if(txt_js_data) {
+tmp_data=kore_strdup(txt_js_data);
+free(txt_js_data);
+}else{
+tmp_data=kore_strdup("some data if any");	
+}
+du->soupi->result=tmp_data;//kore_strdup("some_data");	
+du->soupi->state=SOUP_STATE_RESULT;
+if(du->soupi->cb !=NULL){
+printf(green "du->soupi->cb is HERE!!\n" rst);
+du->soupi->cb(du->soupi, du->soupi->arg);	}else{
+printf(red "du->soupi->cb null??\n" rst);
+kore_free(tmp_data);//??
+tmp_data=NULL;
+}
+}else if(if_exist_key(root, "rejected")==1){
+du->soupi->state=SOUP_STATE_ERROR;
+soup_set_error(du->soupi, "some_error");
+if(du->soupi->cb !=NULL){
+printf(green "du->soupi->cb is HERE!!\n" rst);
+du->soupi->cb(du->soupi, du->soupi->arg);	}else{
+printf(red "du->soupi->cb null??\n" rst);
+}
+	
+	
+}
+
+
 kore_timer_remove(du->timer);
 du->timer=NULL;
-du->soupi->state=SOUP_STATE_RESULT;
+//du->soupi->state=SOUP_STATE_RESULT;
 du->soupi->id=0;
 du->id=0;
-if(du->soupi->cb !=NULL){
-	printf(green "du->soupi->cb is HERE!!\n" rst);
-	du->soupi->cb(du->soupi, du->soupi->arg);	}else{
-		printf(red "du->soupi->cb null??\n" rst);
-		}
+
 
 LIST_REMOVE(du, rlist);
 du->id = 0;
@@ -200,16 +255,25 @@ free(du);
 du=NULL;
 
 }
-
+found_ok=1;
 break;
 }
-if(du==NULL){
-printf("not found\n");
-//return;
-}
 
+
+}//for loop
+if(found_ok==0){
+printf(red "not found\n" rst); 
+if(root)json_decref(root);
+return;
 }
+//if msg.id
+}else if((if_exist_key(root, "targetId")==1) && (if_exist_key(root, "event")==1)){
+printf(yellow "here must be event emitter, got targetId && event\n" rst);
 	
+}else{
+printf(red "received message is not a response nor a notification\n" rst);
+}
+if(root)json_decref(root);
 }
 
 
@@ -242,12 +306,32 @@ du=NULL;
 }
 return 0;
 } 
+
 void * on_from_cpp(uv_callback_t *handle, void*data){
-if(data==NULL){printf("DATA IS NULL! from_cpp.\n");return NULL;}
+if(data==NULL){
+printf(red "*** DATA IS NULL! FROM_CPP!!! ***.\n" rst);
+//uv_stop(((uv_handle_t*)handle)->loop);
+//uv_walk(deplibuv::getloop(), on_walk, NULL);
+//uv_close(handle);
+ return NULL;
+ 
+ }
+
+json_t * cpp_json = load_json_str(data);
+if(cpp_json){
+printf("cpp_json is ok\n");
+
+invoke_for_dummy(cpp_json);
+
+
+//json_decref(cpp_json);	
+}else{
+printf("not json data came\n");	
 printf("ON_FROM_CPP data came: %s \n",(char*)data);
+}
 
 //char*s=(char*)data;
-invoke_for_dummy(data);
+//invoke_for_dummy(data);
 free(data);
 return (NULL);
 }

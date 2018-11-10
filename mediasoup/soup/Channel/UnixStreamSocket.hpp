@@ -2,10 +2,13 @@
 #define MS_CHANNEL_UNIX_STREAM_SOCKET_HPP
 #include "uv_callback.h"
 extern uv_callback_t to_cpp;
+//#pragma once
+//#include "fi.hpp"
 #ifdef __cplusplus
 
 #include "common.hpp"
 #include "Channel/Request.hpp"
+//#include "fi.hpp"
 
 #include <json/json.h>
 
@@ -77,7 +80,7 @@ namespace Channel
 extern "C"
 {
 #endif
-
+//uv_callback_t from_cpp;
 void * on_from_cpp(uv_callback_t*,void*);
 void*set_channel(void);
 void soup_shutdown(void);

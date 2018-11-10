@@ -3,9 +3,9 @@
 #pragma once
 #include <ee.h>
 #include "channel.h"
-#include <jansson.h>
+//#include <jansson.h>
+#include "globikCommon.h"
 #include <stdio.h>
-
 
 struct soup;
 //json_t;

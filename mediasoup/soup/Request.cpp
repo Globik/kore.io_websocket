@@ -54,7 +54,7 @@ namespace Channel
 	{
 		MS_TRACE();
 	std::printf("Entering Request::Request(channel, json)\n");
-std::cout << json << std::endl;
+//std::cout << json << std::endl;
 		static const Json::StaticString JsonStringId{ "id" };
 		static const Json::StaticString JsonStringMethod{ "method" };
 		static const Json::StaticString JsonStringInternal{ "internal" };

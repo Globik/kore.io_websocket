@@ -1,7 +1,10 @@
 // kore.io soup
 //#define MS_CLASS "deplibuv"
 #include <unistd.h>
+//#include "fi.hpp"
 #include "deplibuv.hpp"
+
+//#include "Channel/UnixStreamSocket.hpp"
 //#include "Logger.hpp"
 
 //#include "MediaSoupError.hpp"
@@ -15,7 +18,7 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 uv_loop_t* deplibuv::loop{nullptr};
-
+//uv_callback_t from_cpp;
 
 int deplibuv::classinit(){
 std::cout << "Entering deplibuv::classinit()\n";
@@ -33,6 +36,15 @@ int err;
 // just another dummy method while developing
 void deplibuv::display(char*text){std::cout << text << std::endl;};
 
+void on_clo_unx3(uv_handle_t*client){
+printf("On_clo3() occurred.\n");
+}
+
+void on_walk3(uv_handle_t*handle, void * arg){
+printf("on_walk unixstream socket3\n");
+uv_close(handle, on_clo_unx3);
+}
+
 
 int deplibuv::classdestroy(){
 printf("deplibuv::classdesproy\n");
@@ -41,8 +53,16 @@ std::cout << red "Loop was not allocated!\n" rst;
 return 1;
 }
 
-uv_loop_close(deplibuv::loop);
+int a=uv_loop_close(deplibuv::loop);
+printf(red "a %d\n" rst, a);
+if(a<0){
+//int r=uv_callback_fire(&from_cpp, NULL,NULL);
+//std::printf(yellow "uv_callback_t &from_cpp fire at SHUTDOWN LEVEL: %d\n" rst,r);
+uv_walk(deplibuv::getloop(), on_walk3, NULL);
+}
 delete deplibuv::loop;
+deplibuv::loop=nullptr;
+
 std::cout << yellow "Look ma, loop is destroyd." rst << std::endl;
 return 0;
 }

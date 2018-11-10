@@ -47,8 +47,6 @@ std::printf("uv_callback_t &to_cpp init: %d\n",rc);
 //printf(red "Alisa in unxstrsock is %d\n" rst, UnixStreamSocket::alisa);
 rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
 std::printf("uv_callback_t &from_cpp init: %d\n",rc);
-//rc=uv_callback_init(mloop,&stop_cpp,to_stop_cpp, UV_DEFAULT);
-//std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 		
 		// Create the JSON reader.
 		{
@@ -81,37 +79,32 @@ std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 	
 void on_clo_unx(uv_handle_t*client){
 printf("On_clo() occurred.\n");
-//if(client->data){printf(red "%s\n" rst, (char*)client->data);}
 }
 int af=0;
+
 void on_walk(uv_handle_t*handle, void * arg){
 printf("on_walk unixstream socket\n");
-//uv_close(handle, on_clo_unx);
-af++;
-uv_close(handle, NULL);
-if(af==2){}
+uv_close(handle, on_clo_unx);
 }
 
 void UnixStreamSocket::destroy(){
+	delete this;
 	printf("achieved destroy()\n");
+	usleep(2000);
 	// data is null, just so, let the loop to get rid of two uv_callbacks at shutdown
 	int r=uv_callback_fire(&from_cpp, NULL,NULL);
-	std::printf("uv_callback_t &from_cpp fire: %d\n",r);
+	std::printf(yellow "uv_callback_t &from_cpp fire at SHUTDOWN LEVEL: %d\n" rst,r);
 	uv_walk(deplibuv::getloop(), on_walk, NULL);
-//void * loop_data=uv_loop_get_data(deplibuv::getloop());
-	//free(loop_data);
-	// no idea how destructor in C++ supposed to be work, but does not work and i should manually call destructor
-	if(af==2){printf(red " af is %d\n" rst, af);
-		this->~UnixStreamSocket();
-		}
+
 	}
 	UnixStreamSocket::~UnixStreamSocket()
 	{
-MS_TRACE_STD();
 
+MS_TRACE_STD();
 		delete this->jsonReader;
 		delete this->jsonWriter;
 		std::printf(yellow "Look ma, ~UnixStreamSocket() destructor!\n" rst);
+	
 	}
 
 	void UnixStreamSocket::Soup_Shutdown(){
@@ -129,7 +122,8 @@ void UnixStreamSocket::about_soup_ending(){
 void * UnixStreamSocket::on_to_cpp(uv_callback_t*callback,void*data)
 {
 	if(data==NULL)return nullptr;
-std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
+//std::printf("uv_callback_t UnixStreamSocket::on_to_cpp occured!: %s\n",(char*)data);
+std::printf(yellow "uv_callback_t UnixStreamSocket::on_to_cpp occured!\n" rst);
 	//char * loop_data=(char*)((uv_handle_t*)callback)->loop->data;
 void*loop_data=uv_loop_get_data(deplibuv::getloop());
 	//static_cast<UnixStreamSocket*>(loop_data)->UserOnUnixStreamRead("{\"dama\":\"sama\"}\0");
@@ -150,7 +144,7 @@ this->listener = listener;
 		//return;
 		std::printf("Entering UnixStreamSocket::Send(Json)\n");
 		
-		std::cout << msg << std::endl;
+	//	std::cout << msg << std::endl;
 
 		 MS_TRACE_STD();
 
@@ -183,12 +177,16 @@ this->listener = listener;
 	
 void UnixStreamSocket::SendLog(char* nsPayload, size_t nsPayloadLen)
 	{
+		
 UnixStreamSocket::alisa=2;
 printf(red "Alisa in ::SendLog is %d\n" rst, UnixStreamSocket::alisa);
 		
 		//return;
 		//if(suchara==1){printf(red "yes\n" rst);return;}else{printf(red "no\n" rst);}
 		std::printf("SENDLOG: %s\n",nsPayload);
+		
+		return;
+		
 		char*wl=strdup(nsPayload);
 		int r=uv_callback_fire(&from_cpp, wl, NULL);
 		std::printf("uv_callback_t &from_cpp fire: %d\n",r);
@@ -197,13 +195,15 @@ printf(red "Alisa in ::SendLog is %d\n" rst, UnixStreamSocket::alisa);
 	void UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen)
 	{
 std::printf("Entering UnixStreamSocket::SendBinary(const uint8_t* nsPayload, size_t nsPayloadLen).\n");
+
 	}
 
 void UnixStreamSocket::UserOnUnixStreamRead(void*data)
 	{
 
 MS_TRACE_STD();
-std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",(char*)data);
+//std::printf("Entering UnixStreamSocket::UserOnUnixStreamRead() %s\n",(char*)data);
+std::printf(yellow "Entering UnixStreamSocket::UserOnUnixStreamRead()\n" rst);
 // Be ready to parse more than a single message in a single TCP chunk.
 //std::string text="{\"mama\":\"papa\"}";
 std::string text2=(char*)data;
@@ -229,7 +229,7 @@ size_t jsonLen;
 			if(this->jsonReader->parse(text2.c_str(),text2.c_str()+text2.size(),&json,&jsonParseError))
 			{
 				std::printf("After json parsing.\n");
-				std::cout << json << std::endl;
+				//std::cout << json << std::endl;
 				Channel::Request* request = nullptr;
 
 				try

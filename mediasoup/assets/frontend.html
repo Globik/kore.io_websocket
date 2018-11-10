@@ -64,7 +64,7 @@ return;
 
 
 function connect() {
-	socket = new WebSocket("ws://127.0.0.1:8888/connect");///"+id);
+	socket = new WebSocket("ws://127.0.0.1:8388/connect");///"+id);
 
 	socket.onopen = function(evt) { open(evt) };
 	socket.onclose = function(evt) { mout.innerHTML+="closed<br>"; };

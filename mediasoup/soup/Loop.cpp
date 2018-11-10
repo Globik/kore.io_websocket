@@ -45,9 +45,11 @@ std::printf(green "Good bye, libuv's loop!\n" rst);
 
 Loop::~Loop()
 {
-	std::printf(yellow "Look ma, ~Loop() destructor.\n" rst);
+	std::printf(green "Look ma, ~Loop() destructor.\n" rst);
 	MS_TRACE();
 }
+
+
 
 void Loop::Close()
 {
@@ -87,7 +89,7 @@ this->closed = true;
 	
 	//this->channel->~UnixStreamSocket();
 	this->channel->destroy();
-	//this->channel=nullptr;
+	this->channel=nullptr;
 	//delete this->channel;
 	}
 
@@ -152,7 +154,7 @@ void Loop::OnChannelRequest(Channel::UnixStreamSocket* channel, Channel::Request
 	MS_TRACE();
 
 	MS_DEBUG_DEV("'%s' request", request->method.c_str());
-std::printf("'%s' request\n",request->method.c_str());
+//std::printf("'%s' request\n",request->method.c_str());
 	switch (request->methodId)
 	{
 		case Channel::Request::MethodId::WORKER_DUMP:

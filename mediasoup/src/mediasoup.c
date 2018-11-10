@@ -33,7 +33,7 @@
 #include "Channel/UnixStreamSocket.hpp"
 #include "Room.hpp"
 
-
+#include "globikCommon.h"
 
 
 #include "soup_server.h"
@@ -74,8 +74,8 @@ int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
 void websocket_disconnect(struct connection*);
 void websocket_message(struct connection*, u_int8_t,void*,size_t);
-json_t *load_json(const char*,size_t);
-json_t *load_json_str(const char*);
+//json_t *load_json(const char*,size_t);
+//json_t *load_json_str(const char*);
 
 void signal_handler(int);
 
@@ -121,9 +121,9 @@ if(Putin==1){return;}
 if(md_server==NULL){printf(red "md_server is NULL, returning\n" rst);return;}
 soup_shutdown();
 //usleep(900000);
-usleep(1000);	
-//usleep(5000);
-
+//usleep(10000);	
+usleep(1000);
+//usleep(1000000);
 //just in case
 //if(md_server !=NULL){m_destroy();md_server->destroy(md_server);md_server=NULL;}
 }
@@ -138,7 +138,10 @@ void han(){
 kore_log(LOG_INFO, yellow "at_exit()" rst);
 //im_down();
 //if(ev !=NULL)ee_destroy(ev);
-if(md_server){md_server->destroy(md_server);md_server=NULL;}
+if(md_server){
+if(soup_unavailable==0)m_destroy();
+md_server->destroy(md_server);
+md_server=NULL;}
 }
 
 
@@ -174,8 +177,8 @@ struct sigaction sa;
 memset(&sa,0,sizeof(sa));
 sa.sa_handler=signal_handler;
 if(sigfillset(&sa.sa_mask)==-1){
-	printf(red "fillset: %s\n" rst, errno_s);
-	}
+printf(red "fillset: %s\n" rst, errno_s);
+}
 	
 if(sigaction(SIGHUP, &sa, NULL)==-1)printf(red "sigaction: %s\n" rst, errno_s);
 
@@ -299,7 +302,7 @@ kore_log(LOG_INFO, green "SOUP_STATE_DEFAULT" rst);
 void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
 if(data==NULL)return;
 int send_to_clients=0;
-json_auto_t*root=load_json((const char*)data,len);
+json_auto_t*root=load_json_buf((const char*)data,len);
 if(!root)return;
 json_t *type_f=json_object_get(root,"type");
 const char*type_str=json_string_value(type_f);
@@ -395,7 +398,7 @@ m_init();
 set_soup_loop(soup_channel);// it's a Loop loop(channel)
 m_destroy();
 //if(md_server){md_server->destroy(md_server);md_server=NULL;}
-
+soup_unavailable=1;
 kore_log(LOG_NOTICE,"Bye. *******\n");
 
 return (KORE_RESULT_OK);
@@ -428,28 +431,6 @@ utils_crypto_class_destroy();
 class_destroy();
 }
 
-json_t *load_json(const char*text,size_t buflen){
-json_t *root;
-json_error_t error;
-root=json_loadb(text,buflen,0,&error);
-if(root){
-return root;
-}else{
-kore_log(LOG_INFO,"json error on line %d: %s",error.line,error.text);
-return (json_t*)0;
-}
-}
-json_t *load_json_str(const char*text){
-json_t *root;
-json_error_t error;
-root=json_loads(text,0,&error);
-if(root){
-return root;
-}else{
-kore_log(LOG_INFO,"json error on line %d: %s",error.line,error.text);
-return (json_t*)0;
-}
-}
 
 void signal_handler(int a){
 printf(red "*** SIGNAL_HANDLER: %d ***\n" rst, a);	
