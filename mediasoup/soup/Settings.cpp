@@ -41,12 +41,15 @@ std::map<LogLevel, std::string> Settings::logLevel2String =
 
 
 
-void Settings::SetConfiguration(int argc, char* argv[])
+int Settings::SetConfiguration(int argc, char* argv[])
 {
 	MS_TRACE();
+	
+	//return 1;
 
 	/* Set default configuration. */
-
+//MS_THROW_ERROR("fuck"); it's ok for try catch
+//MS_ABORT("abooort");// abort is a fucking suck in a thread for the main process
 	SetDefaultRtcIP(AF_INET);
 	SetDefaultRtcIP(AF_INET6);
 
@@ -669,5 +672,19 @@ bool isBindableIp(const std::string& ip, int family, int* bindErrno)
 }
 
 // c wrapper
-void settings_set_configuration(int argc,char* argv[]){Settings::SetConfiguration(argc,argv);}
+int settings_set_configuration(int argc,char* argv[]){
+try{
+int sua=Settings::SetConfiguration(argc,argv);
+
+return 0;
+}catch(const MediaSoupError& error){printf("suka err: %s\n",error.what());
+
+return 1;}
+return 1;
+}
+int settings_set_configuration2(int argc, char*argv[]){
+	int ass=Settings::SetConfiguration(argc, argv);
+	
+	return ass;
+}
 void settings_print_configuration(){Settings::PrintConfiguration();}

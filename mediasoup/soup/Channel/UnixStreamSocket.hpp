@@ -43,7 +43,7 @@ namespace Channel
 		//uv_callback_t to_cpp;
 		static void * on_to_cpp(uv_callback_t *callback,void*data);
 		static void * close_work(uv_callback_t*callback,void*data);
-		static void Soup_Shutdown();
+		static void Soup_Shutdown(int);
 		void SetListener(Listener* listener);
 		
 		void Send(Json::Value& msg);
@@ -83,8 +83,8 @@ extern "C"
 //uv_callback_t from_cpp;
 void * on_from_cpp(uv_callback_t*,void*);
 void*set_channel(void);
-void soup_shutdown(void);
-
+void soup_shutdown(int);
+void soup_destroy(void);
 #ifdef __cplusplus
 }
 #endif

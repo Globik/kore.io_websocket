@@ -58,7 +58,7 @@ printf(red "a %d\n" rst, a);
 if(a<0){
 //int r=uv_callback_fire(&from_cpp, NULL,NULL);
 //std::printf(yellow "uv_callback_t &from_cpp fire at SHUTDOWN LEVEL: %d\n" rst,r);
-uv_walk(deplibuv::getloop(), on_walk3, NULL);
+//uv_walk(deplibuv::getloop(), on_walk3, NULL);
 }
 delete deplibuv::loop;
 deplibuv::loop=nullptr;
@@ -88,19 +88,7 @@ return 0;
 void deplibuv_printversion(){
 deplibuv::printversion();
 }
-static int class_v_init(){
-	/*
-try{
-deplibuv::classinit();
-return 0;
-}catch(const MediaSoupError &error){
-	printf(red " *** ERRRRORRR! in class_init() %s\n" rst, error.what());
-MS_ERROR("Conf error: %s", error.what());
-return 1;	
-}
-return 0;
-*/ 
-}
+
 int class_init(){
 int as=deplibuv::classinit();
 return as;

@@ -23,6 +23,15 @@ extern "C" {
 //#include <netstring.h>
 }
 uv_callback_t from_cpp;
+/*
+void on_clo_unx(uv_handle_t*client){
+printf("On_clo() occurred.\n");
+}
+void on_walk(uv_handle_t*handle, void * arg){
+printf("on_walk unixstream socket\n");
+uv_close(handle, on_clo_unx);
+}
+*/ 
 namespace Channel
 {
 	/* Static. */
@@ -32,21 +41,47 @@ namespace Channel
 	static constexpr size_t MessageMaxSize{ 65536 };
 	static uint8_t WriteBuffer[MaxSize];
 	
+void on_clo_unx(uv_handle_t*client){
+printf("On_clo() occurred.\n");
+}
+
+
+
+void on_walk(uv_handle_t*handle, void * arg){
+printf("on_walk unixstream socket\n");
+uv_stop(deplibuv::getloop());
+uv_close(handle, on_clo_unx);
+uv_run(deplibuv::getloop(),UV_RUN_DEFAULT);
+}
 
 	/* Instance methods. */
 
 UnixStreamSocket::UnixStreamSocket(int fd) //: ::UnixStreamSocket::UnixStreamSocket(fd, MaxSize)
 {
 		MS_TRACE_STD();
+		
 		uv_loop_t*mloop=deplibuv::getloop();
 		uv_loop_set_data(mloop,(void*)this);
 		
+		void*m22=uv_loop_get_data(mloop);
+		
 int rc=uv_callback_init(mloop, &to_cpp, UnixStreamSocket::on_to_cpp, UV_DEFAULT);
-std::printf("uv_callback_t &to_cpp init: %d\n",rc);
+std::printf("uv_callback_t &to_cpp init: %d\n", rc);
+if(rc !=0){
+
+free(m22);
+return;
+
+}
 //UnixStreamSocket::alisa=2;
 //printf(red "Alisa in unxstrsock is %d\n" rst, UnixStreamSocket::alisa);
-rc=uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
-std::printf("uv_callback_t &from_cpp init: %d\n",rc);
+int rc2 = uv_callback_init(mloop,&from_cpp,on_from_cpp, UV_DEFAULT);
+std::printf("uv_callback_t &from_cpp init: %d\n", rc2);
+if(rc2 !=0){
+free(m22);
+if(rc==0)uv_walk(mloop, on_walk, NULL);	
+return;
+}
 		
 		// Create the JSON reader.
 		{
@@ -77,15 +112,7 @@ std::printf("uv_callback_t &from_cpp init: %d\n",rc);
 		}
 	}
 	
-void on_clo_unx(uv_handle_t*client){
-printf("On_clo() occurred.\n");
-}
-int af=0;
 
-void on_walk(uv_handle_t*handle, void * arg){
-printf("on_walk unixstream socket\n");
-uv_close(handle, on_clo_unx);
-}
 
 void UnixStreamSocket::destroy(){
 	delete this;
@@ -95,7 +122,6 @@ void UnixStreamSocket::destroy(){
 	int r=uv_callback_fire(&from_cpp, NULL,NULL);
 	std::printf(yellow "uv_callback_t &from_cpp fire at SHUTDOWN LEVEL: %d\n" rst,r);
 	uv_walk(deplibuv::getloop(), on_walk, NULL);
-
 	}
 	UnixStreamSocket::~UnixStreamSocket()
 	{
@@ -107,11 +133,15 @@ MS_TRACE_STD();
 	
 	}
 
-	void UnixStreamSocket::Soup_Shutdown(){
-	printf("Soup::Shutdown()\n");
-		void*bu=uv_loop_get_data(deplibuv::getloop());
-	static_cast<UnixStreamSocket*>(bu)->about_soup_ending();
-		}
+void UnixStreamSocket::Soup_Shutdown(int asig){
+printf("Soup::Shutdown()\n");
+void*bu=uv_loop_get_data(deplibuv::getloop());
+if(asig==1){	
+static_cast<UnixStreamSocket*>(bu)->destroy();
+return;
+}
+static_cast<UnixStreamSocket*>(bu)->about_soup_ending();
+}
 		
 void UnixStreamSocket::about_soup_ending(){
 	printf("::about_soup_ending()\n");
@@ -135,6 +165,7 @@ void UnixStreamSocket::SetListener(Listener* listener)
 	{
 		
 		MS_TRACE_STD();
+		
 		std::printf("Entering UnixStreamSocket::SetListener(listener)\n");
 this->listener = listener;
 	}
@@ -281,19 +312,26 @@ std::printf("Entering ::UserOnUnixStreamSocketClosed(bool).\n");
 } // namespace Channel
 
 // C wrapper
-void*set_channel(){
-// dummy integer 3 as a parameter, just for fun
-
+void* set_channel(){
 auto* chl = new Channel::UnixStreamSocket(3);
-//Channel::UnixStreamSocket::alisa=10;
-//std::string id=std::string("3");
-//Logger::Init(id,chl);
-
-//chl->alisa="8";
-// printf("SET CHANNEL: %d\n",(int)chl->alisa);
+if(chl){printf(green "CHANNEL!\n" rst);}else{printf(red "no channel!\n" rst);}
 return chl;
+
+
+//return chl;
 }
-void soup_shutdown(){
+void soup_shutdown(int asig){
 	printf("soup_shutdown()\n");
-	Channel::UnixStreamSocket::Soup_Shutdown();
+	Channel::UnixStreamSocket::Soup_Shutdown(asig);
+	}
+	
+	void soup_destroy(){
+	//Channel::UnixStreamSocket::destroy();	
+	/*
+	int r=uv_callback_fire(&from_cpp, NULL,NULL);
+	std::printf(yellow "uv_callback_t &from_cpp fire at SHUTDOWN LEVEL: %d\n" rst,r);
+	uv_walk(deplibuv::getloop(), on_walk, NULL);
+	//delete this;
+	usleep(1000);
+	*/ 
 	}

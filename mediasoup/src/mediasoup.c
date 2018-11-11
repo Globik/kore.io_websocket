@@ -119,7 +119,7 @@ need_exit=1;
 if(need_exit){
 if(Putin==1){return;}
 if(md_server==NULL){printf(red "md_server is NULL, returning\n" rst);return;}
-soup_shutdown();
+soup_shutdown(0);
 //usleep(900000);
 //usleep(10000);	
 usleep(1000);
@@ -202,7 +202,7 @@ im_down();
 void tick(void*unused,u_int64_t now){
 	kore_log(LOG_INFO, green " a tick occured." rst);
 	if(Putin==0){
-	soup_shutdown();Putin=1;
+	soup_shutdown(0);Putin=1;
 	}
 	}
 int init(int state){
@@ -382,27 +382,32 @@ char * LL_id="3";
 //int sk=class_init2();
 if(class_init()==1){
 printf(red " sk is 1\n" rst);
-soup_unavailable=1;
+soup_unavailable = 1;
 class_destroy();//by idea must be fatal be,  exit with error
 return (KORE_RESULT_OK);
 }
 void * soup_channel=set_channel();
+
 logger_init(LL_id, soup_channel);
 char* vli[1]={"a"};
-settings_set_configuration(1, vli);
+int settings_failed=0;
+if(settings_set_configuration(1, vli) ==1){
+printf(red "settings failed\n" rst);	
+settings_failed=1;
+soup_shutdown(1);
+}
 //settings_print_configuration();
-m_init();
+if(settings_failed==0)m_init();
 
-//md_server=server_new();
-//if(md_server==NULL){kore_log(LOG_INFO,red "md_server is NULL!" rst);}
 set_soup_loop(soup_channel);// it's a Loop loop(channel)
-m_destroy();
-//if(md_server){md_server->destroy(md_server);md_server=NULL;}
+class_destroy();
+if(settings_failed==0)m_destroy();
+
 soup_unavailable=1;
 kore_log(LOG_NOTICE,"Bye. *******\n");
-
 return (KORE_RESULT_OK);
 }
+
 void pipe_data_available(struct kore_task*t){
 	kore_log(LOG_INFO, yellow "pipe_data_available" rst);
 if(kore_task_finished(t)){
@@ -424,11 +429,7 @@ rtc_room_classinit();
 }
 void m_exit(){}
 void m_destroy(){
-kore_log(LOG_INFO,red "Destroy m_destroy()." rst);
-//usleep(10000);
-//usleep(10);
 utils_crypto_class_destroy();
-class_destroy();
 }
 
 
