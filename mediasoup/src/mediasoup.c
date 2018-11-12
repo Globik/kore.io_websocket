@@ -34,7 +34,7 @@
 #include "Room.hpp"
 
 #include "globikCommon.h"
-
+#include "room.h"
 
 #include "soup_server.h"
 
@@ -81,7 +81,8 @@ void signal_handler(int);
 
 uint32_t random_u32(void);
 
-
+struct room* tmp_room=NULL;
+//struct room_holder holder;
 struct kore_task pipe_task;
 
 struct server*md_server=NULL;
@@ -111,6 +112,11 @@ kore_task_run(&pipe_task, 0);
 
 void im_down(){
 kore_log(LOG_INFO,"im_down()");
+if(tmp_room !=NULL){
+printf("tmp_room is NOT NULL\n");
+//tmp_room->befree(tmp_room);
+//tmp_room=NULL;	
+}
 if(soup_unavailable==1){
 kore_log(LOG_INFO, yellow "THE SOUP IS NOT AVAILABLE NOW! %d" rst, soup_unavailable);
 return;	
@@ -271,7 +277,18 @@ printf(yellow "result str lenght: %d\n" rst, strlen(soupi->result));
 // char*sik=strdup(soupi->result);
 size_t lk=strlen(soupi->result);
 //if(soupi->name){kore_log(LOG_INFO, green "name: %s" rst, soupi->name);}
-kore_websocket_send(c,1, soupi->result, lk+1);
+kore_websocket_send(c, 1, soupi->result, lk+1);
+if(!strcmp(soupi->name, "worker.createRoom")){
+kore_log(LOG_INFO, green "%s" rst, soupi->name);
+kore_log(LOG_INFO, green "soupi->in_id: %"PRIu32"" rst, soupi->in_id);
+struct room* sroom = room_new(soupi->in_id, md_server->ch);
+if(sroom==NULL){kore_log(LOG_INFO, red "room is NULL" rst);}	
+if(tmp_room==NULL)tmp_room=sroom;
+//by idea
+//ee_on(sroom->ch->ee, soupi->in_id, func);
+//or 
+holder.a=999;
+}
 //free(sik);
 //kore_websocket_send(c,1, soupi->result, sizeof(soupi->result));
 

@@ -7,6 +7,7 @@
 
 
 
+
 static void closi(struct server*);
 
 int create_room(struct server*, struct soup*, const char*);
@@ -21,7 +22,7 @@ printf("in create_room()\n");
 uint32_t room_id=random_u32();
 json_t * jso_internal = json_object();
 json_object_set_new(jso_internal, "roomId", json_integer(room_id));
-
+soupi->in_id = room_id;
 serv->ch->request(serv->ch, soupi, options, jso_internal);
 return 0;
 }
@@ -59,7 +60,7 @@ ee_destroy(ee);
 obj->ee=NULL;
 return NULL;
 }
-obj->ch->ee=obj->ee;
+//obj->ch->ee=obj->ee;
 obj->emit=emiti;
 
 obj->close=closi;
@@ -83,6 +84,7 @@ memset(s, 0, sizeof(*s));
 s->state= SOUP_STATE_INIT;	
 s->conn=serv;
 s->id = 0;
+s->in_id = 0;
 //s->name=NULL;//?? by memset scenario causes the segfault
 //s->result=NULL;//?? by memset scenario is segfault
 }

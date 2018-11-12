@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <kore/kore.h>
+//#include <ee.h>
+
 #include "globikCommon.h"
 
 
@@ -39,15 +41,38 @@ static int id_lookup(uint32_t);
 
 static void on_timeout(void*, u_int64_t);
 
+struct notify_s{
+struct channel *ch;	
+void(*angabe)(struct notify_s, char*, char*);
+}notify;
+
+void angabe(struct notify_s, char*, char*);
+void angabe(struct notify_s nota, char* s, char* msg_data){
+printf("angabe\n");	
+printf("msg_data: %s\n", msg_data);
+printf("target id: %s\n", s);
+//ee_emit(ee, stri_uint, "message");	
+//ee_emit(nota->ch->ee, s, msg_data);
+ee_emit(nota.ch->ee, s, msg_data);
+}
 struct channel * channel_new(){
 LIST_INIT(&letters);
 struct channel*ch = NULL;
 ch=malloc(sizeof(struct channel));
 if(ch==NULL)return NULL;
-ch->ee=NULL;
+ch->ee=ee_new();
+if(ch->ee==NULL){
+printf(red "ee is NULL\n" rst);
+free(ch);
+ch=NULL;
+return NULL;
+}
 ch->request=channel_send;
 ch->close=channel_close;
-
+//ch->datei=get_data;
+//struct notify_s notify;
+notify.ch=ch;
+notify.angabe=angabe;
 return ch;	
 }
 
@@ -89,7 +114,10 @@ void channel_close(struct channel* ch){
 	//printf("channel_close()\n");
 	int a=pending_close();
 	printf("is it OK pending_close? %d\n", a);//0 is OK
-	if(ch->ee !=NULL)ch->ee=NULL;
+	if(ch->ee !=NULL){
+	ee_destroy(ch->ee);
+	ch->ee=NULL;
+	}
 	free(ch);
 }
 
@@ -190,7 +218,7 @@ static void invoke_for_dummy(json_t * data){
 //ee_emit(ch->ee, erste_data, (void*)&resp);
 json_t* root=data;
 //if(!json_is_object(root))bla bla error
-
+//uint32_t msg_target_id = 0;
 if(if_exist_key(root, "id")==1){
 printf("key 'id' exists\n");
 uint32_t res_id=js_get_uint32(root, "id");
@@ -269,7 +297,13 @@ return;
 //if msg.id
 }else if((if_exist_key(root, "targetId")==1) && (if_exist_key(root, "event")==1)){
 printf(yellow "here must be event emitter, got targetId && event\n" rst);
-	
+uint32_t target_id = js_get_uint32(root, "targetId");
+printf("targetId: %"PRIu32"\n", target_id);
+char stri_uint[9];
+snprintf(stri_uint, sizeof stri_uint,"%" PRIu32, target_id);
+kore_log(LOG_INFO, red "target_id str: %s" rst, stri_uint);
+//ee_emit(ee, stri_uint, "message");	
+notify.angabe(notify, stri_uint, "hallo world!");
 }else{
 printf(red "received message is not a response nor a notification\n" rst);
 }

@@ -5,6 +5,7 @@
 #include "channel.h"
 //#include <jansson.h>
 #include "globikCommon.h"
+//#include "room.h"
 #include <stdio.h>
 
 struct soup;
@@ -24,6 +25,7 @@ struct soup{
 struct server*conn;
 u_int8_t state;
 uint32_t id;
+uint32_t in_id;
 char*error;
 char*name;
 void *arg;
@@ -31,6 +33,11 @@ void (*cb)(struct soup *, void*);
 char*result;	
 };
 struct out_data{char*str;};
+
+struct room_holder{
+int a;	
+}holder;
+
 struct server *server_new(void);
 void soup_init(struct soup*, struct server*);
 void soup_bind_callback(struct soup*, void (*cb)(struct soup*,void*), void*);
