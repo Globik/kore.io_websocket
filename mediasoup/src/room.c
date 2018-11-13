@@ -10,15 +10,26 @@
 #define yellow "\x1b[33m"
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
-
-static void on_room_targetId(void*);
+static void room_close(struct room*);
+static void on_room_targetId(void*, void*const ObjThis);
 //void set_event();
-void on_room_targetId(void* rdata){
+//const
+ struct passData{struct channel*ch;struct room* r;char* str;};
+void on_room_targetId(void* rdata, void* const ObjThis){
+if(ObjThis==NULL){printf(red "ObjThis is NULL? %s\n" rst, __FILE__); return;}
 printf("on_room_targetId()\n");	
-//printf("data event:\n");
-//printf("data: %s\n",(char*)rdata);
-//by idea in for loop free room where target id == roomid
-printf("HOLDER.A: %d\n", holder.a);
+printf("data: %s\n", (char*)rdata);
+//struct room* r=(struct room*)ObjThis;
+//r->close(r);
+struct passData *data=(struct passData*)ObjThis;
+//struct room* r=data->r;
+//struct channel *ch=data->ch;
+ee_remove_all_listeners(data->ch->ee, data->str);
+kore_free(data->str);
+printf("before close data r\n");
+data->r->close(data->r);
+free(data);
+data=NULL;
 }
 struct room* room_new(uint32_t room_id, struct channel* ch)//internal, data, channel
 {
@@ -28,24 +39,25 @@ struct room* room_new(uint32_t room_id, struct channel* ch)//internal, data, cha
 	r->name="globik";
 	r->roomId = room_id;
 	r->ch=ch;
-	r->befree=room_free;
+	r->close=room_close;
 char stri_uint[9];
 snprintf(stri_uint, sizeof stri_uint,"%" PRIu32, room_id);
 kore_log(LOG_INFO, red "stri: %s" rst, stri_uint);
 char*foo=stri_uint;
-ee_on(ch->ee, foo, on_room_targetId);
-//r->event = set_event;
+struct passData *pass = malloc(sizeof(struct passData));
+pass->ch=ch;
+pass->r=r;
+pass->str=kore_strdup(stri_uint);
+ee_on(ch->ee, foo, on_room_targetId,(void*)pass);
 return r;
 }
 
 
-void room_free(struct room* r){
+void room_close(struct room* r){
+printf(green "on room_close()\n" rst);
+//ee_remove_all_listeners(c
 r->roomId=0;
 r->ch=NULL;
 free(r);
 r=NULL;	
 }
-/*
-void set_event(struct channel* ch){
-ee_on(ch->ee, ev_str, on_room_targetId);
-}*/

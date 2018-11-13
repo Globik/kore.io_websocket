@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <kore/kore.h>
+//#include "globikCommon.h"
 #include "soup_server.h"
 
 
@@ -102,4 +103,5 @@ soupi->name=kore_strdup("worker.createRoom");
 soupi->conn->create_room(soupi->conn, soupi, room_options);
 return 1;
 }
+
 

@@ -1,7 +1,7 @@
 #ifndef _H_SOUP_SERVER
 #define _H_SOUP_SERVER
 #pragma once
-#include <ee.h>
+#include "globi_ee.h"
 #include "channel.h"
 //#include <jansson.h>
 #include "globikCommon.h"
@@ -34,11 +34,8 @@ char*result;
 };
 struct out_data{char*str;};
 
-struct room_holder{
-int a;	
-}holder;
-
 struct server *server_new(void);
+struct server *get_soup_client(void);
 void soup_init(struct soup*, struct server*);
 void soup_bind_callback(struct soup*, void (*cb)(struct soup*,void*), void*);
 void soup_continue(struct soup*);
@@ -48,6 +45,7 @@ json_t *load_json_str(const char*);
 uint32_t random_u32(void);
 uint32_t rand32(uint32_t,uint32_t);
 
+//struct server* md_server;// = NULL;
 
 
 

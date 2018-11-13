@@ -14,7 +14,7 @@ struct channel{
 ee_t*ee;
 void (*request)(struct channel*, struct soup*, const char*, json_t*);// options, internal
 void (*close)(struct channel*);
-
+void (*invoke_for_dummy)(struct channel*, json_t*);
 };
 struct channel * channel_new(void);
 void ersti_cb(struct channel*,void*);

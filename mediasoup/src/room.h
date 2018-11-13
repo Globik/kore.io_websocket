@@ -5,10 +5,9 @@ struct room{
 char* name;
 uint32_t roomId;
 struct channel* ch;
-void(* befree)(struct room*);
-//(void* event)();
+void(* close)(struct room*);
 };
 
 struct room* room_new(uint32_t, struct channel*);//internal, data, channel
-void room_free(struct room*);
+
 #endif

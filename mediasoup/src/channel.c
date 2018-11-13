@@ -32,7 +32,7 @@ void channel_close(struct channel*);
 static int pending_close(void);
 
 
-static void invoke_for_dummy(json_t * data);
+static void invoke_for_dummy(struct channel*, json_t *);
 static void soup_set_error(struct soup *, const char*);
 static void soup_handle(struct soup*);
 static void soup_release(struct soup*);
@@ -41,20 +41,7 @@ static int id_lookup(uint32_t);
 
 static void on_timeout(void*, u_int64_t);
 
-struct notify_s{
-struct channel *ch;	
-void(*angabe)(struct notify_s, char*, char*);
-}notify;
 
-void angabe(struct notify_s, char*, char*);
-void angabe(struct notify_s nota, char* s, char* msg_data){
-printf("angabe\n");	
-printf("msg_data: %s\n", msg_data);
-printf("target id: %s\n", s);
-//ee_emit(ee, stri_uint, "message");	
-//ee_emit(nota->ch->ee, s, msg_data);
-ee_emit(nota.ch->ee, s, msg_data);
-}
 struct channel * channel_new(){
 LIST_INIT(&letters);
 struct channel*ch = NULL;
@@ -69,10 +56,7 @@ return NULL;
 }
 ch->request=channel_send;
 ch->close=channel_close;
-//ch->datei=get_data;
-//struct notify_s notify;
-notify.ch=ch;
-notify.angabe=angabe;
+ch->invoke_for_dummy=invoke_for_dummy;
 return ch;	
 }
 
@@ -209,7 +193,7 @@ return id;
 return 0;
 }
 
-static void invoke_for_dummy(json_t * data){
+static void invoke_for_dummy(struct channel* ch, json_t * data){
 //struct responsi resp;
 //resp.ch=ch;
 //resp.data="room_created";
@@ -302,8 +286,7 @@ printf("targetId: %"PRIu32"\n", target_id);
 char stri_uint[9];
 snprintf(stri_uint, sizeof stri_uint,"%" PRIu32, target_id);
 kore_log(LOG_INFO, red "target_id str: %s" rst, stri_uint);
-//ee_emit(ee, stri_uint, "message");	
-notify.angabe(notify, stri_uint, "hallo world!");
+ee_emit(ch->ee, stri_uint, "message from invoke for dummy");
 }else{
 printf(red "received message is not a response nor a notification\n" rst);
 }
@@ -344,18 +327,17 @@ return 0;
 void * on_from_cpp(uv_callback_t *handle, void*data){
 if(data==NULL){
 printf(red "*** DATA IS NULL! FROM_CPP!!! ***.\n" rst);
-//uv_stop(((uv_handle_t*)handle)->loop);
-//uv_walk(deplibuv::getloop(), on_walk, NULL);
-//uv_close(handle);
- return NULL;
+return NULL;
+}
+struct server* soup_client = get_soup_client();
+if(soup_client == NULL){printf(red "soup_client is NULL!\n" rst); if(data)free(data);return NULL;}
  
- }
 
 json_t * cpp_json = load_json_str(data);
 if(cpp_json){
 printf("cpp_json is ok\n");
 
-invoke_for_dummy(cpp_json);
+if(soup_client->ch)soup_client->ch->invoke_for_dummy(soup_client->ch, cpp_json);
 
 
 //json_decref(cpp_json);	

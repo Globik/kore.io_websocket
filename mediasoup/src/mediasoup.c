@@ -74,15 +74,14 @@ int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
 void websocket_disconnect(struct connection*);
 void websocket_message(struct connection*, u_int8_t,void*,size_t);
-//json_t *load_json(const char*,size_t);
-//json_t *load_json_str(const char*);
+
 
 void signal_handler(int);
 
 uint32_t random_u32(void);
 
 struct room* tmp_room=NULL;
-//struct room_holder holder;
+
 struct kore_task pipe_task;
 
 struct server*md_server=NULL;
@@ -93,7 +92,7 @@ char*msg;
 
 //ee_t* ev=NULL;
 
-uv_callback_t stop_worker, to_cpp;
+uv_callback_t to_cpp;
 
 const char*room_create_str="{\"id\":3444444333,\"method\":\"worker.createRoom\",\"internal\":{\"roomId\":35,\"sister\":\"sister_1\"},\"data\":{\"a\":1}}";
 
@@ -109,6 +108,14 @@ kore_task_run(&pipe_task, 0);
 //tim=kore_timer_add(tick, 2000, NULL, 1);
 //tim=kore_timer_add(tick,10000,NULL,1);
 }
+
+struct server* get_soup_client(void);
+
+struct server* get_soup_client(){
+	
+return md_server;	
+}
+
 
 void im_down(){
 kore_log(LOG_INFO,"im_down()");
@@ -287,7 +294,7 @@ if(tmp_room==NULL)tmp_room=sroom;
 //by idea
 //ee_on(sroom->ch->ee, soupi->in_id, func);
 //or 
-holder.a=999;
+
 }
 //free(sik);
 //kore_websocket_send(c,1, soupi->result, sizeof(soupi->result));
