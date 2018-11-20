@@ -19,3 +19,14 @@ exit 0
 #alias dab="ls"
 #alias pgstart="sudo chmod a+w /var/run/postgresql && /usr/lib/postgresql/9.6/bin/pg_ctl start -D $HOME/data"
 #alias pgstop="/usr/lib/postgresql/9.6/bin/pg_ctl stop -D $HOME/data"
+
+# export / import database
+# pg_dump -U globik postgres > kore.pgsql (export to file) current db must running
+# psql -U globik alikon  < dbexport.sql = import db export file
+
+
+#psql postgres = connect to the db by name postgres
+#createdb alikon = create new db
+
+#dropdb postgres
+#createdb postgres
