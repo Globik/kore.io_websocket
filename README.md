@@ -31,6 +31,10 @@ trying to implement authentication and authorization based on cookies and postgr
 
 [list](https://github.com/Globik/kore.io_websocket/tree/master/list)
 
+[libre](https://github.com/Globik/kore.io_websocket/tree/master/libre)
+
+trying integrate libre's main loop into the kore app, into dedicated thread.
+
 Free BSD 10 queue.h
 
 Trying reimplement node.js event emitter based on it.
