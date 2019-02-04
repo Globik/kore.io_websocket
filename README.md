@@ -31,15 +31,23 @@ trying to implement authentication and authorization based on cookies and postgr
 
 [list](https://github.com/Globik/kore.io_websocket/tree/master/list)
 
+#libre
+
+[libre](https://github.com/creytiv/re) - generic library for real-time communications with async IO support
+
 [libre](https://github.com/Globik/kore.io_websocket/tree/master/libre)
 
-trying integrate libre's main loop into the kore app, into dedicated thread.
+trying integrate libre's main loop into the kore app, into dedicated thread. Got it!
 
-Free BSD 10 queue.h
 
-Trying reimplement node.js event emitter based on it.
+# RAWRTC
 
-And on [https://github.com/thlorenz/ee.c](https://github.com/thlorenz/ee.c)
+[RAWRTC](https://github.com/rawrtc/rawrtc) - A WebRTC and ORTC library with a small footprint that runs everywhere
+
+Can be runned from within kore.c framework in a dedicated thread [rawrtc](https://gitghub.com/Globik/kore.io_websocket/tree/master/rawrtc)
+
+
+
 
 [template](https://github.com/Globik/kore.io_websocket/tree/master/template) - 
 

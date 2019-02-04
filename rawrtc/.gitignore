@@ -1,0 +1,6 @@
+*.o
+.flavor
+.objs
+rawrtc.so
+assets.h
+cert
