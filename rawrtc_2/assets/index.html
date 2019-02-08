@@ -1,0 +1,40 @@
+<!DOCTYPE><html>
+	<body>
+		<output id="out"></output>
+		 <button onclick="start_channel();">start client</button> 
+		 <br><button onclick="stop_client();">stop client</button>
+		<script>
+		var sock=null;
+		sock=new WebSocket("ws://127.0.0.1:8888/connect");
+		sock.onopen=on_open;
+		sock.onclose=on_close;
+		sock.onmessage=on_message;
+		sock.onerror=on_error;
+		function on_error(e){out.innerHTML+='error: '+e+'<br>';}
+		function on_close(){out.innerHTML+='Websocket closed.<br>';}
+		function on_open(){out.innerHTML+='Websocket opened.<br>';sock.send(JSON.stringify({type:'msg',msg:'hello'}));}
+		function on_message(evt){out.innerHTML+='data: '+evt.data+'<br>';
+		var jsdata;
+		try{jsdata=JSON.parse(evt.data);}catch(err){out.innerHTML+="parse err: "+err+"<br>";return;}	
+		if(jsdata.type=="offer"){
+		out.innerHTML+="offer came<br>";
+		//start_channel()	
+		}else if(jsdata.type=="msg"){
+		out.innerHTML+="message: "+evt.data+"<br>";	
+		}else if(jsdata.type=="call"){
+		//pingback from server	
+		}else{out.innerHTML+="unknown type came: "+evt.type+"<b>"+evt+"</b>"+" <br>";
+			console.log(evt);}
+		}
+		
+		function start_channel(){
+		if(sock)sock.send(JSON.stringify({type:"call",msg:"yes"}));
+		}
+		
+		function stop_client(){
+		if(sock)sock.send(JSON.stringify({type:'endi',msg:'f'}));	
+		}
+		
+		</script>
+	
+	</body></html>

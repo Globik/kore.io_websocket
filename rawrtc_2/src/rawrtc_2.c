@@ -4,6 +4,7 @@
 #include <kore/tasks.h>
 #include "assets.h"
 #include <rawrtc.h>
+//include <jansson.h>
 #include "helper/utils.h"
 #include "helper/handler.h"
 #define DEBUG_MODULE "peer-connection-app"
@@ -35,14 +36,23 @@ struct peer_connection_client {
     struct rawrtc_peer_connection* connection;
     struct data_channel_helper* data_channel_negotiated;
     struct data_channel_helper* data_channel;
+    struct connection*c;
 };
 
 static void print_local_description(struct peer_connection_client* const client);
 static void client_init(struct peer_connection_client* const client);
 static void parse_remote_description(int flags,void* arg);
 static void client_stop(struct peer_connection_client* const client);
-static struct tmr timer = {{0}};
 
+int page_ws_connect(struct http_request*);
+void websocket_connect(struct connection*);
+void websocket_disconnect(struct connection*);
+void websocket_message(struct connection*,u_int8_t,void*,size_t);
+
+
+static struct tmr timer = {{0}};
+struct peer_connection_client clienti = {0};
+ 
 int	page(struct http_request *);
 int init(int);
 int libre_loop(struct kore_task*);
@@ -54,15 +64,24 @@ void kore_worker_teardown(void){
 kore_log(LOG_INFO,yellow "teardown" rst);
 if(chao==0){
 int s=mqueue_push(mq, 1, NULL);
+chao=1;
 kore_log(LOG_INFO, green "mqueue push %d" rst,s);
 usleep(5000);
+
 }
 }
 void mqueue_handler(int f, void*data, void*arg){
 kore_log(LOG_INFO, green "mqueue_handler occured" rst);
-//if(f==1)
+if(f==1){
 kore_log(LOG_INFO, yellow "F: %d" rst, f);
-re_cancel();	
+re_cancel();
+}else if(f==2){
+	kore_log(LOG_INFO,yellow "f==2, client_init" rst);
+	client_init(&clienti);
+}else if(f==3){
+kore_log(LOG_INFO,yellow "f==3, client_stop" rst);
+client_stop(&clienti);	
+}else{}	
 }
 
 int init(int state){
@@ -73,6 +92,69 @@ kore_task_bind_callback(&task, data_available);
 kore_task_run(&task, 0);
 return (KORE_RESULT_OK);	
 }   
+
+
+int page_ws_connect(struct http_request*req){
+kore_log(LOG_INFO,"websocket connected , path %s %p", req->path, req);
+kore_websocket_handshake(req, "websocket_connect","websocket_message","websocket_disconnect");
+return (KORE_RESULT_OK);	
+}
+void websocket_connect(struct connection*c){
+kore_log(LOG_INFO,"websocket connected %p",c);	
+//clienti.c=c;
+}
+void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
+kore_log(LOG_INFO,"on message %d",len);
+//kore_websocket_send(c,op,data,len);	
+int send_to_clients=0;
+/*
+json_auto_t*root=load_json_buf((const char*)data,len);
+if(!root){kore_log(LOG_INFO, red "why not a root?" rst);return;}
+json_t *type_f=json_object_get(root,"type");
+const char*type_str=json_str_value(type_f);
+if(!strcmp(type_str,"msg")){
+kore_log(LOG_INFO,  green "type msg" rst);	
+}else if(!strcmp(type_str,"call")){
+kore_log(LOG_INFO, green "type call" rst);
+// local sdp to be send, try it
+
+}else if(!strcmp(type_str,"was")){
+	
+}else{
+kore_log(LOG_INFO,yellow "Unknown type: %s" rst,type_str);	
+send_to_clients=1;
+}
+*/
+struct odict*dict=NULL;
+char*type_str;
+int err;
+err=json_decode_odict(&dict,16,data,len,3);
+if(err){kore_log(LOG_INFO,red "decode odict err" rst);} 
+err |=dict_get_entry(&type_str,dict,"type",ODICT_STRING,true);
+if(err){kore_log(LOG_INFO, red "dict get entry error." rst);}
+
+//if(type_str)kore_log(LOG_INFO, green "type came: %s" rst, type_str);
+if(!strcmp(type_str,"msg")){
+kore_log(LOG_INFO,green "type msg" rst);	
+}else if(!strcmp(type_str,"call")){
+kore_log(LOG_INFO, green "type call to browser" rst);
+mqueue_push(mq, 2, NULL);
+//clienti->c=c;	
+//client_init(&clienti);
+}else if(!strcmp(type_str,"endi")){
+kore_log(LOG_INFO,yellow "type endi" rst);
+mqueue_push(mq,3,NULL);
+//client_stop(&clienti);	
+}else{
+kore_log(LOG_INFO,yellow "unknown type %s" rst, type_str);	
+}
+mem_deref(dict);
+if(send_to_clients==0){kore_websocket_send(c,op,data,len);}
+}
+
+void websocket_disconnect(struct connection*c){
+kore_log(LOG_INFO,"websocket disconnected %p",c);	
+}
 
 int
 page(struct http_request *req)
@@ -106,7 +188,7 @@ int err;
     char* const stun_google_com_urls[] = {"stun:stun.l.google.com:19302",
                                           "stun:stun1.l.google.com:19302"};
     char* const turn_threema_ch_urls[] = {"turn:turn.threema.ch:443"};
-    struct peer_connection_client client = {0};
+  struct peer_connection_client client = {0};
     (void) client.ice_candidate_types; (void) client.n_ice_candidate_types;
 
     // Initialise
@@ -117,7 +199,7 @@ if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
 
     // Debug
     dbg_init(DBG_DEBUG, DBG_ALL);
-    DEBUG_PRINTF("SSSSSSSSSSSSSSSS Init\n");
+    //DEBUG_PRINTF(" Init\n");
 
     // Check arguments length
     if (mi.argc < 2) {
@@ -165,17 +247,19 @@ if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
     client.offering = role == RAWRTC_ICE_ROLE_CONTROLLING ? true : false;
 
     // Setup client
-    client_init(&client);
+    
+  // client_init(&client);
+    clienti=client;
 
     // Listen on stdin
-    EOR(fd_listen(STDIN_FILENO, FD_READ, parse_remote_description, &client));
+  //  EOR(fd_listen(STDIN_FILENO, FD_READ, parse_remote_description, &client));
 
 printf("***Start main loop***\n");
 
 EOR(re_main(NULL));
 
 printf("*** Stop client & bye ***\n");
-client_stop(&client);
+if(chao==0)client_stop(&client);
 mem_deref(mq);
 before_exit();
 
@@ -190,6 +274,7 @@ mem_deref(mq);
 }
 }
 kore_log(LOG_INFO, green "***bye from a task!***" rst);
+chao=1;
 return (KORE_RESULT_OK);
 }
 
@@ -352,6 +437,7 @@ static void local_candidate_handler(
 
     // Print local description (if last candidate)
     if (!candidate) {
+		printf(yellow "!candidate in local_candidate_handler\n" rst);
         print_local_description(client);
     }
 }
@@ -408,6 +494,11 @@ static void client_stop(
     client->data_channel_negotiated = mem_deref(client->data_channel_negotiated);
     client->connection = mem_deref(client->connection);
     client->configuration = mem_deref(client->configuration);
+    //by me
+    if(client->c !=NULL){
+	printf(yellow "client->c is NOT null\n" rst);
+	client->c=NULL;	
+	}
 
     // Stop listening on STDIN
     fd_close(STDIN_FILENO);
@@ -505,6 +596,8 @@ static void print_local_description(
 
     // Print local description as JSON
     DEBUG_INFO("Local Description:\n%H\n", json_encode_odict, dict);
+    
+    if(client->c){printf(green "CLIENT->C!!\n" rst);kore_websocket_send(client->c,1,"mama\0",5);}
 
     // Un-reference
     mem_deref(dict);
