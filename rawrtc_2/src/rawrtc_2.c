@@ -72,15 +72,21 @@ usleep(5000);
 }
 void mqueue_handler(int f, void*data, void*arg){
 kore_log(LOG_INFO, green "mqueue_handler occured" rst);
+//kore_log(LOG_INFO, green "data: %s" rst,data);
+struct peer_connection_client *client=(struct peer_connection_client*)arg;
 if(f==1){
 kore_log(LOG_INFO, yellow "F: %d" rst, f);
 re_cancel();
 }else if(f==2){
-	kore_log(LOG_INFO,yellow "f==2, client_init" rst);
-	client_init(&clienti);
+kore_log(LOG_INFO,yellow "f==2, client_init" rst);
+struct connection*c=data;
+client->c=c;
+client_init(client);
+
+kore_websocket_send(c,1,"mama\0",4);
 }else if(f==3){
 kore_log(LOG_INFO,yellow "f==3, client_stop" rst);
-client_stop(&clienti);	
+client_stop(client);	
 }else{}	
 }
 
@@ -138,13 +144,10 @@ if(!strcmp(type_str,"msg")){
 kore_log(LOG_INFO,green "type msg" rst);	
 }else if(!strcmp(type_str,"call")){
 kore_log(LOG_INFO, green "type call to browser" rst);
-mqueue_push(mq, 2, NULL);
-//clienti->c=c;	
-//client_init(&clienti);
+mqueue_push(mq, 2,c);
 }else if(!strcmp(type_str,"endi")){
 kore_log(LOG_INFO,yellow "type endi" rst);
-mqueue_push(mq,3,NULL);
-//client_stop(&clienti);	
+mqueue_push(mq,3,NULL);	
 }else{
 kore_log(LOG_INFO,yellow "unknown type %s" rst, type_str);	
 }
@@ -192,8 +195,8 @@ int err;
     (void) client.ice_candidate_types; (void) client.n_ice_candidate_types;
 
     // Initialise
-    err=mqueue_alloc(&mq,mqueue_handler,NULL);
-if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
+   // err=mqueue_alloc(&mq,mqueue_handler,NULL);
+//if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
 
     EOE(rawrtc_init());
 
@@ -250,7 +253,8 @@ if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
     
   // client_init(&client);
     clienti=client;
-
+ err=mqueue_alloc(&mq,mqueue_handler,&client);
+if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
     // Listen on stdin
   //  EOR(fd_listen(STDIN_FILENO, FD_READ, parse_remote_description, &client));
 
@@ -495,10 +499,10 @@ static void client_stop(
     client->connection = mem_deref(client->connection);
     client->configuration = mem_deref(client->configuration);
     //by me
-    if(client->c !=NULL){
+   /* if(client->c !=NULL){
 	printf(yellow "client->c is NOT null\n" rst);
 	client->c=NULL;	
-	}
+	}*/
 
     // Stop listening on STDIN
     fd_close(STDIN_FILENO);
@@ -596,9 +600,20 @@ static void print_local_description(
 
     // Print local description as JSON
     DEBUG_INFO("Local Description:\n%H\n", json_encode_odict, dict);
-    
-    if(client->c){printf(green "CLIENT->C!!\n" rst);kore_websocket_send(client->c,1,"mama\0",5);}
-
+    struct mbuf*mb_enc=NULL;
+    mb_enc=mbuf_alloc(1024);
+    if(!mb_enc){printf(red "no  memory in mb_enc?\n" rst);}
+    int err;
+    err=mbuf_printf(mb_enc,"%H",json_encode_odict,dict);
+    if(err){printf(red "error in mbuf_printf?\n" rst);}
+    printf(yellow "%d\n" rst,mb_enc->end);
+    printf(green "data: %s\n" rst,mb_enc->buf);
+    if(client->c){printf(green "CLIENT->C!!\n" rst);
+	//kore_websocket_send(client->c,1,"papa\0",5);
+	//[000006048] main: long async blocking: 612>100 ms (h=0xb777d4e6 arg=0xb5c0f9b0)
+	kore_websocket_send(client->c,1,mb_enc->buf,mb_enc->end);
+	}
+mem_deref(mb_enc);
     // Un-reference
     mem_deref(dict);
     mem_deref(sdp);
