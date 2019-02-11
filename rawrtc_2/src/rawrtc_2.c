@@ -81,9 +81,10 @@ re_cancel();
 kore_log(LOG_INFO,yellow "f==2, client_init" rst);
 struct connection*c=data;
 client->c=c;
+//rawrtc_thread_enter();
 client_init(client);
 
-kore_websocket_send(c,1,"mama\0",4);
+//kore_websocket_send(c,1,"mama\0",4);
 }else if(f==3){
 kore_log(LOG_INFO,yellow "f==3, client_stop" rst);
 client_stop(client);	
@@ -144,7 +145,7 @@ if(!strcmp(type_str,"msg")){
 kore_log(LOG_INFO,green "type msg" rst);	
 }else if(!strcmp(type_str,"call")){
 kore_log(LOG_INFO, green "type call to browser" rst);
-mqueue_push(mq, 2,c);
+mqueue_push(mq, 2, c);
 }else if(!strcmp(type_str,"endi")){
 kore_log(LOG_INFO,yellow "type endi" rst);
 mqueue_push(mq,3,NULL);	
@@ -452,7 +453,7 @@ static void client_init(
 ) {
     struct rawrtc_data_channel_parameters* channel_parameters;
 
-    // Create peer connection
+   printf(yellow "Create peer connection\n" rst);
     EOE(rawrtc_peer_connection_create(
             &client->connection, client->configuration,
             negotiation_needed_handler, local_candidate_handler,
@@ -472,7 +473,7 @@ static void client_init(
 
     // Create pre-negotiated data channel
     EOE(rawrtc_peer_connection_create_data_channel(
-            &client->data_channel_negotiated->channel, client->connection,
+           &client->data_channel_negotiated->channel, client->connection,
             channel_parameters, NULL,
             data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
             default_data_channel_error_handler, default_data_channel_close_handler,
@@ -480,9 +481,25 @@ static void client_init(
 
     // TODO: Create in-band negotiated data channel
     // TODO: Return some kind of promise that resolves once the data channel can be created
+    // yeah it would be nice to have a promise here [000007196] main: long async blocking: 607>100 ms (h=0xb770f505 arg=0xb5c0f9b0)
+    // о чем се говорит? а о томБ что данная библиотека игрушка и не тянет на продакшн. Она по большому счету бесполезна.
+    //Нахуй ее автор писал, я хуй ее знает. Выебнуться?
+    /*
+     * в реальной жизни библиотеку нужно подключать к фреймворку, а не делать стендалоне. Может и заебись в главном потоке работатает
+     * само по себе с ебанным либрэ луп, но совершенно не дееспособна в реальной жизни. Выбрал либрэ луп он зазря.
+     * Тебе туду по идее следовало бы доки написать и промисы ко всем этим тяжеловесным синхроническим операциям. 
+     * Хоть, блядЬ, садись и сам эту либу переписывай под коммерческие нужды. Причем с нуля.
+     * У тебя эта либа недоработана и не жизнеспособна. Какой бы крутой либой либрэ не была, базис которой ты используешь. Не жизнеспособна.
+     * Тут че, я так вижу, либрэ полность сносить нахуй и прикручивать юзрсктплиб к кор напрямую. Иначе никак. Только спиздить у тебя структуру
+     * данных. Позаимствовать. Но в корне менять всё. 
+     * Так. Просто мысли. У меня нет времени тоже эту библиотеку переписывать. Просто не надо ее вов се места толкать. Оная не жизнеспособнаю
+     * Что доказывает моя практика.
+     * 
+     * /
 
     // Un-reference data channel parameters
     mem_deref(channel_parameters);
+    
 }
 
 
@@ -505,7 +522,7 @@ static void client_stop(
 	}*/
 
     // Stop listening on STDIN
-    fd_close(STDIN_FILENO);
+   // fd_close(STDIN_FILENO);
 }
 
 static void parse_remote_description(
