@@ -37,6 +37,7 @@ struct peer_connection_client {
     struct data_channel_helper* data_channel_negotiated;
     struct data_channel_helper* data_channel;
     struct connection*c;
+    struct kore_task *tas;
 };
 
 static void print_local_description(struct peer_connection_client* const client);
@@ -94,9 +95,9 @@ client_stop(client);
 int init(int state){
 if(state==KORE_MODULE_UNLOAD)return (KORE_RESULT_ERROR);
 printf("state init!\n");
-kore_task_create(&task, libre_loop);
-kore_task_bind_callback(&task, data_available);
-kore_task_run(&task, 0);
+//kore_task_create(&task, libre_loop);
+//kore_task_bind_callback(&task, data_available);
+//kore_task_run(&task, 0);
 return (KORE_RESULT_OK);	
 }   
 
@@ -145,7 +146,11 @@ if(!strcmp(type_str,"msg")){
 kore_log(LOG_INFO,green "type msg" rst);	
 }else if(!strcmp(type_str,"call")){
 kore_log(LOG_INFO, green "type call to browser" rst);
-mqueue_push(mq, 2, c);
+//mqueue_push(mq, 2, c);
+kore_task_create(&task, libre_loop);
+kore_task_bind_callback(&task, data_available);
+kore_task_run(&task, 0);
+
 }else if(!strcmp(type_str,"endi")){
 kore_log(LOG_INFO,yellow "type endi" rst);
 mqueue_push(mq,3,NULL);	
@@ -235,13 +240,16 @@ int err;
             &configuration, RAWRTC_ICE_GATHER_POLICY_ALL));
 
     // Add ICE servers to configuration
+    
     EOE(rawrtc_peer_connection_configuration_add_ice_server(
             configuration, stun_google_com_urls, ARRAY_SIZE(stun_google_com_urls),
             NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE));
+            //jj
     EOE(rawrtc_peer_connection_configuration_add_ice_server(
             configuration, turn_threema_ch_urls, ARRAY_SIZE(turn_threema_ch_urls),
             "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
             RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD));
+            
 
     // Set client fields
     client.name = "A";
@@ -251,20 +259,22 @@ int err;
     client.offering = role == RAWRTC_ICE_ROLE_CONTROLLING ? true : false;
 
     // Setup client
-    
-  // client_init(&client);
-    clienti=client;
- err=mqueue_alloc(&mq,mqueue_handler,&client);
+    client.tas=t;
+   client_init(&client);
+   clienti=client;
+   
+ err=mqueue_alloc(&mq, mqueue_handler, &client);
 if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
     // Listen on stdin
-  //  EOR(fd_listen(STDIN_FILENO, FD_READ, parse_remote_description, &client));
+    EOR(fd_listen(STDIN_FILENO, FD_READ, parse_remote_description, &client));
 
 printf("***Start main loop***\n");
 
 EOR(re_main(NULL));
 
 printf("*** Stop client & bye ***\n");
-if(chao==0)client_stop(&client);
+//if(chao==0)
+client_stop(&client);
 mem_deref(mq);
 before_exit();
 
@@ -303,8 +313,9 @@ return;
 }
 len=kore_task_channel_read(t,buf,sizeof(buf));
 if(len > sizeof(buf))printf(red "len great than buf\n" rst);
-kore_log(LOG_NOTICE,"Task msg: %s", buf);
+kore_log(LOG_NOTICE,"Task msg: %s\n", buf);
 printf(yellow "LEN: %d\n" rst,len);	
+kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,len,0/*WEBSOCKET_BROADCAST_GLOBAL*/);
 }
 
 
@@ -482,20 +493,7 @@ static void client_init(
     // TODO: Create in-band negotiated data channel
     // TODO: Return some kind of promise that resolves once the data channel can be created
     // yeah it would be nice to have a promise here [000007196] main: long async blocking: 607>100 ms (h=0xb770f505 arg=0xb5c0f9b0)
-    // о чем се говорит? а о томБ что данная библиотека игрушка и не тянет на продакшн. Она по большому счету бесполезна.
-    //Нахуй ее автор писал, я хуй ее знает. Выебнуться?
-    /*
-     * в реальной жизни библиотеку нужно подключать к фреймворку, а не делать стендалоне. Может и заебись в главном потоке работатает
-     * само по себе с ебанным либрэ луп, но совершенно не дееспособна в реальной жизни. Выбрал либрэ луп он зазря.
-     * Тебе туду по идее следовало бы доки написать и промисы ко всем этим тяжеловесным синхроническим операциям. 
-     * Хоть, блядЬ, садись и сам эту либу переписывай под коммерческие нужды. Причем с нуля.
-     * У тебя эта либа недоработана и не жизнеспособна. Какой бы крутой либой либрэ не была, базис которой ты используешь. Не жизнеспособна.
-     * Тут че, я так вижу, либрэ полность сносить нахуй и прикручивать юзрсктплиб к кор напрямую. Иначе никак. Только спиздить у тебя структуру
-     * данных. Позаимствовать. Но в корне менять всё. 
-     * Так. Просто мысли. У меня нет времени тоже эту библиотеку переписывать. Просто не надо ее вов се места толкать. Оная не жизнеспособнаю
-     * Что доказывает моя практика.
-     * 
-     * /
+   
 
     // Un-reference data channel parameters
     mem_deref(channel_parameters);
@@ -522,7 +520,7 @@ static void client_stop(
 	}*/
 
     // Stop listening on STDIN
-   // fd_close(STDIN_FILENO);
+   fd_close(STDIN_FILENO);
 }
 
 static void parse_remote_description(
@@ -624,11 +622,16 @@ static void print_local_description(
     err=mbuf_printf(mb_enc,"%H",json_encode_odict,dict);
     if(err){printf(red "error in mbuf_printf?\n" rst);}
     printf(yellow "%d\n" rst,mb_enc->end);
-    printf(green "data: %s\n" rst,mb_enc->buf);
+    //printf(green "data: %s\n" rst,mb_enc->buf);
     if(client->c){printf(green "CLIENT->C!!\n" rst);
 	//kore_websocket_send(client->c,1,"papa\0",5);
 	//[000006048] main: long async blocking: 612>100 ms (h=0xb777d4e6 arg=0xb5c0f9b0)
-	kore_websocket_send(client->c,1,mb_enc->buf,mb_enc->end);
+	//kore_websocket_send(client->c,1,mb_enc->buf,mb_enc->end);
+	}
+	if(client->tas){
+	printf(green "client->tas!\n" rst);	
+	//kore_task_channel_write(client->tas,"lapa\0",5);
+	kore_task_channel_write(client->tas,mb_enc->buf,mb_enc->end);
 	}
 mem_deref(mb_enc);
     // Un-reference
