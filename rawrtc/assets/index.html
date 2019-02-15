@@ -190,6 +190,7 @@ const start = (offering) => {
         signaling = new WebSocketSignaling(wsUrl + (offering ? '/1' : '/0'));
     }
     signaling.onLocalDescriptionUpdate = (description) => {
+		console.error('update on local description', JSON.stringify(description));
         localDescriptionTextarea.value = JSON.stringify(description);
 
         // Enable remote description once local description has been set
@@ -235,6 +236,7 @@ const start = (offering) => {
     const createDataChannelWithName = (
         name, options = null, createOnOpenWithName = null, createOnOpenOptions = null
     ) => {
+		console.warn("CREATING DATA CHANNEL***", name, options);
         const dc = pc.createDataChannel(name, options);
         const defaultOnOpenHandler = dc.onopen;
         dc.onopen = (event) => {
@@ -270,6 +272,28 @@ const start = (offering) => {
 // Introduction
 console.info("Hello! Press 'Start' when you're ready.");
 </script>
+<!--
+=0
+↵o=- 1743931703443809700 2 IN IP4 127.0.0.1
+↵s=-
+↵t=0 0
+↵a=group:BUNDLE rawrtc-sctp-dc
+↵a=msid-semantic: WMS
+↵m=application 9 DTLS/SCTP 5000
+↵c=IN IP4 0.0.0.0
+↵b=AS:30
+↵a=ice-ufrag:N3IB
+↵a=ice-pwd:SSKlLUGnpJZQ9nrTwz9D4blI
+↵a=ice-options:trickle
+↵a=fingerprint:sha-256 F7:5A:F7:03:07:5B:BC:56:0A:9C:7F:09:2C:2F:DD:7B:D9:13:89:2C:03:79:E0:42:31:B9:05:33:EC:59:BA:50
+↵a=setup:active
+↵a=mid:rawrtc-sctp-dc
+↵a=sctpmap:5000 webrtc-datachannel 1024
+↵"
+type
+:
+"answer"
 
+-->
 </body>
 </html>

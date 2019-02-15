@@ -74,7 +74,7 @@ pc.createAnswer(function(answer){
 pc.setLocalDescription(answer,function(){
 console.log('answer+>',answer);
 pranswer=answer.sdp;
-console.log(JSON.stringify(answer));	
+console.error("TRY THIS ANSWER\n",JSON.stringify(pc.localDescription));	
 },onerror)	
 },onerror)	
 },onerror)
@@ -96,17 +96,18 @@ function onNewDataChannel(e){
 //msg("Channel [" + e.channel.label + "] created");
 console.log("data channel created => ",e.channel.label);
 dc = e.channel;
+dc.send('suka');
 dc.onmessage = function (event) { console.log("Remote: " + event.data);
 out.innerHTML+='<b>data from ch: </b>'+event.data+'<br>';
-dc.send("fucker");	
+//dc.send("fucker");	
  }
  dc.onclose=function(){out.innerHTML+='<b>data channel closed</b>'+ dc.label+'<br>';}
  dc.onerror=function(e){console.error(e);}
 }
 		</script>
-		
 <!-- {"type":"answer",
 "sdp":"v=0\r\n
+		
 o=- 493873149022961985 2 IN IP4 127.0.0.1\r\n
 s=-\r\nt=0 0\r\n
 a=group:BUNDLE rawrtc-sctp-dc\r\n

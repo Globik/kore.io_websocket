@@ -25,15 +25,17 @@ class CopyPasteSignaling {
     }
 
     set onLocalDescriptionUpdate(callback) {
+		console.warn('onlocal occured ',callback);
         this._onLocalDescriptionUpdate = callback;
     }
 
     set onRemoteDescriptionUpdate(callback) {
+		console.warn('onremote occured',callback);
         this._onRemoteDescriptionUpdate = callback;
     }
 
     handleLocalDescription(description, complete = false) {
-        console.log('Local description:', description);
+        console.error('Local description:', JSON.stringify(description));
 
         // Send local description
         this.sendMessage('description', description);
@@ -45,6 +47,8 @@ class CopyPasteSignaling {
 
         // Call 'update'
         if (this._onLocalDescriptionUpdate !== null) {
+			console.warn('this._onLocalDescriptionUpdate(this._pc.localDescription)');
+			console.error('ON_LOCAL DO  UPDATE:\n',JSON.stringify(this._pc.localDescription));
             this._onLocalDescriptionUpdate(this._pc.localDescription);
         }
     }
@@ -62,6 +66,7 @@ class CopyPasteSignaling {
 
         // Call 'update' (remote description)
         if (this._onRemoteDescriptionUpdate !== null) {
+			console.warn('update remote description');
             this._onRemoteDescriptionUpdate(this._pc.remoteDescription);
         }
 
@@ -69,7 +74,7 @@ class CopyPasteSignaling {
         if (!this._pc._offering) {
             console.log(name, 'Creating answer');
             description = await this._pc.createAnswer();
-
+console.error('ANSWER ', JSON.stringify(description));
             // Apply local description
             await this._pc.setLocalDescription(description);
             this.handleLocalDescription(description);
@@ -91,6 +96,7 @@ class CopyPasteSignaling {
 
         // Call 'update' (local description)
         if (this._onLocalDescriptionUpdate !== null) {
+			console.warn('on local desc update');
             this._onLocalDescriptionUpdate(this._pc.localDescription);
         }
     }
@@ -98,7 +104,7 @@ class CopyPasteSignaling {
     async handleRemoteCandidate(candidate) {
         console.log('Remote ICE candidate:', candidate);
         if (candidate !== null) {
-            // Add remote candidate (if any)
+            console.warn('Add remote candidate (if any)');
             await this._pc.addIceCandidate(candidate);
         } else {
             // Special handling for last candidate
@@ -109,6 +115,7 @@ class CopyPasteSignaling {
 
         // Call 'update' (remote description)
         if (this._onRemoteDescriptionUpdate !== null) {
+			console.warn('this._onremotedescupd');
             this._onRemoteDescriptionUpdate(this._pc.remoteDescription);
         }
     }
@@ -118,12 +125,14 @@ class CopyPasteSignaling {
     }
 
     receiveMessage(type, value) {
-        // Hold back messages until peer connection is set
+        console.warn('Hold back messages until peer connection is set');
         if (this._pc === null) {
+			console.warn('push');
             this.pending_inbound_messages.push({type: type, value: value});
         }
 
         // Handle message
+        console.warn('TYPE: ',type);
         switch (type) {
             case 'description':
                 this.handleRemoteDescription(value).catch((error) => console.error(error));
