@@ -1,10 +1,21 @@
+/*
+ * Based on RAWRTC peer_connection.c tool
+ * see https://gitgub.com/rawrtc/rawrtc/blob/master/src/tools/peer-connection.c
+ * this server peer-connection hardcoded to the role 'offering' and the browser is "answering'
+ * see in index.html in a ..assets directory
+ * https://github/com/Globik/kore.io_websocket/blob/master/rawrtc_2/assets
+ * webRTC DataChannel API, text messages ping-pong (end to end)
+ * peer_connection is via websocket established, using kore webframework written in C
+ * see https://github.com/jorisvink/kore  
+ */
+
 #include <kore/kore.h>
 #include <kore/http.h>
 
 #include <kore/tasks.h>
 #include "assets.h"
 #include <rawrtc.h>
-//include <jansson.h>
+
 #include "helper/utils.h"
 #include "helper/handler.h"
 #define DEBUG_MODULE "peer-connection-app"
@@ -16,14 +27,13 @@
 #define red "\x1b[31m"
 #define rst "\x1b[0m"
 
-int chao=0;
-struct kore_task task;  
+int chao=0;//should be volatile? if started rawrtc thread or not
+struct kore_task task;  //dedicated thread for rawrtc instance
 struct mqueue *mq = NULL;
 
 struct me{
 int argc;
 char* argvi[3];
-//argv[argc+1];
 }mi;
 
 // Note: Shadows struct client 
@@ -36,14 +46,22 @@ struct peer_connection_client {
     struct rawrtc_peer_connection* connection;
     struct data_channel_helper* data_channel_negotiated;
     struct data_channel_helper* data_channel;
-    struct connection*c;
-    struct kore_task *tas;
+    //struct connection*c;?? for a websocket connection 
+    struct kore_task *tas;//this is for a communication from a dedicated task
 };
-
+struct parser_indata{
+//from websocket coming data (webrtc 'answering')
+void *data;
+size_t len;	
+struct odict *dict;
+};
 static void print_local_description(struct peer_connection_client* const client);
 static void client_init(struct peer_connection_client* const client);
 static void parse_remote_description(int flags,void* arg);
+static void my_parse_remote_description(int flags, struct peer_connection_client*, struct parser_indata*);
 static void client_stop(struct peer_connection_client* const client);
+static void custom_data_channel_message_handler(struct mbuf* const buffer,enum rawrtc_data_channel_message_flag const flags,
+void* const arg);
 
 int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
@@ -73,23 +91,16 @@ usleep(5000);
 }
 void mqueue_handler(int f, void*data, void*arg){
 kore_log(LOG_INFO, green "mqueue_handler occured" rst);
-//kore_log(LOG_INFO, green "data: %s" rst,data);
 struct peer_connection_client *client=(struct peer_connection_client*)arg;
 if(f==1){
 kore_log(LOG_INFO, yellow "F: %d" rst, f);
 re_cancel();
 }else if(f==2){
-kore_log(LOG_INFO,yellow "f==2, client_init" rst);
-struct connection*c=data;
-client->c=c;
-//rawrtc_thread_enter();
-client_init(client);
-
-//kore_websocket_send(c,1,"mama\0",4);
-}else if(f==3){
-kore_log(LOG_INFO,yellow "f==3, client_stop" rst);
-client_stop(client);	
-}else{}	
+kore_log(LOG_INFO,yellow "f==2, parse remote description" rst);
+struct parser_indata*das=(struct parser_indata*)data;
+if(das==NULL){kore_log(LOG_INFO, red "struct parser_indata is NULL" rst);return;}
+my_parse_remote_description(0, client, das);
+}else{kore_log(LOG_INFO, yellow "Unknown mqueue message type" rst);}	
 }
 
 int init(int state){
@@ -109,30 +120,96 @@ return (KORE_RESULT_OK);
 }
 void websocket_connect(struct connection*c){
 kore_log(LOG_INFO,"websocket connected %p",c);	
-//clienti.c=c;
 }
-void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
-kore_log(LOG_INFO,"on message %d",len);
-//kore_websocket_send(c,op,data,len);	
-int send_to_clients=0;
-/*
-json_auto_t*root=load_json_buf((const char*)data,len);
-if(!root){kore_log(LOG_INFO, red "why not a root?" rst);return;}
-json_t *type_f=json_object_get(root,"type");
-const char*type_str=json_str_value(type_f);
-if(!strcmp(type_str,"msg")){
-kore_log(LOG_INFO,  green "type msg" rst);	
-}else if(!strcmp(type_str,"call")){
-kore_log(LOG_INFO, green "type call" rst);
-// local sdp to be send, try it
 
-}else if(!strcmp(type_str,"was")){
-	
-}else{
-kore_log(LOG_INFO,yellow "Unknown type: %s" rst,type_str);	
-send_to_clients=1;
+
+static void my_parse_remote_description(
+        int flags,
+        struct peer_connection_client* client, struct parser_indata*indata
+) {
+	// TODO. make returning of enum error callback function? if using mqueue?
+	DEBUG_WARNING("my_parse_remote_description entering\n");
+   // struct peer_connection_client* const client = arg;
+    enum rawrtc_code error;
+    bool do_exit = false;
+   // struct odict* dict = NULL;
+   struct odict*dict=indata->dict;
+    char* type_str;
+    char* sdp;
+    enum rawrtc_sdp_type type;
+    struct rawrtc_peer_connection_description* remote_description = NULL;
+    (void) flags;
+
+    // Get dict from JSON
+    /*
+    error = get_json_stdin(&dict);
+    if (error) {
+        do_exit = error == RAWRTC_CODE_NO_VALUE;
+        goto out;
+    }
+    */
+   
+error=json_decode_odict(&dict, 16, indata->data, indata->len, 3);
+if(error){kore_log(LOG_INFO,red "decode odict err" rst);} 
+
+    // Decode JSON
+    error |= dict_get_entry(&type_str, dict, "type", ODICT_STRING, true);
+    error |= dict_get_entry(&sdp, dict, "sdp", ODICT_STRING, true);
+    if (error) {
+        DEBUG_WARNING("Invalid remote description\n");
+        goto out;
+    }
+
+    // Convert to description
+    error = rawrtc_str_to_sdp_type(&type, type_str);
+    if (error) {
+        DEBUG_WARNING("Invalid SDP type in remote description: '%s'\n", type_str);
+        goto out;
+    }
+    error = rawrtc_peer_connection_description_create(&remote_description, type, sdp);
+    if (error) {
+        DEBUG_WARNING("Cannot parse remote description: %s\n", rawrtc_code_to_str(error));
+        goto out;
+    }
+
+    // Set remote description
+    DEBUG_INFO("Applying remote description\n");
+    EOE(rawrtc_peer_connection_set_remote_description(client->connection, remote_description));
+
+    // Answering: Create and set local description
+    if (!client->offering) {
+        struct rawrtc_peer_connection_description* local_description;
+        EOE(rawrtc_peer_connection_create_answer(&local_description, client->connection));
+        EOE(rawrtc_peer_connection_set_local_description(client->connection, local_description));
+        mem_deref(local_description);
+    }
+
+out:
+    // Un-reference
+    mem_deref(remote_description);
+    mem_deref(dict);
+
+    // Exit?
+    if (do_exit) {
+        DEBUG_NOTICE("Exiting\n");
+
+        // Stop client & bye
+      //  client_stop(client);
+       // tmr_cancel(&timer);
+        //before_exit();
+        //exit(0);
+    }
 }
-*/
+
+
+
+
+
+void websocket_message(struct connection*c,u_int8_t op,void*data,size_t len){
+kore_log(LOG_INFO,green "websocket message length %d" rst, len);
+
+int send_to_clients=0;
+
 struct odict*dict=NULL;
 char*type_str;
 int err;
@@ -141,19 +218,19 @@ if(err){kore_log(LOG_INFO,red "decode odict err" rst);}
 err |=dict_get_entry(&type_str,dict,"type",ODICT_STRING,true);
 if(err){kore_log(LOG_INFO, red "dict get entry error." rst);}
 
-//if(type_str)kore_log(LOG_INFO, green "type came: %s" rst, type_str);
 if(!strcmp(type_str,"msg")){
 kore_log(LOG_INFO,green "type msg" rst);	
 }else if(!strcmp(type_str,"call")){
-kore_log(LOG_INFO, green "type call to browser" rst);
-//mqueue_push(mq, 2, c);
+kore_log(LOG_INFO, green "Start rawrtc client" rst);
+send_to_clients = 1;
 kore_task_create(&task, libre_loop);
 kore_task_bind_callback(&task, data_available);
 kore_task_run(&task, 0);
 
-}else if(!strcmp(type_str,"endi")){
-kore_log(LOG_INFO,yellow "type endi" rst);
-mqueue_push(mq,3,NULL);	
+}else if(!str_cmp(type_str,"answer")){
+send_to_clients = 1;
+kore_log(LOG_INFO, yellow "webRTC answer" rst);
+mqueue_push(mq, 2, &(struct parser_indata){.data=data,.len=len,.dict=dict});	
 }else{
 kore_log(LOG_INFO,yellow "unknown type %s" rst, type_str);	
 }
@@ -168,9 +245,10 @@ kore_log(LOG_INFO,"websocket disconnected %p",c);
 int
 page(struct http_request *req)
 {
-	http_response_header(req,"content-type","text/html");
-	http_response(req, 200, asset_index_html, asset_len_index_html);
-	return (KORE_RESULT_OK);
+// see in ..'assets' folder - the index.html file for webrRTC frontend with DataChannel API
+http_response_header(req,"content-type","text/html");
+http_response(req, 200, asset_index_html, asset_len_index_html);
+return (KORE_RESULT_OK);
 }
 
 static void exit_with_usage(char*program){
@@ -178,6 +256,7 @@ DEBUG_WARNING("Usage: %s <0|1 (offering)> [<ice-candidate-type> ...]",program);
 }
 int libre_loop(struct kore_task*t){
 kore_task_channel_write(t,"mama\0",5);
+// peer_connection hardcoded to 'offering' role
 lmain(3,(char*[3]){"peer-connection", "1", "host"});
 
 printf("argc: %d\n", mi.argc);	
@@ -187,22 +266,15 @@ printf("mi.argvi[2] %s\n",mi.argvi[2]);
 
 
 int err;
+char** ice_candidate_types = NULL;
+size_t n_ice_candidate_types = 0;
+enum rawrtc_ice_role role;
+struct rawrtc_peer_connection_configuration* configuration;
+// char* const stun_google_com_urls[] = {"stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"};
+// char* const turn_threema_ch_urls[] = {"turn:turn.threema.ch:443"};
+struct peer_connection_client client = {0};
+(void) client.ice_candidate_types; (void) client.n_ice_candidate_types;
 
-
-
-    char** ice_candidate_types = NULL;
-    size_t n_ice_candidate_types = 0;
-    enum rawrtc_ice_role role;
-    struct rawrtc_peer_connection_configuration* configuration;
-    char* const stun_google_com_urls[] = {"stun:stun.l.google.com:19302",
-                                          "stun:stun1.l.google.com:19302"};
-    char* const turn_threema_ch_urls[] = {"turn:turn.threema.ch:443"};
-  struct peer_connection_client client = {0};
-    (void) client.ice_candidate_types; (void) client.n_ice_candidate_types;
-
-    // Initialise
-   // err=mqueue_alloc(&mq,mqueue_handler,NULL);
-//if(err){kore_log(LOG_INFO, red "mqueue_alloc allocate failed");goto out;}
 
     EOE(rawrtc_init());
 
@@ -240,7 +312,7 @@ int err;
             &configuration, RAWRTC_ICE_GATHER_POLICY_ALL));
 
     // Add ICE servers to configuration
-    
+    /*
     EOE(rawrtc_peer_connection_configuration_add_ice_server(
             configuration, stun_google_com_urls, ARRAY_SIZE(stun_google_com_urls),
             NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE));
@@ -250,7 +322,7 @@ int err;
             "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
             RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD));
             
-
+*/
     // Set client fields
     client.name = "A";
     client.ice_candidate_types = ice_candidate_types;
@@ -313,80 +385,48 @@ return;
 }
 len=kore_task_channel_read(t,buf,sizeof(buf));
 if(len > sizeof(buf))printf(red "len great than buf\n" rst);
-kore_log(LOG_NOTICE,"Task msg: %s\n", buf);
-printf(yellow "LEN: %d\n" rst,len);	
+//kore_log(LOG_NOTICE,"Task msg: %s\n", buf);
+kore_log(LOG_INFO, yellow "LEN: %d" rst,len);	
 kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,buf,len,0/*WEBSOCKET_BROADCAST_GLOBAL*/);
 }
 
 
-static void timer_handler(
-        void* arg
-) {
-    struct data_channel_helper* const channel = arg;
-    struct peer_connection_client* const client = (struct peer_connection_client*) channel->client;
-    struct mbuf* buffer;
-    enum rawrtc_code error;
-
-    // Compose message (16 KiB)
-    buffer = mbuf_alloc(1 << 14);
-    EOE(buffer ? RAWRTC_CODE_SUCCESS : RAWRTC_CODE_NO_MEMORY);
-    EOR(mbuf_fill(buffer, 'M', mbuf_get_space(buffer)));
-    mbuf_set_pos(buffer, 0);
-
-    // Send message
-    DEBUG_PRINTF("(%s) Sending %zu bytes\n", client->name, mbuf_get_left(buffer));
-    error = rawrtc_data_channel_send(channel->channel, buffer, true);
-    if (error) {
-        DEBUG_WARNING("Could not send, reason: %s\n", rawrtc_code_to_str(error));
-    }
-    mem_deref(buffer);
-
-    // Close if offering
-    if (client->offering) {
-        // Close bear-noises
-        DEBUG_PRINTF("(%s) Closing channel\n", client->name, channel->label);
-        EOR(rawrtc_data_channel_close(client->data_channel->channel));
-    }
+static void custom_data_channel_message_handler(struct mbuf* const buffer,enum rawrtc_data_channel_message_flag const flags,
+void* const arg)
+{
+struct data_channel_helper*const channel=arg;
+struct peer_connection_client*const client=(struct peer_connection_client*)channel->client;
+enum rawrtc_code error;
+default_data_channel_message_handler(buffer,flags,arg);
+DEBUG_PRINTF("*** MY!!! (%s) sending %zu bytes ***\n",client->name,mbuf_get_left(buffer));
+//DEBUG_PRINTF("*** DATA_CHANNEL_MESSAGE: %H ***\n",buffer);
+error=rawrtc_data_channel_send(channel->channel,buffer,flags & RAWRTC_DATA_CHANNEL_MESSAGE_FLAG_IS_BINARY ? true:false);
+if(error){
+DEBUG_WARNING("could not send, reason: %s\n", rawrtc_code_to_str(error));	
 }
+(void) flags;	
+}
+
 
 
 static void data_channel_open_handler(
         void* const arg
 ) {
     struct data_channel_helper* const channel = arg;
-    struct peer_connection_client* const client = (struct peer_connection_client*) channel->client;
-    struct mbuf* buffer;
-    enum rawrtc_code error;
+   struct peer_connection_client* const client = (struct peer_connection_client*) channel->client;
+   // struct mbuf* buffer;
+    //enum rawrtc_code error;
 
-    // Print open event
+    DEBUG_WARNING("data_channel_open_handler\n");
     default_data_channel_open_handler(arg);
 
-    // Send data delayed on bear-noises
-    if (str_cmp(channel->label, "bear-noises") == 0) {
-        tmr_start(&timer, 30000, timer_handler, channel);
-        return;
-    }
-
-    // Compose message (8 KiB)
-    buffer = mbuf_alloc(1 << 13);
-    EOE(buffer ? RAWRTC_CODE_SUCCESS : RAWRTC_CODE_NO_MEMORY);
-    EOR(mbuf_fill(buffer, 'M', mbuf_get_space(buffer)));
-    mbuf_set_pos(buffer, 0);
-
-    // Send message
-    DEBUG_PRINTF("(%s) Sending %zu bytes\n", client->name, mbuf_get_left(buffer));
-    error = rawrtc_data_channel_send(channel->channel, buffer, true);
-    if (error) {
-        DEBUG_WARNING("Could not send, reason: %s\n", rawrtc_code_to_str(error));
-    }
-    mem_deref(buffer);
 }
 static void negotiation_needed_handler(
         void* const arg
 ) {
     struct peer_connection_client* const client = arg;
 
-    // Print negotiation needed
+    DEBUG_WARNING("negotiation_needed_handler\n");
     default_negotiation_needed_handler(arg);
 
     // Offering: Create and set local description
@@ -409,34 +449,6 @@ static void connection_state_change_handler(
 
     // Print state
     default_peer_connection_state_change_handler(state, arg);
-
-    // Open? Create new channel
-    // Note: Since this state can switch from 'connected' to 'disconnected' and back again, we
-    //       need to make sure we don't re-create data channels unintended.
-    // TODO: Move this once we can create data channels earlier
-    if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) {
-        struct rawrtc_data_channel_parameters* channel_parameters;
-        char* const label = client->offering ? "bear-noises" : "lion-noises";
-
-        // Create data channel helper for in-band negotiated data channel
-        data_channel_helper_create(
-                &client->data_channel, (struct client *) client, label);
-
-        // Create data channel parameters
-        EOE(rawrtc_data_channel_parameters_create(
-                &channel_parameters, client->data_channel->label,
-                RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_UNORDERED, 0, NULL, false, 0));
-
-        // Create data channel
-        EOE(rawrtc_peer_connection_create_data_channel(
-                &client->data_channel->channel, client->connection, channel_parameters, NULL,
-                data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
-                default_data_channel_error_handler, default_data_channel_close_handler,
-                default_data_channel_message_handler, client->data_channel));
-
-        // Un-reference data channel parameters
-        mem_deref(channel_parameters);
-    }
 }
 
 
@@ -474,6 +486,7 @@ static void client_init(
             default_data_channel_handler, client));
 
     // Create data channel helper for pre-negotiated data channel
+    
     data_channel_helper_create(
             &client->data_channel_negotiated, (struct client *) client, "cat-noises");
 
@@ -488,7 +501,7 @@ static void client_init(
             channel_parameters, NULL,
             data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
             default_data_channel_error_handler, default_data_channel_close_handler,
-            default_data_channel_message_handler, client->data_channel_negotiated));
+            custom_data_channel_message_handler, client->data_channel_negotiated));
 
     // TODO: Create in-band negotiated data channel
     // TODO: Return some kind of promise that resolves once the data channel can be created
@@ -509,15 +522,10 @@ static void client_stop(
     EOE(rawrtc_peer_connection_close(client->connection));
 
     // Un-reference & close
-    client->data_channel = mem_deref(client->data_channel);
+    client->data_channel = mem_deref(client->data_channel);//?? no bear-noises any more
     client->data_channel_negotiated = mem_deref(client->data_channel_negotiated);
     client->connection = mem_deref(client->connection);
     client->configuration = mem_deref(client->configuration);
-    //by me
-   /* if(client->c !=NULL){
-	printf(yellow "client->c is NOT null\n" rst);
-	client->c=NULL;	
-	}*/
 
     // Stop listening on STDIN
    fd_close(STDIN_FILENO);
@@ -527,6 +535,7 @@ static void parse_remote_description(
         int flags,
         void* arg
 ) {
+	DEBUG_WARNING("parse_remote_description entering\n");
     struct peer_connection_client* const client = arg;
     enum rawrtc_code error;
     bool do_exit = false;
@@ -622,15 +631,10 @@ static void print_local_description(
     err=mbuf_printf(mb_enc,"%H",json_encode_odict,dict);
     if(err){printf(red "error in mbuf_printf?\n" rst);}
     printf(yellow "%d\n" rst,mb_enc->end);
-    //printf(green "data: %s\n" rst,mb_enc->buf);
-    if(client->c){printf(green "CLIENT->C!!\n" rst);
-	//kore_websocket_send(client->c,1,"papa\0",5);
-	//[000006048] main: long async blocking: 612>100 ms (h=0xb777d4e6 arg=0xb5c0f9b0)
-	//kore_websocket_send(client->c,1,mb_enc->buf,mb_enc->end);
-	}
+   
 	if(client->tas){
-	printf(green "client->tas!\n" rst);	
-	//kore_task_channel_write(client->tas,"lapa\0",5);
+	printf(green "client->task!\n" rst);	
+	// pass local description to the frontend via websocket
 	kore_task_channel_write(client->tas,mb_enc->buf,mb_enc->end);
 	}
 mem_deref(mb_enc);

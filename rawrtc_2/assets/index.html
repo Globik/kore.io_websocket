@@ -1,127 +1,98 @@
 <!DOCTYPE><html>
-	<body>
-		<output id="out"></output>
-		 <button onclick="start_channel();">start client</button> 
-		 <br><button onclick="stop_client();">stop client</button>
-		<script>
-		var sock=null;
-		sock=new WebSocket("ws://127.0.0.1:8888/connect");
-		sock.onopen=on_open;
-		sock.onclose=on_close;
-		sock.onmessage=on_message;
-		sock.onerror=on_error;
-		function on_error(e){out.innerHTML+='error: '+e+'<br>';}
-		function on_close(){out.innerHTML+='Websocket closed.<br>';}
-		function on_open(){out.innerHTML+='Websocket opened.<br>';sock.send(JSON.stringify({type:'msg',msg:'hello'}));}
-		function on_message(evt){out.innerHTML+='data: '+evt.data+'<br>';
-		var jsdata;
-		try{jsdata=JSON.parse(evt.data);}catch(err){out.innerHTML+="parse err: "+err+"<br>";return;}	
-		if(jsdata.type=="offer"){
-		out.innerHTML+="offer came<br>";
-		handle_offer(jsdata);	
-		}else if(jsdata.type=="msg"){
-		out.innerHTML+="message: "+evt.data+"<br>";	
-		}else if(jsdata.type=="call"){
-		//pingback from server	
-		}else{out.innerHTML+="unknown type came: "+evt.type+"<b>"+evt+"</b>"+" <br>";
-		console.log(evt);}
-		}
+<body>
+<output id="out"></output>
+<button onclick="start_channel();">start RAWRTC client</button><br><hr>
+<h2>Data Channel input for text</h2>
+<input id="txttosend" type="text" value="hello world." placeholder="something to send"><button onclick="send();">send</button>
+<script>
+var cat_data_channel=null;
+var pc=null;
+var sock=null;
+	sock=new WebSocket("ws://127.0.0.1:8889/connect");
+	sock.onopen=on_open;
+	sock.onclose=on_close;
+	sock.onmessage=on_message;
+	sock.onerror=on_error;
+	
+function on_error(e){out.innerHTML+='error: '+e+'<br>';}
+function on_close(){out.innerHTML+='Websocket closed.<br>';}
+function on_open(){
+out.innerHTML+='Websocket opened.<br>';
+sock.send(JSON.stringify({type:'msg',msg:'hello. Press button "Start RAWRTC client" '}));}
 		
-		function start_channel(){
-		if(sock)sock.send(JSON.stringify({type:"call",msg:"yes"}));
-		}
-		
-		function stop_client(){
-		if(sock)sock.send(JSON.stringify({type:'endi',msg:'f'}));	
-		}
-		var pc=null;var dc;
-		var config={iceServers:[ {urls: 'stun:stun.services.mozilla.com',}],};
-		function handle_offer(d){
-		var offer=new RTCSessionDescription(d);
-pc=new RTCPeerConnection(config);
-var pranswer;
-pc.onicecandidate=function(ev){console.log("ICE CANDIDATE!: ",ev);
-	if(ev.candidate){
-	if(pranswer){
-	pranswer+="a="+ev.candidate.candidate+"\r\n";
-	out.innerHTML+="<b>local candidate:</b>"+ev.candidate.candidate+"<br>";
-	var d={};
-	d.type="answer";
-	d.sdp=pranswer;
-	console.warn("WITH CANDIDATE");
-	console.error(JSON.stringify(d));
-}	
-	}
+function on_message(evt){
+var jsdata;
+try{jsdata=JSON.parse(evt.data);}catch(err){out.innerHTML+="<b>Websocket data: </b>"+evt.data+"<br>";return;}	
+if(jsdata.type=="offer"){
+out.innerHTML+="<b>offer came</b><br>";
+handle_offer(jsdata);	
+}else if(jsdata.type=="msg"){
+out.innerHTML+="message: "+evt.data+"<br>";	
+}else{
+out.innerHTML+="unknown type came: "+evt.type+"<b>"+evt+"</b>"+" <br>";
 }
+}
+		
+function start_channel(){
+if(pc){console.warn("RAWRTC already established");return;}
+if(sock)sock.send(JSON.stringify({type:"call",msg:"yes"}));
+}
+
+//var config={iceServers:[ {urls: 'stun:stun.services.mozilla.com',}],};
+var config={iceServers:[]};
+function handle_offer(d){
+var offer=new RTCSessionDescription(d);
+pc=new RTCPeerConnection(config);
+cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
+pc.onicecandidate = function(ev){console.log("ICE CANDIDATE!: ",ev);if(ev.candidate){}}
 pc.onnegotiationneeded=function(){console.log('negotiation needed');}
 
-//pc.oniceconnectionstatechange=function(e){console.log("connection state: ", e);}
+pc.signalingstatechange = function(){console.log('Signaling state:', pc.signalingState);};
+pc.oniceconnectionstatechange = function(){
+console.log('ICE connection state:', pc.iceConnectionState);
+if(pc.iceConnectionState=="connected"){bind_toEvents(cat_data_channel);
+}else if(pc.iceConnectionState=="disconnected"){
+if(cat_data_channel){cat_data_channel.close();cat_data_channel=null;}
+if(pc){pc.close();}
 
-pc.signalingstatechange = () => {console.log('Signaling state:', pc.signalingState);};
-pc.oniceconnectionstatechange = () => {console.log('ICE connection state:', pc.iceConnectionState);};
-pc.onicegatheringstatechange = () => { console.log('ICE gathering state:', pc.iceGatheringState);};
-pc.onconnectionstatechange = () => {console.log('Connection state:', pc.connectionState);};
-pc.onicecandidateerror = (event) => {console.error('ICE candidate error:', event);};
-
-
-
-
-
-
+}else{}
+};
+pc.onicegatheringstatechange = function(){ console.log('ICE gathering state:', pc.iceGatheringState);};
+pc.onconnectionstatechange = function(){console.log('Connection state:', pc.connectionState);};
+pc.onicecandidateerror = function(event){console.error('ICE candidate error:', event);};
 
 pc.setRemoteDescription(offer,function(){
 pc.createAnswer(function(answer){
 pc.setLocalDescription(answer,function(){
-console.log('answer+>',answer);
-pranswer=answer.sdp;
-console.error("TRY THIS ANSWER\n",JSON.stringify(pc.localDescription));	
+let a=JSON.stringify(pc.localDescription);
+console.error("TRY THIS ANSWER\n", a);
+if(sock)sock.send(a);	
 },onerror)	
 },onerror)	
-},onerror)
-
-/*dc=pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
-dc.onopen=function(){out.innerHTML+='<b>datachannel opened: </b>'+dc.label+'<br>';
-	out.innerHTML+='<b>ready state: </b>'+dc.readyState+'<br>';
-	}
-	*/
-//dc.onerror=function(){alert('error');}
-pc.ondatachannel = onNewDataChannel;
-//pc.setLocalDescription(pc.createAnswer())
-//send(desc:pc.localDescription			
+},onerror);	
+//cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
 }
+function onerror(e){console.error(e);}
 
-function onerror(e){console.log(e);}
-
-function onNewDataChannel(e){
-//msg("Channel [" + e.channel.label + "] created");
-console.log("data channel created => ",e.channel.label);
-dc = e.channel;
-dc.send('suka');
-dc.onmessage = function (event) { console.log("Remote: " + event.data);
-out.innerHTML+='<b>data from ch: </b>'+event.data+'<br>';
-//dc.send("fucker");	
- }
- dc.onclose=function(){out.innerHTML+='<b>data channel closed</b>'+ dc.label+'<br>';}
- dc.onerror=function(e){console.error(e);}
+function bind_toEvents(cat){
+cat.onopen=function(){
+out.innerHTML+='<b>datachannel opened: </b>'+cat.label+'<br>';
+out.innerHTML+='<b>ready state: </b>'+cat.readyState+'<br>';
 }
-		</script>
-<!-- {"type":"answer",
-"sdp":"v=0\r\n
-		
-o=- 493873149022961985 2 IN IP4 127.0.0.1\r\n
-s=-\r\nt=0 0\r\n
-a=group:BUNDLE rawrtc-sctp-dc\r\n
-a=msid-semantic: WMS\r\n
-m=application 9 DTLS/SCTP 5000\r\n
-c=IN IP4 0.0.0.0\r\n
-b=AS:30\r\n
-a=ice-ufrag:z/xL\r\n
-a=ice-pwd:QDnENT7SWay5sYAyANRGJ3+h\r\n
-a=ice-options:trickle\r\n
-a=fingerprint:sha-256 AF:7C:05:B4:74:E4:F0:22:04:AD:8E:E5:78:18:0D:8C:D7:D2:B6:35:77:5F:65:B8:98:39:A3:34:6F:5C:90:85\r\n
-a=setup:active\r\n
-a=mid:rawrtc-sctp-dc\r\na=sctpmap:5000 webrtc-datachannel 1024\r\n"}
--->
-	
-	</body></html>
-	
+cat.onmessage=function(event){
+out.innerHTML+='<b>cat msg: </b>'+event.data+'<br>';
+}
+cat.onerror=function(e){
+out.innerHTML+='<b>cat error: </b>'+e+'<br>';
+}
+cat.onclose=function(){
+out.innerHTML+='<b>cat closed.</b>';
+}
+}
+function send(){
+if(!cat_data_channel){console.warn('not connected via data channel');return;}
+if(!txttosend.value)return;
+cat_data_channel.send(txttosend.value);
+}
+</script>
+</body></html>
