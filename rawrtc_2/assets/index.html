@@ -8,7 +8,7 @@
 var cat_data_channel=null;
 var pc=null;
 var sock=null;
-	sock=new WebSocket("ws://127.0.0.1:8889/connect");
+	sock=new WebSocket("ws://127.0.0.1:8888/connect");
 	sock.onopen=on_open;
 	sock.onclose=on_close;
 	sock.onmessage=on_message;
@@ -41,10 +41,11 @@ if(sock)sock.send(JSON.stringify({type:"call",msg:"yes"}));
 //var config={iceServers:[ {urls: 'stun:stun.services.mozilla.com',}],};
 var config={iceServers:[]};
 function handle_offer(d){
-var offer=new RTCSessionDescription(d);
 pc=new RTCPeerConnection(config);
 cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
-pc.onicecandidate = function(ev){console.log("ICE CANDIDATE!: ",ev);if(ev.candidate){}}
+pc.onicecandidate = function(ev){console.log("ICE CANDIDATE!: ",ev);if(ev.candidate){
+//cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
+}}
 pc.onnegotiationneeded=function(){console.log('negotiation needed');}
 
 pc.signalingstatechange = function(){console.log('Signaling state:', pc.signalingState);};
@@ -61,16 +62,37 @@ pc.onicegatheringstatechange = function(){ console.log('ICE gathering state:', p
 pc.onconnectionstatechange = function(){console.log('Connection state:', pc.connectionState);};
 pc.onicecandidateerror = function(event){console.error('ICE candidate error:', event);};
 
-pc.setRemoteDescription(offer,function(){
+//var offer=new RTCSessionDescription(d);
+//console.log(pc.remote);
+//setTimeout(function(){
+/*
+pc.setRemoteDescription(d,function(){
+console.log('settled remote description');//},onerror);
+//cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
 pc.createAnswer(function(answer){
 pc.setLocalDescription(answer,function(){
 let a=JSON.stringify(pc.localDescription);
 console.error("TRY THIS ANSWER\n", a);
-if(sock)sock.send(a);	
+//setTimeout(function(){
+	if(sock)sock.send(a);
+//	},2000);	
 },onerror)	
 },onerror)	
 },onerror);	
+//},2000);
 //cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
+*/
+async function boo(){
+	console.log('in boo');
+await pc.setRemoteDescription(d);
+let desc=await pc.createAnswer();
+await pc.setLocalDescription(desc);	
+let a=JSON.stringify(pc.localDescription);
+if(sock)setTimeout(function(){sock.send(a);},5000);
+}
+boo().then(function(){})
+
+
 }
 function onerror(e){console.error(e);}
 

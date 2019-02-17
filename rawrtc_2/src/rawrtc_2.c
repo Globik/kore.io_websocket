@@ -178,6 +178,7 @@ if(error){kore_log(LOG_INFO,red "decode odict err" rst);}
 
     // Answering: Create and set local description
     if (!client->offering) {
+		printf("not offering\n");
         struct rawrtc_peer_connection_description* local_description;
         EOE(rawrtc_peer_connection_create_answer(&local_description, client->connection));
         EOE(rawrtc_peer_connection_set_local_description(client->connection, local_description));
@@ -230,7 +231,9 @@ kore_task_run(&task, 0);
 }else if(!str_cmp(type_str,"answer")){
 send_to_clients = 1;
 kore_log(LOG_INFO, yellow "webRTC answer" rst);
-mqueue_push(mq, 2, &(struct parser_indata){.data=data,.len=len,.dict=dict});	
+//mqueue_push(mq, 2, &(struct parser_indata){.data=data,.len=len,.dict=dict});	
+
+my_parse_remote_description(0,&clienti, &(struct parser_indata){.data=data,.len=len,.dict=dict});
 }else{
 kore_log(LOG_INFO,yellow "unknown type %s" rst, type_str);	
 }
@@ -412,8 +415,8 @@ DEBUG_WARNING("could not send, reason: %s\n", rawrtc_code_to_str(error));
 static void data_channel_open_handler(
         void* const arg
 ) {
-    struct data_channel_helper* const channel = arg;
-   struct peer_connection_client* const client = (struct peer_connection_client*) channel->client;
+  //  struct data_channel_helper* const channel = arg;
+  // struct peer_connection_client* const client = (struct peer_connection_client*) channel->client;
    // struct mbuf* buffer;
     //enum rawrtc_code error;
 
@@ -445,7 +448,7 @@ static void connection_state_change_handler(
         enum rawrtc_peer_connection_state const state, // read-only
         void* const arg
 ) {
-    struct peer_connection_client* const client = arg;
+   // struct peer_connection_client* const client = arg;
 
     // Print state
     default_peer_connection_state_change_handler(state, arg);
