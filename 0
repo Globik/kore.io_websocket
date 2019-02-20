@@ -1,11 +1,26 @@
     ./configure SRTP15X_CFLAGS='/usr/include/srtp' SRTP15X_LIBS='/usr/lib'  --enable-libsrtp2=no --disable-plugin-sip --disable-plugin-videocall --disable-plugin-sipre  --disable-plugin-nosip  --disable-plugin-recordplay  --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge
 
 # this configuration I am using:
-  ./configure --disable-turn-rest-api --disable-plugin-sip --disable-rest --disable-plugin-videocall --disable-plugin-sipre --disable-plugin-nosip --disable-plugin-recordplay --disable-plugin-streaming --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge JANUS_CFLAGS="-v -Wall -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
+  ./configure --disable-turn-rest-api --disable-plugin-sip --disable-rest --disable-plugin-videocall 
+  --disable-plugin-sipre --disable-plugin-nosip --disable-plugin-recordplay --disable-plugin-streaming
+   --disable-plugin-voicemail --disable-plugin-videoroom --disable-plugin-audiobridge
+    JANUS_CFLAGS="-v -Wall -I/opt/boringssl/include -I/usr/local/include -I/usr/include/glib-2.0 
+    -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" 
+    JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl 
+    -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib 
+    -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0 -lconfig"
 
 # sudo leafpad /usr/local/etc/janus/janus.transport.pfunix.cfg
+sudo leafpad /usr/local/etc/janus/janus.cfg
+2019.02
+ ./configure --disable-plugin-videocall --disable-plugin-recordplay --disable-plugin-voicemail --disable-plugin-sip --disable-plugin-sipre --disable-plugin-nosip JANUS_CFLAGS="-v -Wall -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" JANUS_LIBS="-L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0  -L/usr/lib/i386-linux-gnu -lglib-2.0 -lconfig -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto"
+    
+    
+    /usr/lib/i386-linux-gnu/glib-2.0/include/glibconfig.h
 
-
+    
+    
+    
 
 
 JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp"
