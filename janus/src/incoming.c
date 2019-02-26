@@ -1,13 +1,37 @@
 
-int janus_process_incoming_request(janus_request *request) {
+static int janus_process_error_string(struct connection*, guint64 session_id, const char* transaction,gint error_code,gchar* error_cause);
+static int janus_process_error_string(struct connection*c, guint64 session_id, const char* transaction,gint error,gchar* error_string){
+JANUS_LOG(LOG_VERB, "[%s] Returning %s API error %d (%s)\n", transaction, request->admin ? "admin" : "Janus", error, error_string);
+	/* Prepare JSON error */
+	json_t *reply = janus_create_message("error", session_id, transaction);
+	json_t *error_data = json_object();
+	json_object_set_new(error_data, "code", json_integer(error));
+	json_object_set_new(error_data, "reason", json_string(error_string));
+	json_object_set_new(reply, "error", error_data);
+	/* Pass to the right transport plugin */
+	size_t size=json_dumpb(reply,NULL,0,0);
+	if(size==0){
+	JANUS_LOG(LOG_VERB,"not enough size for json buf %d", size);
+	json_decref(error_data);
+	json_decref(reply);
+	return -1;
+}
+char *buf=alloca(size);
+size=json_dumpb(reply,buf,size,0);
+kore_websocket_send(c,1,buf,size);
+
+return 0;	
+}
+//struct connection*c, guint64 session_id, const char* transaction,gint error,gchar* error_string
+int janus_process_incoming_request(struct connection*c) {
 	int ret = -1;
-	if(request == NULL) {
-		JANUS_LOG(LOG_ERR, "Missing request or payload to process, giving up...\n");
-		return ret;
+	//if(request == NULL) {
+		//JANUS_LOG(LOG_ERR, "Missing request or payload to process, giving up...\n");
+		//return ret;
 	}
 	int error_code = 0;
 	char error_cause[100];
-	json_t *root = request->message;
+	json_t *root = //request->message;
 	/* Ok, let's start with the ids */
 	guint64 session_id = 0, handle_id = 0;
 	json_t *s = json_object_get(root, "session_id");
@@ -25,7 +49,7 @@ int janus_process_incoming_request(janus_request *request) {
 		error_code, error_cause, FALSE,
 		JANUS_ERROR_MISSING_MANDATORY_ELEMENT, JANUS_ERROR_INVALID_ELEMENT_TYPE);
 	if(error_code != 0) {
-		ret = janus_process_error_string(request, session_id, NULL, error_code, error_cause);
+		ret = janus_process_error_string(c, session_id, NULL, error_code, error_cause);
 		goto jsondone;
 	}
 	json_t *transaction = json_object_get(root, "transaction");
