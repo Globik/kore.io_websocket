@@ -790,7 +790,7 @@ static void janus_request_ice_handle_answer(janus_ice_handle *handle, int audio,
 	}
 }
 ////struct connection* request, guint64 session_id, const char* transaction,gint error,gchar* error_string , root?
-int janus_process_incoming_request(struct connection *request,json_t *vroot) {
+int janus_process_incoming_request(struct connection *request,json_t *root) {
 	int ret = -1;
 //	if(request == NULL) {
 	//	JANUS_LOG(LOG_ERR, "Missing request or payload to process, giving up...\n");
@@ -798,7 +798,8 @@ int janus_process_incoming_request(struct connection *request,json_t *vroot) {
 	//}
 	int error_code = 0;
 	char error_cause[100];
-	json_t *root = vroot;//request->message;
+	//NOTICE via kore.c handle json message
+	//json_t *root = vroot;//request->message;
 	/* Ok, let's start with the ids */
 	guint64 session_id = 0, handle_id = 0;
 	json_t *s = json_object_get(root, "session_id");
@@ -872,9 +873,11 @@ int janus_process_incoming_request(struct connection *request,json_t *vroot) {
 		/* We increase the counter as this request is using the session */
 		janus_refcount_increase(&session->ref);
 		/* Take note of the request source that originated this session (HTTP, WebSockets, RabbitMQ?) */
-		session->source = janus_request_new(request->transport, request->instance, NULL, FALSE, NULL);
+		//NOTICE we have out own transport=> kore.c
+		session->source = NULL;//janus_request_new(request->transport, request->instance, NULL, FALSE, NULL);
 		/* Notify the source that a new session has been created */
-		request->transport->session_created(request->instance, session->session_id);
+		// TODO via websocket send this
+		//request->transport->session_created(request->instance, session->session_id);
 		/* Notify event handlers */
 		if(janus_events_is_enabled()) {
 			/* Session created, add info on the transport that originated it */
@@ -1519,12 +1522,14 @@ static json_t *janus_json_list_token_plugins(const char *token_value, const gcha
 	return reply;
 }
 
-static int janus_request_allow_token(janus_request *request, guint64 session_id, const gchar *transaction_text, gboolean allow, gboolean add) {
-	/* Allow/disallow a valid token valid to access a plugin */
+static int janus_request_allow_token(struct connection *request, guint64 session_id, 
+const gchar *transaction_text, gboolean allow, gboolean add,json_t*root) {
+	/* Allow/disallow a valid token valid to access a plugin  janus_request* is away by me*/
 	int ret = -1;
 	int error_code = 0;
 	char error_cause[100];
-	json_t *root = request->message;
+	//NOTICE via kore.c websocket
+	//json_t *root = request->message;
 	if(!janus_auth_is_stored_mode()) {
 		ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_UNKNOWN, "Stored-Token based authentication disabled");
 		goto jsondone;
@@ -1628,7 +1633,8 @@ jsondone:
 }
 
 /* Admin/monitor WebServer requests handler */
-int janus_process_incoming_admin_request(janus_request *request) {
+int janus_process_incoming_admin_request(struct connection *request, json_t*root) {
+	//NOTICE janus_request away by me
 	int ret = -1;
 	int error_code = 0;
 	char error_cause[100];
@@ -1636,7 +1642,8 @@ int janus_process_incoming_admin_request(janus_request *request) {
 		JANUS_LOG(LOG_ERR, "Missing request or payload to process, giving up...\n");
 		return ret;
 	}
-	json_t *root = request->message;
+	//NOTICE kore.c
+	//json_t *root = request->message;
 	/* Ok, let's start with the ids */
 	guint64 session_id = 0, handle_id = 0;
 	json_t *s = json_object_get(root, "session_id");
@@ -2294,7 +2301,8 @@ return 0;
 }
 
 //struct connection*, guint64 session_id, const char* transaction,gint error_code,gchar* error_cause)
-static int janus_process_error_string(struct connection *c, uint64_t session_id, const char *transaction, gint error, gchar *error_string)
+static int janus_process_error_string(struct connection *c, uint64_t session_id, 
+const char *transaction, gint error, gchar *error_string)
 {
 	if(!request)
 		return -1;
@@ -2577,22 +2585,27 @@ json_t *janus_admin_component_summary(janus_ice_component *component) {
 
 /* Transports */
 void janus_transport_close(gpointer key, gpointer value, gpointer user_data) {
+	/*
 	janus_transport *transport = (janus_transport *)value;
 	if(!transport)
 		return;
 	transport->destroy();
+	*/ 
 }
 
 void janus_transportso_close(gpointer key, gpointer value, gpointer user_data) {
-	void *transport = value;
+	/* 
+	 void *transport = value;
 	if(!transport)
-		return;
+	return;
+		*/ 
 	/* FIXME We don't dlclose transports to be sure we can detect leaks */
 	//~ dlclose(transport);
 }
 
 /* Transport callback interface */
-void janus_transport_incoming_request(janus_transport *plugin, janus_transport_session *transport, void *request_id, gboolean admin, json_t *message, json_error_t *error) {
+void janus_transport_incoming_request(janus_transport *plugin, janus_transport_session *transport, 
+void *request_id, gboolean admin, json_t *message, json_error_t *error) {
 	JANUS_LOG(LOG_VERB, "Got %s API request from %s (%p)\n", admin ? "an admin" : "a Janus", plugin->get_package(), transport);
 	/* Create a janus_request instance to handle the request */
 	janus_request *request = janus_request_new(plugin, transport, request_id, admin, message);
@@ -2763,7 +2776,8 @@ janus_plugin *janus_plugin_find(const gchar *package) {
 
 
 /* Plugin callback interface */
-int janus_plugin_push_event(janus_plugin_session *plugin_session, janus_plugin *plugin, const char *transaction, json_t *message, json_t *jsep) {
+int janus_plugin_push_event(janus_plugin_session *plugin_session, janus_plugin *plugin, 
+const char *transaction, json_t *message, json_t *jsep) {
 	if(!plugin || !message)
 		return -1;
 	if(!janus_plugin_session_is_alive(plugin_session))
@@ -2844,7 +2858,8 @@ int janus_plugin_push_event(janus_plugin_session *plugin_session, janus_plugin *
 	return JANUS_OK;
 }
 
-json_t *janus_plugin_handle_sdp(janus_plugin_session *plugin_session, janus_plugin *plugin, const char *sdp_type, const char *sdp, gboolean restart) {
+json_t *janus_plugin_handle_sdp(janus_plugin_session *plugin_session, 
+janus_plugin *plugin, const char *sdp_type, const char *sdp, gboolean restart) {
 	if(!janus_plugin_session_is_alive(plugin_session) ||
 			plugin == NULL || sdp_type == NULL || sdp == NULL) {
 		JANUS_LOG(LOG_ERR, "Invalid arguments\n");
