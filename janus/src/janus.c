@@ -1,11 +1,84 @@
 #include <kore/kore.h>
 #include <kore/http.h>
+#include <kore/tasks.h>
+#include <jansson.h>
 
 int		page(struct http_request *);
+int page_ws_connect(struct http_request*);
+void websocket_connect(struct connection*);
+void websocket_disconnect(struct connection*);
+void websocket_message(struct connection*,u_int8_t,void*,size_t);
+int init(int);
+int janus_task(struct kore_task*);
+void data_available(struct kore_task*);
+json_t*load_json(const char*, size_t);
+
+void kore_worker_teardown(void){
+kore_log(LOG_INFO,"kore_worker_teardown");	
+}
+struct kore_task task;
+int init(int state){
+if(state==KORE_MODULE_UNLOAD)return (KORE_RESULT_ERROR);	
+kore_task_create(&task, janus_task);
+kore_task_bind_callback(&task, data_available);
+kore_task_run(&task, 0);
+return (KORE_RESULT_OK);
+}
+
+json_t *load_json(const char*text, size_t buflen){
+json_t *root;
+json_error_t error;
+root=json_loadb(text, buflen, 0, &error);
+if(root){return root;}else{
+kore_log(LOG_INFO,"json buffer parse err: %d %s",error.line,error.text);
+return (json_t*)0;	
+}	
+}
+
+int page_ws_connect(struct http_request*req){
+	kore_log(LOG_INFO,"websocket connected %s %p",req->path, req);
+	kore_websocket_handshake(req,"websocket_connect", "websocket_message", "websocket_disconnect");
+	return (KORE_RESULT_OK);
+}
 
 int
 page(struct http_request *req)
 {
 	http_response(req, 200, NULL, 0);
 	return (KORE_RESULT_OK);
+}
+
+void websocket_connect(struct connection*c){
+kore_log(LOG_INFO, "websocket connected %p",c);	
+}
+void websocket_disconnect(struct connection*c){
+kore_log(LOG_INFO,"websocket disconnected %p", c);	
+}
+void websocket_message(struct connection*c,u_int8_t op, void* vdata, size_t vlen){
+int send_to_clients=0;
+json_t *root=load_json((const char*)vdata,vlen);//ll
+if(root){
+int abi=janus_process_incoming_request2(c, root);
+kore_log(LOG_INFO, "janus process incoming request %d",abi);
+send_to_clients=1;
+}else{kore_log(LOG_INFO,"no json root in ws message");}
+if(send_to_clients==0)kore_websocket_send(c, op, vdata, vlen);
+if(root)json_decref(root);
+}
+int janus_task(struct kore_task* t){
+//gint Janusmain(int argc, char *argv[])
+Janusmain(3, (char*[3]){"mama","papa", "deda"});
+kore_log(LOG_INFO,"*** bye from janus task ***");
+return (KORE_RESULT_OK);	
+}
+void data_available(struct kore_task*t){
+size_t len;
+u_int8_t buf[BUFSIZ];
+if(kore_task_finished(t)){
+kore_log(LOG_INFO, "task finished");
+return;	
+}
+len=kore_task_channel_read(t, buf, sizeof(buf));
+if(len>sizeof buf){kore_log(LOG_INFO,"len greater than buffer");}
+kore_log(LOG_INFO,"available data is %d", len);	
 }
