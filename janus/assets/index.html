@@ -1,0 +1,19 @@
+<html>
+<body>
+	<h1>websocket</h1>
+	<button onclick="dowas();">send</button>
+<script>
+//alert('fuck');
+var sock=new WebSocket("ws://127.0.0.1:8888/connect");
+sock.onopen=function(){
+//alert("OPen!");
+sock.send("suka");
+}
+sock.onerror=function(e){alert("error");}
+sock.onmessage=function(evt){console.log("message", evt.data);}
+function dowas(){
+if(sock)sock.send(JSON.stringify({data:"suka",msg: "fucker"}));	
+}
+</script>
+</body>
+</html>

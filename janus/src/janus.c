@@ -2,6 +2,7 @@
 #include <kore/http.h>
 #include <kore/tasks.h>
 #include <jansson.h>
+#include "assets.h"
 
 int		page(struct http_request *);
 int page_ws_connect(struct http_request*);
@@ -44,7 +45,9 @@ int page_ws_connect(struct http_request*req){
 int
 page(struct http_request *req)
 {
-	http_response(req, 200, NULL, 0);
+	//http_response(req, 200, NULL, 0);
+	http_response_header(req,"content-type","text/html");
+	http_response(req,200, asset_index_html, asset_len_index_html);
 	return (KORE_RESULT_OK);
 }
 
@@ -55,10 +58,11 @@ void websocket_disconnect(struct connection*c){
 kore_log(LOG_INFO,"websocket disconnected %p", c);	
 }
 void websocket_message(struct connection*c,u_int8_t op, void* vdata, size_t vlen){
+kore_log(LOG_INFO,"message");
 int send_to_clients=0;
 json_t *root=load_json((const char*)vdata,vlen);//ll
 if(root){
-int abi=janus_process_incoming_request2(c, root);
+int abi=janus_process_incoming_request(c, root);
 kore_log(LOG_INFO, "janus process incoming request %d",abi);
 send_to_clients=1;
 }else{kore_log(LOG_INFO,"no json root in ws message");}
