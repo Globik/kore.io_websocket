@@ -7,12 +7,17 @@
 var sock=new WebSocket("ws://127.0.0.1:8888/connect");
 sock.onopen=function(){
 //alert("OPen!");
-sock.send("suka");
+let d={};
+d.ping="ping";
+sock.send(JSON.stringify(d));
 }
 sock.onerror=function(e){alert("error");}
 sock.onmessage=function(evt){console.log("message", evt.data);}
 function dowas(){
-if(sock)sock.send(JSON.stringify({data:"suka",msg: "fucker"}));	
+let d={};
+d.mata="suka";
+d.msg="fucker"
+if(sock)sock.send(JSON.stringify(d));	
 }
 </script>
 </body>

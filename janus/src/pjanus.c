@@ -182,7 +182,8 @@ void janus_set_public_ip(const char *ip) {
 		return;
 	public_ip = g_strdup(ip);
 }
-static volatile gint stop = 0;
+//static 
+volatile gint stop = 0;
 static gint stop_signal = 0;
 gint janus_is_stopping(void) {
 	return g_atomic_int_get(&stop);
@@ -384,6 +385,7 @@ static void janus_handle_signal(int signum) {
 /*! \brief Termination handler (atexit) */
 static void janus_termination_handler(void) {
 	/* Free the instance name, if provided */
+	g_print("JANUS TERMINATION HANDLER\n");
 	g_free(server_name);
 	/* Remove the PID file if we created it */
 	janus_pidfile_remove();
@@ -391,6 +393,7 @@ static void janus_termination_handler(void) {
 	janus_log_destroy();
 	/* If we're daemonizing, we send an error code to the parent */
 	if(daemonize) {
+		g_print("*** DEMONIZE ***\n");
 		int code = 1;
 		ssize_t res = 0;
 		do {
@@ -3335,7 +3338,7 @@ void janus_plugin_notify_event(janus_plugin *plugin, janus_plugin_session *plugi
 		}
 		session_id = session->session_id;
 	}
-	/* Notify event handlers */
+	/* Notifyfe event handlers */
 	if(janus_events_is_enabled()) {
 		janus_events_notify_handlers(JANUS_EVENT_TYPE_PLUGIN,
 			session_id, handle_id, opaque_id, plugin->get_package(), event);
@@ -3354,7 +3357,7 @@ gboolean janus_plugin_auth_signature_contains(janus_plugin *plugin, const char *
 
 
 /* Main */
-gint Janusmain(int argc, char *argv[])
+int Janusmain(int argc, char *argv[])
 {
 	/* Core dumps may be disallowed by parent of this process; change that */
 	struct rlimit core_limits;
@@ -3532,8 +3535,8 @@ gint Janusmain(int argc, char *argv[])
 	JANUS_PRINT("---------------------------------------------------\n\n");
 
 	/* Handle SIGINT (CTRL-C), SIGTERM (from service managers) */
-	signal(SIGINT, janus_handle_signal);
-	signal(SIGTERM, janus_handle_signal);
+	//signal(SIGINT, janus_handle_signal);
+	//signal(SIGTERM, janus_handle_signal);
 	atexit(janus_termination_handler);
 
 	/* Setup Glib */
@@ -4552,6 +4555,7 @@ gint Janusmain(int argc, char *argv[])
 
 	/* Done */
 	JANUS_LOG(LOG_INFO, "Ending sessions timeout watchdog...\n");
+	g_print("Ending sessions timeout watchdog...\n");
 	g_main_loop_quit(watchdog_loop);
 	g_thread_join(watchdog);
 	watchdog = NULL;
@@ -4639,6 +4643,6 @@ gint Janusmain(int argc, char *argv[])
 #endif
 
 	JANUS_PRINT("Bye!\n");
-
-	exit(0);
+return 0;
+	//exit(0);
 }

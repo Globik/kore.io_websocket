@@ -28,8 +28,6 @@
 
 #include <jansson.h>
 
-#include <kore/kore.h>
-
 
 #include "mutex.h"
 #include "ice.h"
@@ -37,9 +35,13 @@
 #include "transports/transport.h"
 #include "events/eventhandler.h"
 #include "plugins/plugin.h"
+#include <kore/kore.h>
 
+#include <kore/kore.h>
 
 #define JANUS_BUFSIZE	8192
+
+extern volatile gint stop;
 
 /*! \brief Helper to address requests and their sources (e.g., a specific HTTP connection, websocket, RabbitMQ or others) */
 typedef struct janus_request janus_request;
@@ -170,7 +172,7 @@ int janus_process_success(/*janus_request *request */ struct connection*request,
  */
 int janus_process_error(/* janus_request *request */ struct connection *request, uint64_t session_id, const char *transaction, gint error, const char *format, ...) G_GNUC_PRINTF(5, 6);
 ///@}
-
+int Janusmain(int argc, char *argv[]);
 
 /** @name Janus transport plugin management
  * The core doesn't support any transport for the Janus API by default.

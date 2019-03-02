@@ -1,9 +1,10 @@
-#include <kore/kore.h>
+//#include <kore/kore.h>
 #include <kore/http.h>
+#include "janus.h"
 #include <kore/tasks.h>
 #include <jansson.h>
 #include "assets.h"
-
+//.fr
 int		page(struct http_request *);
 int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
@@ -13,9 +14,16 @@ int init(int);
 int janus_task(struct kore_task*);
 void data_available(struct kore_task*);
 json_t*load_json(const char*, size_t);
+void kore_worker_configure(){
+printf("CONFIGURE WORKER!\n");	
+}
 
 void kore_worker_teardown(void){
-kore_log(LOG_INFO,"kore_worker_teardown");	
+kore_log(LOG_INFO,"kore_worker_teardown");
+printf("\n*** TEARDOWN! ***\n");	
+
+g_atomic_int_inc(&stop);
+usleep(500000);
 }
 struct kore_task task;
 int init(int state){
@@ -47,6 +55,8 @@ page(struct http_request *req)
 {
 	//http_response(req, 200, NULL, 0);
 	http_response_header(req,"content-type","text/html");
+	//Lorenzo's shit here must be but with no luck; bug!
+	// so I must myself all do here
 	http_response(req,200, asset_index_html, asset_len_index_html);
 	return (KORE_RESULT_OK);
 }
@@ -55,15 +65,21 @@ void websocket_connect(struct connection*c){
 kore_log(LOG_INFO, "websocket connected %p",c);	
 }
 void websocket_disconnect(struct connection*c){
-kore_log(LOG_INFO,"websocket disconnected %p", c);	
+//kore_log(LOG_INFO,"websocket disconnected %p", c);	
+//JANUS_LOG(LOG_VERB, "websocket disconnected %p\n",c);
+g_print("g_print: websocket disconnected %p\n",c);
 }
 void websocket_message(struct connection*c,u_int8_t op, void* vdata, size_t vlen){
-kore_log(LOG_INFO,"message");
+//kore_log(LOG_INFO,"message");
+//printf("message: \n");
+//JANUS_LOG(LOG_VERB, "[message] janus log\n");
+g_print("message: g_print\n");
 int send_to_clients=0;
 json_t *root=load_json((const char*)vdata,vlen);//ll
 if(root){
 int abi=janus_process_incoming_request(c, root);
-kore_log(LOG_INFO, "janus process incoming request %d",abi);
+//JANUS_LOG(LOG_VERB, "janus process incoming request %d",abi);
+g_print("g_print: janus process incoming request %d\n",abi);
 send_to_clients=1;
 }else{kore_log(LOG_INFO,"no json root in ws message");}
 if(send_to_clients==0)kore_websocket_send(c, op, vdata, vlen);
@@ -71,8 +87,9 @@ if(root)json_decref(root);
 }
 int janus_task(struct kore_task* t){
 //gint Janusmain(int argc, char *argv[])
-Janusmain(3, (char*[3]){"mama","papa", "deda"});
-kore_log(LOG_INFO,"*** bye from janus task ***");
+Janusmain(1, (char*[3]){"-Nii","1", "1"});
+//kore_log(LOG_INFO,"*** bye from janus task ***");
+printf("*** BYE ***\n");
 return (KORE_RESULT_OK);	
 }
 void data_available(struct kore_task*t){
