@@ -23,7 +23,7 @@ kore_log(LOG_INFO,"kore_worker_teardown");
 printf("\n*** TEARDOWN! ***\n");	
 
 g_atomic_int_inc(&stop);
-usleep(500000);
+usleep(400000);
 }
 struct kore_task task;
 int init(int state){
@@ -45,7 +45,7 @@ return (json_t*)0;
 }
 
 int page_ws_connect(struct http_request*req){
-	kore_log(LOG_INFO,"websocket connected %s %p",req->path, req);
+	g_print("websocket connected %s %p\n", req->path, req);
 	kore_websocket_handshake(req,"websocket_connect", "websocket_message", "websocket_disconnect");
 	return (KORE_RESULT_OK);
 }
@@ -62,7 +62,7 @@ page(struct http_request *req)
 }
 
 void websocket_connect(struct connection*c){
-kore_log(LOG_INFO, "websocket connected %p",c);	
+g_print("websocket connected %p\n",c);	
 }
 void websocket_disconnect(struct connection*c){
 //kore_log(LOG_INFO,"websocket disconnected %p", c);	

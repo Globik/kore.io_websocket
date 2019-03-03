@@ -900,18 +900,21 @@ int janus_process_incoming_request(struct connection *request, json_t *root) {
 		//request->transport->session_created(request->instance, session->session_id);
 		/* Notify event handlers */
 		if(janus_events_is_enabled()) {
-			/* Session created, add info on the transport that originated it */
+			/*
+			g_print(" Session created, add info on the transport that originated it\n");
 			json_t *transport = json_object();
 			//NOTICE transport json
 			json_object_set_new(transport, "transport", json_string("session->source->transport->get_package()"));
 			char id[32];
 			memset(id, 0, sizeof(id));
 			//NOTICE session->source->instance
-			g_snprintf(id, sizeof(id), "%p", session->source->instance);
+			//g_snprintf(id, sizeof(id), "%p", session->source->instance);
+			g_snprintf(id, sizeof(id), "%p", (void*)session_id);
 			json_object_set_new(transport, "id", json_string(id));
 			janus_events_notify_handlers(JANUS_EVENT_TYPE_SESSION, session_id, "created", transport);
+			*/
 		}
-		/* Prepare JSON reply */
+		// Prepare JSON reply 
 		json_t *reply = janus_create_message("success", 0, transaction_text);
 		json_t *data = json_object();
 		json_object_set_new(data, "id", json_integer(session_id));
@@ -940,12 +943,12 @@ int janus_process_incoming_request(struct connection *request, json_t *root) {
 	}
 
 	/* If we got here, make sure we have a session (and/or a handle) */
-	session = janus_session_find(session_id);
-	if(!session) {
-		JANUS_LOG(LOG_ERR, "Couldn't find any session %"SCNu64"...\n", session_id);
-		ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_SESSION_NOT_FOUND, "No such session %"SCNu64"", session_id);
-		goto jsondone;
-	}
+session = janus_session_find(session_id);
+if(!session) {
+JANUS_LOG(LOG_ERR, "Couldn't find any session %"SCNu64"...\n", session_id);
+ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_SESSION_NOT_FOUND, "No such session %"SCNu64"", session_id);
+goto jsondone;
+}
 	/* Update the last activity timer */
 	session->last_activity = janus_get_monotonic_time();
 	handle = NULL;

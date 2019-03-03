@@ -1,0 +1,46 @@
+Initializing library
+janus.js:390 Library initialized: true
+janus.js:417 Using REST API to contact Janus: http://localhost:8088/janus
+janus.js:864 Created session: 7609842558349908
+janus.js:1119 Created handle: 8999057300768649
+videoroomtest.js:91 Plugin attached! (janus.plugin.videoroom, id=8999057300768649)
+videoroomtest.js:92   -- This is a publisher/manager
+videoroomtest.js:161 Successfully joined room 1234 with ID 309948532460642
+janus.js:1607 Creating PeerConnection
+janus.js:1615 Preparing local SDP and gathering candidates (trickle=true)
+janus.js:1666 Adding local stream
+janus.js:1668 Adding local track: MediaStreamTrack {kind: "audio", id: "a941048b-bf27-426c-a012-5ae6cd5f433f", label: "Default", enabled: true, muted: false, …}
+janus.js:1668 Adding local track: MediaStreamTrack {kind: "video", id: "ba6be332-d761-4cd7-8f14-84037defcccb", label: "USB 2.0 PC Cam (5149:13d3)", enabled: true, muted: false, …}
+janus.js:2303 Creating offer (iceDone=false)
+janus.js:2421 Setting local description
+janus.js:2441 Offer ready
+janus.js:1623 End of candidates.
+janus.js:2264 Remote description accepted!
+videoroomtest.js:131 Janus says our WebRTC PeerConnection is up now
+videoroomtest.js:128 Janus started receiving our audio
+videoroomtest.js:128 Janus started receiving our video
+videoroomtest.js:218 Publisher left: ok
+janus.js:2844 Cleaning WebRTC stuff
+janus.js:2893 Stopping local stream tracks
+janus.js:2897 MediaStreamTrack {kind: "audio", id: "a941048b-bf27-426c-a012-5ae6cd5f433f", label: "Default", enabled: true, muted: false, …}
+janus.js:2897 MediaStreamTrack {kind: "video", id: "ba6be332-d761-4cd7-8f14-84037defcccb", label: "USB 2.0 PC Cam (5149:13d3)", enabled: true, muted: false, …}
+videoroomtest.js:327  ::: Got a cleanup notification: we are unpublished now :::
+videoroomtest.js:131 Janus says our WebRTC PeerConnection is down now
+janus.js:2844 Cleaning WebRTC stuff
+videoroomtest.js:327  ::: Got a cleanup notification: we are unpublished now :::
+
+#PUBLISH
+Creating PeerConnection
+janus.js:1615 Preparing local SDP and gathering candidates (trickle=true)
+janus.js:1666 Adding local stream
+janus.js:1668 Adding local track: MediaStreamTrack {kind: "audio", id: "f0e909cb-feee-4e22-99b5-4d72ec74e8be", label: "Default", enabled: true, muted: false, …}
+janus.js:1668 Adding local track: MediaStreamTrack {kind: "video", id: "c2356643-cd66-4552-8083-cc44f0fa371b", label: "USB 2.0 PC Cam (5149:13d3)", enabled: true, muted: false, …}contentHint: ""enabled: trueid: "c2356643-cd66-4552-8083-cc44f0fa371b"kind: "video"label: "USB 2.0 PC Cam (5149:13d3)"muted: falseonended: nullonmute: nullonunmute: nullreadyState: "live"__proto__: MediaStreamTrack
+janus.js:2303 Creating offer (iceDone=false)
+janus.js:2421 Setting local description
+janus.js:2441 Offer ready
+janus.js:1623 End of candidates.
+janus.js:2264 Remote description accepted!
+videoroomtest.js:131 Janus says our WebRTC PeerConnection is up now
+videoroomtest.js:128 Janus started receiving our audio
+videoroomtest.js:128 Janus started receiving our video
+#STOP!

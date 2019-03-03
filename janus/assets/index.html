@@ -1,23 +1,124 @@
-<html>
+<html><head><title>title</title><style>.red{color:red;} #out{border: 1px solid rgba(0,255,0,0.3);}</style></head>
 <body>
-	<h1>websocket</h1>
-	<button onclick="dowas();">send</button>
+	<h1>websocket and janus</h1>
+	<b>session_id: <span id="sessid"></span></b><b> handle_id: <span id="hanid"></span></b><br>
+	<button onclick="ping();">ping janus</button>
+	<button onclick="session_create();">session create</button>
+	<button onclick="janus_info();">janus info</button>
+	<button onclick="session_destroy();">session destroy</button>
+	<button onclick="attach_plugin();">attach plugin</button>
+	<button onclick="detach_plugin();">detach plugin</button>
+	<button onclick="create_room();">create room</button>
+	<h4>output:</h4>
+	<output id="out"></output>
 <script>
 //alert('fuck');
+/*
+1. Create session
+2. Attach plugin
+3. Detach plugin
+4. Destroy session
+*/
+var session_id=0;
+var handle_id=0;
+var transaction="polydor";
+
 var sock=new WebSocket("ws://127.0.0.1:8888/connect");
 sock.onopen=function(){
-//alert("OPen!");
-let d={};
-d.ping="ping";
-sock.send(JSON.stringify(d));
+outi("<b>websocket opened</b>");
 }
-sock.onerror=function(e){alert("error");}
-sock.onmessage=function(evt){console.log("message", evt.data);}
-function dowas(){
+sock.onerror=function(e){outi("<b>websocket error</b>");}
+sock.onmessage=function(evt){
+console.log("message", evt.data);
+outi("<b>msg: </b>" + evt.data);
+let a;
+try{a=JSON.parse(evt.data);}catch(e){console.error(e);return;}
+if(a.janus && a.janus=="success"){
+if(a.transaction=="session_create"){
+session_id=a.data.id;//(a.data?a.data.id:0);
+sessid.textContent=session_id;
+//hanid.textContent=session_id;
+//handle_id=2;
+}else if(a.transaction=="session_destroy"){
+session_id=0;
+sessid.textContent=session_id;
+}else if(a.transaction=="attach_plugin"){
+handle_id=a.data.id;
+hanid.textContent=handle_id;	
+}else if(a.transaction=="detach_plugin"){
+handle_id=0;
+hanid.textContent=handle_id;	
+}
+}
+}
+sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
+function ping(){
 let d={};
-d.mata="suka";
-d.msg="fucker"
-if(sock)sock.send(JSON.stringify(d));	
+d.transaction="ping";
+d.janus="ping"
+wsend(d);
+}
+function janus_info(){
+let d={};
+d.transaction="info";
+d.janus="info";
+wsend(d);
+}
+function session_create(){
+let d={};
+d.transaction="session_create";
+d.janus="create";
+wsend(d);
+// {"janus": "success", "transaction": "polydor", "data": {"id": 1800535620133879}} => session_id
+}
+function session_destroy(){
+let d={};
+d.transaction="session_destroy";
+d.session_id=session_id;
+d.janus="destroy";
+//console.log(d);
+wsend(d);
+//{"janus": "success", "session_id": 8368784709788683, "transaction": "session_destroy"}
+}
+function attach_plugin(){
+let d={};
+d.transaction="attach_plugin";
+d.session_id=session_id;
+d.janus="attach";
+d.plugin="janus.plugin.videoroom";
+d.opaque_id="fucker";//?? any need here?
+//console.log(d);
+wsend(d);
+//{"janus": "success", "session_id": 343331563099243, "transaction": "attach_plugin", "data": {"id": 3577031667291224}}
+}
+function detach_plugin(){
+let d={};
+d.handle_id=handle_id;
+d.transaction="detach_plugin";
+d.session_id=session_id;
+d.janus="detach";
+d.plugin="janus.plugin.videoroom";
+d.opaque_id="fucker";//?? any need?
+//console.log(d);
+//{"janus": "success", "session_id": 4085346587175549, "transaction": "detach_plugin"}
+wsend(d);	
+}
+
+function create_room(){
+let d={};
+d.request="create";
+d.is_private=false;
+d.transaction="create_room";
+d.janus=
+wsend(d);
+}
+
+function outi(str){return out.innerHTML+=str+"<br>";}
+function wsend(obj){
+if(!sock){outi("<b class=\"red\">no websocket available</b>");return;}
+let d;
+try{d=JSON.stringify(obj);}catch(e){outi("Error sock send json: "+e);return;}	
+sock.send(d);
 }
 </script>
 </body>

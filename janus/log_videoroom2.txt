@@ -1,0 +1,77 @@
+Initializing library
+janus.js:390 Library initialized: true
+janus.js:417 Using REST API to contact Janus: http://localhost:8088/janus
+janus.js:864 Created session: 2118745805048450
+janus.js:1120 Created handle: 3024638554318661
+videoroomtest.js:91 Plugin attached! (janus.plugin.videoroom, id=3024638554318661)
+videoroomtest.js:92   -- This is a publisher/manager
+janus.js:1213 *** MESAGE! ***
+ {request: "join", room: 1234, ptype: "publisher", display: "globi"}
+sendMessage @ janus.js:1213
+send @ janus.js:1165
+registerUsername @ videoroomtest.js:389
+dispatch @ jquery.min.js:3
+i @ jquery.min.js:3
+videoroomtest.js:161 Successfully joined room 1234 with ID 6678305128959859
+janus.js:1609 Creating PeerConnection
+janus.js:1617 Preparing local SDP and gathering candidates (trickle=true)
+janus.js:1668 Adding local stream
+janus.js:1670 Adding local track: MediaStreamTrack {kind: "audio", id: "26f9d046-d219-4c76-8d93-9871ba29805a", label: "Default", enabled: true, muted: false, …}
+janus.js:1670 Adding local track: MediaStreamTrack {kind: "video", id: "e98c9473-0ce6-4e0e-820b-c4ffa23003fe", label: "USB 2.0 PC Cam (5149:13d3)", enabled: true, muted: false, …}
+janus.js:2305 Creating offer (iceDone=false)
+janus.js:2423 Setting local description
+janus.js:2443 Offer ready
+janus.js:1213 *** MESAGE! ***
+message:
+display
+:
+"globi"
+ptype
+:
+"publisher"
+request
+:
+"join"
+room
+:
+1234
+ {request: "configure", audio: true, video: true}
+sendMessage @ janus.js:1213
+send @ janus.js:1165
+success @ videoroomtest.js:418
+(anonymous) @ janus.js:2451
+Promise.then (async)
+createOffer @ janus.js:2421
+streamsDone @ janus.js:1704
+(anonymous) @ janus.js:2228
+Promise.then (async)
+(anonymous) @ janus.js:2226
+Promise.then (async)
+prepareWebrtc @ janus.js:2187
+createOffer @ janus.js:1174
+publishOwnFeed @ videoroomtest.js:396
+onmessage @ videoroomtest.js:162
+handleEvent @ janus.js:717
+(anonymous) @ janus.js:140
+Promise.then (async)
+(anonymous) @ janus.js:139
+Promise.then (async)
+httpAPICall @ janus.js:136
+eventHandler @ janus.js:500
+success @ janus.js:867
+(anonymous) @ janus.js:140
+Promise.then (async)
+(anonymous) @ janus.js:139
+Promise.then (async)
+httpAPICall @ janus.js:136
+createSession @ janus.js:848
+Janus @ janus.js:469
+(anonymous) @ videoroomtest.js:79
+e @ jquery.min.js:3
+dispatch @ jquery.min.js:3
+i @ jquery.min.js:3
+janus.js:1625 End of candidates.
+janus.js:2266 Remote description accepted!
+videoroomtest.js:131 Janus says our WebRTC PeerConnection is up now
+videoroomtest.js:128 Janus started receiving our audio
+videoroomtest.js:128 Janus started receiving our video

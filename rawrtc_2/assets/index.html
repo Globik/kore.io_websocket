@@ -40,6 +40,7 @@ if(sock)sock.send(JSON.stringify({type:"call",msg:"yes"}));
 
 //var config={iceServers:[ {urls: 'stun:stun.services.mozilla.com',}],};
 var config={iceServers:[]};
+
 function handle_offer(d){
 pc=new RTCPeerConnection(config);
 cat_data_channel = pc.createDataChannel('cat-noises', {negotiated: true,id: 0});
