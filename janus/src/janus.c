@@ -23,7 +23,7 @@ kore_log(LOG_INFO,"kore_worker_teardown");
 printf("\n*** TEARDOWN! ***\n");	
 
 g_atomic_int_inc(&stop);
-usleep(400000);
+usleep(300000);
 }
 struct kore_task task;
 int init(int state){

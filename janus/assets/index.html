@@ -163,6 +163,7 @@ navigator.mediaDevices.getUserMedia({audio: false,video: true}).then(gotLocalStr
 function gotLocalStream(stream){
 localStream=stream;
 playVideo(localVideo, stream);
+
 /*
 const audioTracks=localStream.getAudioTracks();
 if(audioTracks.length>0){
@@ -172,14 +173,57 @@ localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)}
 console.log("adding local stream to pc");
 pc.createOffer(offer_opts).then(got_local_desc, on_error);	
 */	
+pc=new RTCPeerConnection(null);
+pc.onicecandidate=function(event){
+if(event.candidate){
+console.warn("ON ICE CANDIDATE!");
+let d={};
+d.janus="message"
+d.type="trickle"
+d.trickle=true;
+d.body={};
+d.transaction="candidate"
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.candidate=event.candidate;
+wsend(d);	
+}	
+}
+
+pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',pc.iceConnectionState);}
+pc.onicegatheringstatechange=function(){console.log("ice gathering: ",pc.iceGatheringState);}
+pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
+
+pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
+pc.signalingstatechange=function(){console.log('signaling state: ',pc.signalingState);}
+pc.onconnectionstatechange=function(){console.warn('connection state: ', pc.connectionState);}
+localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
+pc.createOffer(offer_opts).then(set_local_desc, on_error);
+
 }
 function playVideo(element, stream){
 if('srcObject' in element){element.srcObject=stream;}
 element.play();
 element.volume=0;	
 }
-function got_local_desc(){
-
+function set_local_desc(desc){
+pc.setLocalDescription(desc).then(function(){
+console.log("send offer to answer.html");
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="configure";
+d.body.audio=false;
+d.body.video=true;
+d.transaction="configure";
+d.session_id=session_id;
+d.handle_id=handle_id;
+console.log('desc: ',JSON.stringify(desc));
+console.log('ld: ',JSON.stringify(pc.localDescription));
+d.jsep=pc.localDescription.toJSON();	
+console.warn("SDP OFFER: \n",d.jsep);
+wsend(d);
+}, on_error)
 }
 function on_error(err){console.error("creatin offer err: ", err);}
 function outi(str){return out.innerHTML+=str+"<br>";}
