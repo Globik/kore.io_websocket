@@ -5,121 +5,249 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Janus WebRTC Server: Echo Test</title>
-
-<script>
-	alert('suka');
-</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cerulean/bootstrap.min.css" type="text/css"/>
-<link rel="stylesheet" href="css/demo.css" type="text/css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css" type="text/css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.3/toastr.css"/>
-</head>
 <body>
-
-<a href="https://github.com/meetecho/janus-gateway"><img style="position: absolute; top: 0; left: 0; border: 0; z-index: 1001;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png" alt="Fork me on GitHub"></a>
-
-<nav class="navbar navbar-default navbar-static-top">
-</nav>
-
-<div class="container">
-	<div class="row">
-		<div class="col-md-12">
-			<div class="page-header">
-				<h1>Plugin Demo: Echo Test
-					<button class="btn btn-default" autocomplete="off" id="start">Start</button>
-				</h1>
-			</div>
-			<div class="container" id="details">
-				<div class="row">
-					<div class="col-md-12">
-						<h3>Demo details</h3>
-						<p>This Echo Test demo just blindly sends you back whatever you
-						send to it. You're basically attached to yourself, and so your audio
-						and video you send to Janus are echoed back to you. The same
-						is done for RTCP packets as well, with the information properly updated.</p>
-						<p>The demo also provides a few controls to manipulate the media
-						before you send them. You can mute audio and video, for instance,
-						which will tell the server to drop the frames and not echo them
-						back to you. You can also try and cap the bitrate: such control
-						will tell the server to manipulate the RTCP REMB packets passing
-						through, in order to simulate a bandwidth limitation. In case
-						you're interested in testing simulcasting, add the <code>?simulcast=true</code>
-						query string to the url of this page and reload it: buttons will appear
-						to allow you to try and switch between lower and higher quality
-						versions of the video you're capturing: notice that you may have
-						to increase the bandwidth indicator to have the higher quality
-						versions appear, as the browser will not encode them otherwise.</p>
-						<p>Finally, this demo also includes Data Channels: whatever you
-						write in the text box under your local video, will be sent via
-						Data Channels to the plugins, modified by adding a fixed prefix,
-						and sent back to you in the text area below the remote video.</p>
-						<div class="alert alert-info">This demo, as all the others, for the
-						sake of simplicity accesses the default devices you have available on
-						your machine. If you're interested in a demo that shows you how you
-						can select specific devices with <code>janus.js</code>, open the
-						<a class="alert-link" href="devicetest.html">Devices</a> demo instead.</div>
-						<p>Press the <code>Start</code> button above to launch the demo.</p>
-					</div>
-				</div>
-			</div>
-			<div class="container hide" id="videos">
-				<div class="row">
-					<div class="col-md-6">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">Local Stream
-									<div class="btn-group btn-group-xs pull-right hide">
-										<button class="btn btn-danger" autocomplete="off" id="toggleaudio">Disable audio</button>
-										<button class="btn btn-danger" autocomplete="off" id="togglevideo">Disable video</button>
-										<div class="btn-group btn-group-xs">
-											<button id="bitrateset" autocomplete="off" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-												Bandwidth<span class="caret"></span>
-											</button>
-											<ul id="bitrate" class="dropdown-menu" role="menu">
-												<li><a href="#" id="0">No limit</a></li>
-												<li><a href="#" id="128">Cap to 128kbit</a></li>
-												<li><a href="#" id="256">Cap to 256kbit</a></li>
-												<li><a href="#" id="512">Cap to 512kbit</a></li>
-												<li><a href="#" id="1024">Cap to 1mbit</a></li>
-												<li><a href="#" id="1500">Cap to 1.5mbit</a></li>
-												<li><a href="#" id="2000">Cap to 2mbit</a></li>
-											</ul>
-										</div>
-									</div>
-								</h3>
-							</div>
-							<div class="panel-body" id="videoleft"></div>
-						</div>
-						<div class="input-group margin-bottom-sm">
-							<span class="input-group-addon"><i class="fa fa-cloud-upload fa-fw"></i></span>
-							<input class="form-control" type="text" placeholder="Write a DataChannel message" autocomplete="off" id="datasend" onkeypress="return checkEnter(event);" disabled></input>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">Remote Stream <span class="label label-primary hide" id="curres"></span> <span class="label label-info hide" id="curbitrate"></span></h3>
-							</div>
-							<div class="panel-body" id="videoright"></div>
-						</div>
-						<div class="input-group margin-bottom-sm">
-							<span class="input-group-addon"><i class="fa fa-cloud-download fa-fw"></i></span>
-							<input class="form-control" type="text" id="datarecv" disabled></input>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<h1>Echotest with datachannel.</h1>
+<b>Preconfigured room in config room id=1234</b>
+1. Create session 2. Attach plugin 3. Join room 4. Leave room 5. Detach plugin 6. Destroy session<br>
+<b>Local Video </b><video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">no video supported</video>
+<h3>datachannel</h3>
+<input type="text" id="chan" value="hali_halo_data"/><button onclick="send();">send data</button><br><br>
+<br>
+	<b>session_id: <span id="sessid"></span></b><b> handle_id: <span id="hanid"></span></b><br>
+	<button onclick="ping();">ping janus</button>
+	<button onclick="session_create();">session create</button>
+	<button onclick="janus_info();">janus info</button>
+	<button onclick="session_destroy();">session destroy</button>
+	<button onclick="attach_plugin();">attach plugin</button>
+	<button onclick="detach_plugin();">detach plugin</button>
+	<button onclick="join_room();">join prebuild static room</button>
+	<button onclick="publish();">publish</button>
+	<button onclick="leave_room();">leave room</button>
+	
+	<h4>output:</h4>
+	<output id="out"></output>
 <script>
-var sock=new WebSocket("ws://127.0.0.1:8888/connect");
-//sock.onopen=function(){alert("OPen!");}
-alert('a');
-</script>
-	<hr>
-	<div class="footer">
-	</div>
-</div>
+var session_id=0;
+var handle_id=0;
+var transaction="polydor";
 
+var sock=new WebSocket("ws://127.0.0.1:8888/connect");
+sock.onopen=function(){
+outi("<b>websocket opened</b>");
+}
+sock.onerror=function(e){outi("<b>websocket error</b>");}
+sock.onmessage=function(evt){
+console.log("message", evt.data);
+outi("<b>msg: </b>" + evt.data);
+let a;
+try{a=JSON.parse(evt.data);}catch(e){console.error(e);return;}
+if(a.janus && a.janus=="success"){
+if(a.transaction=="session_create"){
+session_id=a.data.id;//(a.data?a.data.id:0);
+sessid.textContent=session_id;
+//hanid.textContent=session_id;
+//handle_id=2;
+}else if(a.transaction=="session_destroy"){
+session_id=0;
+sessid.textContent=session_id;
+}else if(a.transaction=="attach_plugin"){
+handle_id=a.data.id;
+hanid.textContent=handle_id;	
+}else if(a.transaction=="detach_plugin"){
+handle_id=0;
+hanid.textContent=handle_id;	
+}
+}else if(a.janus && a.janus=="event"){
+if(a.jsep && a.jsep.type=="answer"){
+handle_answer(a.jsep);	
+}	
+}
+}
+sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
+function ping(){
+let d={};
+d.transaction="ping";
+d.janus="ping"
+wsend(d);
+}
+function janus_info(){
+let d={};
+d.transaction="info";
+d.janus="info";
+wsend(d);
+}
+function session_create(){
+let d={};
+d.transaction="session_create";
+d.janus="create";
+wsend(d);
+// {"janus": "success", "transaction": "polydor", "data": {"id": 1800535620133879}} => session_id
+}
+function session_destroy(){
+let d={};
+d.transaction="session_destroy";
+d.session_id=session_id;
+d.janus="destroy";
+//console.log(d);
+wsend(d);
+//{"janus": "success", "session_id": 8368784709788683, "transaction": "session_destroy"}
+}
+function attach_plugin(){
+let d={};
+d.transaction="attach_plugin";
+d.session_id=session_id;
+d.janus="attach";
+d.plugin="janus.plugin.echotest";
+//d.opaque_id="fucker";//?? any need here?
+//console.log(d);
+wsend(d);
+//{"janus": "success", "session_id": 343331563099243, "transaction": "attach_plugin", "data": {"id": 3577031667291224}}
+}
+function detach_plugin(){
+let d={};
+d.handle_id=handle_id;
+d.transaction="detach_plugin";
+d.session_id=session_id;
+d.janus="detach";
+d.plugin="janus.plugin.videoroom";
+d.opaque_id="fucker";//?? any need?
+//console.log(d);
+//{"janus": "success", "session_id": 4085346587175549, "transaction": "detach_plugin"}
+wsend(d);	
+}
+
+function join_room(){
+let d={};
+d.body={};
+d.body.request="join";
+d.body.room=1234;
+d.body.ptype="publisher";
+d.body.display="Globik";
+d.transaction="join_room";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.janus="message";
+wsend(d);
+//{"janus": "ack", "session_id": 3951343692014406, "transaction": "join_room"}
+}
+function leave_room(){
+	//exists
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="leave";
+d.body.room=1234;
+d.transaction="leave_room";
+d.session_id=session_id;
+d.handle_id=handle_id;
+wsend(d);	
+}
+var pc=null,dc=null;
+var localStrem;
+var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
+function publish(){
+//navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
+gotLocalStream(null);
+}
+
+function gotLocalStream(stream){
+//localStream=stream;
+//playVideo(localVideo, stream);
+
+/*
+const audioTracks=localStream.getAudioTracks();
+if(audioTracks.length>0){
+console.warn(audioTracks[0].label);	
+}
+localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
+console.log("adding local stream to pc");
+pc.createOffer(offer_opts).then(got_local_desc, on_error);	
+*/	
+pc=new RTCPeerConnection(null);
+dc=pc.createDataChannel("JanusDataChannel", {});
+dc.onopen=function(){outi("<b>datachannel opened!</b>");}//here it works first of all
+dc.onmessage=function(ev){outi("<b>channel msg: </b>"+ev.data);}
+dc.onerror=function(err){outi("<b>channel err: </b>"+err.name);}
+dc.onclose=function(){outi("<b>channel closed!</b>");}
+pc.ondatachannel=on_data_channel;
+pc.onicecandidate=function(event){
+if(event.candidate){
+console.warn("ON ICE CANDIDATE!");
+let d={};
+d.janus="trickle";
+d.transaction="candidate"
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.candidate=event.candidate;
+wsend(d);	
+}	
+}
+
+pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',pc.iceConnectionState);}
+pc.onicegatheringstatechange=function(){console.log("ice gathering: ",pc.iceGatheringState);}
+pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
+
+pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
+pc.signalingstatechange=function(){console.log('signaling state: ',pc.signalingState);}
+pc.onconnectionstatechange=function(){console.warn('connection state: ', pc.connectionState);}
+//localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
+pc.createOffer(offer_opts).then(set_local_desc, on_error);
+
+}
+function playVideo(element, stream){
+if('srcObject' in element){element.srcObject=stream;}
+element.play();
+element.volume=0;	
+}
+function set_local_desc(desc){
+pc.setLocalDescription(desc).then(function(){
+console.log("send offer to answer.html");
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="configure";
+d.body.audio=true;
+d.body.video=true;
+d.transaction="configure";
+d.session_id=session_id;
+d.handle_id=handle_id;
+//console.log('desc: ',JSON.stringify(desc));
+//console.log('ld: ',JSON.stringify(pc.localDescription));
+d.jsep=desc;//pc.localDescription;
+wsend(d);
+//{"janus": "event", "session_id": 7496005352925884,
+//"transaction": "configure", 
+//"sender": 6803282953445005, "plugindata": {"plugin": "janus.plugin.videoroom",
+//"data": {"videoroom": "event", "room": 1234, "configured": "ok", "audio_codec": "opus", "video_codec": "vp8"}},
+ //"jsep": {"type": "answer", "sdp": "v"}
+}, on_error)
+}
+function handle_answer(sdp){
+console.warn("handle_answer: \n",sdp);
+//if(!sdp.sdp) console.warn("What the fuck? No sdp?");
+var ax=new RTCSessionDescription({type:"answer",sdp:sdp.sdp});
+pc.setRemoteDescription(ax).then(function(){
+console.warn("settled remote sdp");
+},on_error)	
+}
+function on_data_channel(ev){
+console.log("channel "+e.channel.label+" created!");//no reaction in this scenario
+dc=e.channel;
+dc.onmessage=function(e){outi("<b>channel_2 msg: </b>"+e.data);}
+dc.onclose=function(){outi("<b>channel_2 closed!</b>");}
+dc.onerror=function(e){outi("<b>channel_2 err: </b>"+e.name);}	
+}
+function send(){
+if(dc)dc.send(chan.value);
+}
+function on_error(err){console.error("creatin offer err: ", err);}
+function outi(str){return out.innerHTML+=str+"<br>";}
+function wsend(obj){
+if(!sock){outi("<b class=\"red\">no websocket available</b>");return;}
+let d;
+try{d=JSON.stringify(obj);}catch(e){outi("Error sock send json: "+e);return;}	
+sock.send(d);
+}	
+</script>
 </body>
 </html>

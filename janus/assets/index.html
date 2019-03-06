@@ -24,9 +24,10 @@ Preconfigured room in config room id=1234
 1. Create session
 2. Attach plugin
 3. Join room
-4. Leave room
-5. Detach plugin
-6. Destroy session
+4.publish
+5. Leave room
+6. Detach plugin
+7. Destroy session
 */
 var session_id=0;
 var handle_id=0;
@@ -58,6 +59,10 @@ hanid.textContent=handle_id;
 handle_id=0;
 hanid.textContent=handle_id;	
 }
+}else if(a.janus && a.janus=="event"){
+if(a.jsep && a.jsep.type=="answer"){
+handle_answer(a.jsep);	
+}	
 }
 }
 sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
@@ -143,20 +148,6 @@ var pc=null;
 var localStrem;
 var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
 function publish(){
-	/*
-pc=new RTCPeerConnection(null);
-pc.onicecandidate=function(event){
-if(event.candidate){console.warn("ON ICE CANDIDATE!");}	
-}
-
-pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',pc.iceConnectionState);}
-pc.onicegatheringstatechange=function(){console.log("ice gathering: ",pc.iceGatheringState);}
-pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
-
-pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
-pc.signalingstatechange=function(){console.log('signaling state: ',pc.signalingState);}
-pc.onconnectionstatechange=function(){console.warn('connection state: ', pc.connectionState);}
-*/
 navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
 }
 
@@ -217,11 +208,22 @@ d.session_id=session_id;
 d.handle_id=handle_id;
 //console.log('desc: ',JSON.stringify(desc));
 //console.log('ld: ',JSON.stringify(pc.localDescription));
-d.jsep=desc;//pc.localDescription.toJSON();	
-//console.warn("SDP OFFER: \n",d.jsep);
-//d.jesp.trickle=false;
+d.jsep=desc;//pc.localDescription;
 wsend(d);
+//{"janus": "event", "session_id": 7496005352925884,
+//"transaction": "configure", 
+//"sender": 6803282953445005, "plugindata": {"plugin": "janus.plugin.videoroom",
+//"data": {"videoroom": "event", "room": 1234, "configured": "ok", "audio_codec": "opus", "video_codec": "vp8"}},
+ //"jsep": {"type": "answer", "sdp": "v"}
 }, on_error)
+}
+function handle_answer(sdp){
+console.warn("handle_answer: \n",sdp);
+//if(!sdp.sdp) console.warn("What the fuck? No sdp?");
+var ax=new RTCSessionDescription({type:"answer",sdp:sdp.sdp});
+pc.setRemoteDescription(ax).then(function(){
+console.warn("settled remote sdp");
+},on_error)	
 }
 function on_error(err){console.error("creatin offer err: ", err);}
 function outi(str){return out.innerHTML+=str+"<br>";}

@@ -600,11 +600,21 @@ janus_session *janus_session_find(guint64 session_id) {
 }
 
 void janus_session_notify_event(janus_session *session, json_t *event) {
+	g_print("janus_session_notify_event\n");
 	if(session != NULL && !g_atomic_int_get(&session->destroyed) && session->source != NULL && session->source->transport != NULL) {
-		/* Send this to the transport client */
+		g_print("Send this to the transport client\n");
 		JANUS_LOG(LOG_HUGE, "Sending event to %s (%p)\n", session->source->transport->get_package(), session->source->instance);
 		//session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
 	} else {
+		g_print("NO TRANSPORT, FREE THE EVENT\n");
+		
+		size_t size=json_dumpb(event,NULL,0,0);
+		if(size==0){g_print("size %d\n",size);}
+		char *buf=alloca(size);
+		size=json_dumpb(event,buf,size,0);
+		fwrite((char*)buf, 1, size, stdout);
+		
+		kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf,size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
 		JANUS_LOG(LOG_HUGE, " No transport, free the event\n");
 		json_decref(event);
 	}
