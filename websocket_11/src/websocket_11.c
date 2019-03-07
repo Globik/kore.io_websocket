@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <postgresql/libpq-fe.h>
+//include <postgresql/libpq-fe.h>ddd
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -152,7 +152,7 @@ if(state==KORE_MODULE_UNLOAD) return (KORE_RESULT_ERROR);
 //if(worker->id !=1) return (KORE_RESULT_OK);
 kore_task_create(&pipe_task,do_loop);
 kore_task_bind_callback(&pipe_task, pipe_data_available);
-kore_task_run(&pipe_task);
+kore_task_run(&pipe_task,1);
 // Register our database.
 //kore_pgsql_register("db", "host=/tmp dbname=test");
 kore_pgsql_register("db","dbname=postgres");

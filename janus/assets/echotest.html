@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Janus WebRTC Server: Echo Test</title>
+<style>.red{color:red;} .green{color:green;}</style>
 <body>
-<h1>Echotest with datachannel.</h1>
-<b>Preconfigured room in config room id=1234</b>
-1. Create session 2. Attach plugin 3. Join room 4. Leave room 5. Detach plugin 6. Destroy session<br>
-<b>Local Video </b><video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">no video supported</video>
+<h1>Echotest with only WebRTC DataChannel API.</h1>
+<b>1. Create session 2. Attach plugin 3. Publish 4. Detach plugin 6. Destroy session</b><br>
+<!-- <b>Local Video </b><video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">
+no video supported</video> -->
 <h3>datachannel</h3>
 <input type="text" id="chan" value="hali_halo_data"/><button onclick="send();">send data</button><br><br>
 <br>
@@ -20,9 +21,9 @@
 	<button onclick="session_destroy();">session destroy</button>
 	<button onclick="attach_plugin();">attach plugin</button>
 	<button onclick="detach_plugin();">detach plugin</button>
-	<button onclick="join_room();">join prebuild static room</button>
+	<!-- <button onclick="join_room();">join prebuild static room</button> -->
 	<button onclick="publish();">publish</button>
-	<button onclick="leave_room();">leave room</button>
+	<!-- <button onclick="leave_room();">leave room</button> -->
 	
 	<h4>output:</h4>
 	<output id="out"></output>
@@ -33,7 +34,7 @@ var transaction="polydor";
 
 var sock=new WebSocket("ws://127.0.0.1:8888/connect");
 sock.onopen=function(){
-outi("<b>websocket opened</b>");
+outi("<b class=\"green\">websocket opened</b>");
 }
 sock.onerror=function(e){outi("<b>websocket error</b>");}
 sock.onmessage=function(evt){
@@ -98,8 +99,6 @@ d.transaction="attach_plugin";
 d.session_id=session_id;
 d.janus="attach";
 d.plugin="janus.plugin.echotest";
-//d.opaque_id="fucker";//?? any need here?
-//console.log(d);
 wsend(d);
 //{"janus": "success", "session_id": 343331563099243, "transaction": "attach_plugin", "data": {"id": 3577031667291224}}
 }
@@ -110,59 +109,19 @@ d.transaction="detach_plugin";
 d.session_id=session_id;
 d.janus="detach";
 d.plugin="janus.plugin.videoroom";
-d.opaque_id="fucker";//?? any need?
-//console.log(d);
 //{"janus": "success", "session_id": 4085346587175549, "transaction": "detach_plugin"}
 wsend(d);	
 }
 
-function join_room(){
-let d={};
-d.body={};
-d.body.request="join";
-d.body.room=1234;
-d.body.ptype="publisher";
-d.body.display="Globik";
-d.transaction="join_room";
-d.session_id=session_id;
-d.handle_id=handle_id;
-d.janus="message";
-wsend(d);
-//{"janus": "ack", "session_id": 3951343692014406, "transaction": "join_room"}
-}
-function leave_room(){
-	//exists
-let d={};
-d.janus="message";
-d.body={};
-d.body.request="leave";
-d.body.room=1234;
-d.transaction="leave_room";
-d.session_id=session_id;
-d.handle_id=handle_id;
-wsend(d);	
-}
 var pc=null,dc=null;
-var localStrem;
+//var localStrem;
 var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
 function publish(){
-//navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
 gotLocalStream(null);
 }
 
 function gotLocalStream(stream){
-//localStream=stream;
-//playVideo(localVideo, stream);
 
-/*
-const audioTracks=localStream.getAudioTracks();
-if(audioTracks.length>0){
-console.warn(audioTracks[0].label);	
-}
-localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
-console.log("adding local stream to pc");
-pc.createOffer(offer_opts).then(got_local_desc, on_error);	
-*/	
 pc=new RTCPeerConnection(null);
 dc=pc.createDataChannel("JanusDataChannel", {});
 dc.onopen=function(){outi("<b>datachannel opened!</b>");}//here it works first of all
@@ -190,18 +149,18 @@ pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
 pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
 pc.signalingstatechange=function(){console.log('signaling state: ',pc.signalingState);}
 pc.onconnectionstatechange=function(){console.warn('connection state: ', pc.connectionState);}
-//localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
 pc.createOffer(offer_opts).then(set_local_desc, on_error);
 
 }
+/*
 function playVideo(element, stream){
 if('srcObject' in element){element.srcObject=stream;}
 element.play();
 element.volume=0;	
-}
+}*/
 function set_local_desc(desc){
 pc.setLocalDescription(desc).then(function(){
-console.log("send offer to answer.html");
+console.warn("SEND OFFER to answer.html");
 let d={};
 d.janus="message";
 d.body={};
@@ -211,8 +170,6 @@ d.body.video=true;
 d.transaction="configure";
 d.session_id=session_id;
 d.handle_id=handle_id;
-//console.log('desc: ',JSON.stringify(desc));
-//console.log('ld: ',JSON.stringify(pc.localDescription));
 d.jsep=desc;//pc.localDescription;
 wsend(d);
 //{"janus": "event", "session_id": 7496005352925884,
@@ -223,7 +180,7 @@ wsend(d);
 }, on_error)
 }
 function handle_answer(sdp){
-console.warn("handle_answer: \n",sdp);
+console.warn("HANDLE_ANSWER: \n",sdp);
 //if(!sdp.sdp) console.warn("What the fuck? No sdp?");
 var ax=new RTCSessionDescription({type:"answer",sdp:sdp.sdp});
 pc.setRemoteDescription(ax).then(function(){

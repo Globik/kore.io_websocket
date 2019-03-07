@@ -1,3 +1,4 @@
+# .bash_aliases in $HOME directory ; ls -a =list all files ,included . hidden
 #!/bin/sh
 #export PATH=/usr/lib/postgresql/9.6/bin:$PATH
 #export PGDATA=$HOME/data
