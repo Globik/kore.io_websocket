@@ -56,18 +56,32 @@ page(struct http_request *req)
 	//http_response(req, 200, NULL, 0);
 	http_response_header(req,"content-type","text/html");
 	
-	//http_response(req,200, asset_index_html, asset_len_index_html);//janus.plugin.videoroom
-	http_response(req, 200, asset_echotest_html, asset_len_echotest_html);
+	http_response(req,200, asset_index_html, asset_len_index_html);//janus.plugin.videoroom
+	//http_response(req, 200, asset_echotest_html, asset_len_echotest_html);
 	return (KORE_RESULT_OK);
 }
 
+//struct usi{guint64 sid;};
+
 void websocket_connect(struct connection*c){
 g_print("websocket connected %p\n",c);	
+
+if(c->hdlr_extra==NULL){
+struct usi* us=kore_malloc(sizeof(*us));
+if(us==NULL)return;
+us->sid=0;
+c->hdlr_extra=us;
+}
+
 }
 void websocket_disconnect(struct connection*c){
 //kore_log(LOG_INFO,"websocket disconnected %p", c);	
 //JANUS_LOG(LOG_VERB, "websocket disconnected %p\n",c);
 g_print("g_print: websocket disconnected %p\n",c);
+if(c->hdlr_extra !=NULL){
+kore_free(c->hdlr_extra);
+c->hdlr_extra=NULL;	
+}
 }
 void websocket_message(struct connection*c,u_int8_t op, void* vdata, size_t vlen){
 //kore_log(LOG_INFO,"message");

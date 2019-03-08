@@ -515,12 +515,25 @@ static gboolean janus_check_sessions(gpointer user_data) {
 				/* Mark the session as over, we'll deal with it later */
 				janus_session_handles_clear(session);
 				/* Notify the transport */
-				if(session->source) {
-					json_t *event = janus_create_message("timeout", session->session_id, NULL);
+				//if(session->source) {
+					//json_t *event = janus_create_message("timeout", session->session_id, NULL);
 					/* Send this to the transport client and notify the session's over */
-					session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
-					session->source->transport->session_over(session->source->instance, session->session_id, TRUE, FALSE);
-				}
+					//session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
+					//session->source->transport->session_over(session->source->instance, session->session_id, TRUE, FALSE);
+				//}
+		json_t *event = janus_create_message("timeout", session->session_id, NULL);
+		size_t size=json_dumpb(event, NULL, 0, 0);
+		if(size==0){g_print("size %d\n",size);json_decref(event);}
+		char *buf=alloca(size);
+		if(size > 0){
+		
+		size=json_dumpb(event, buf, size, 0);
+		//fwrite((char*)buf, 1, size, stdout);
+		json_decref(event);
+		kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf, size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
+				
+		}
+				
 				/* Notify event handlers as well */
 				if(janus_events_is_enabled())
 					janus_events_notify_handlers(JANUS_EVENT_TYPE_SESSION, session->session_id, "timeout", NULL);
@@ -601,23 +614,28 @@ janus_session *janus_session_find(guint64 session_id) {
 
 void janus_session_notify_event(janus_session *session, json_t *event) {
 	g_print("janus_session_notify_event\n");
-	if(session != NULL && !g_atomic_int_get(&session->destroyed) && session->source != NULL && session->source->transport != NULL) {
+	if(session != NULL && !g_atomic_int_get(&session->destroyed)/* && session->source != NULL && session->source->transport != NULL*/) {
 		g_print("Send this to the transport client\n");
-		JANUS_LOG(LOG_HUGE, "Sending event to %s (%p)\n", session->source->transport->get_package(), session->source->instance);
+		//JANUS_LOG(LOG_HUGE, "Sending event to %s (%p)\n", session->source->transport->get_package(), session->source->instance);
 		//session->source->transport->send_message(session->source->instance, NULL, FALSE, event);
-	} else {
-		g_print("NO TRANSPORT, FREE THE EVENT\n");
 		
-		size_t size=json_dumpb(event,NULL,0,0);
+		
+		size_t size=json_dumpb(event, NULL,0,0);
 		if(size==0){g_print("size %d\n",size);}
+		g_print("after size\n");
 		char *buf=alloca(size);
+		g_print("after alloca\n");
 		size=json_dumpb(event,buf,size,0);
-		fwrite((char*)buf, 1, size, stdout);
+		g_print("after json_dumpb\n");
+		//fwrite((char*)buf, 1, size, stdout);
 		
 		kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf,size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
-		JANUS_LOG(LOG_HUGE, " No transport, free the event\n");
-		json_decref(event);
+		g_print("after kore_websocket_broadcast\n");
+	} else {
+		//g_print(" No transport, free the event\n");
+		
 	}
+	json_decref(event);
 }
 
 
@@ -925,6 +943,10 @@ int janus_process_incoming_request(struct connection *request, json_t *root) {
 			*/
 		}
 		// Prepare JSON reply 
+		if(request->hdlr_extra !=NULL){
+		struct usi*us=(struct usi*)request->hdlr_extra;
+		us->sid=session_id;	
+		}
 		json_t *reply = janus_create_message("success", 0, transaction_text);
 		json_t *data = json_object();
 		json_object_set_new(data, "id", json_integer(session_id));
@@ -1050,6 +1072,10 @@ goto jsondone;
 		if(session->source && session->source->transport) {
 			//NOTICE
 			//session->source->transport->session_over(session->source->instance, session->session_id, FALSE, FALSE);
+		}
+		if(request->hdlr_extra !=NULL){
+		struct usi*us=(struct usi*)request->hdlr_extra;
+		us->sid=0;	
 		}
 		/* Schedule the session for deletion */
 		janus_session_destroy(session);

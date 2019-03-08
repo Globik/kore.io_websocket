@@ -14,7 +14,11 @@
 	<button onclick="detach_plugin();">detach plugin</button>
 	<button onclick="join_room();">join prebuild static room</button>
 	<button onclick="publish();">publish</button>
+	<button onclick="unpublish();">unpublish</button>
 	<button onclick="leave_room();">leave room</button>
+	<button onclick="keep_alive();">keep alive</button>
+	<button onclick="list_rooms();">list rooms</button>
+	<button onclick="exists_room();">exists room</button>
 	
 	<h4>output:</h4>
 	<output id="out"></output>
@@ -62,8 +66,16 @@ hanid.textContent=handle_id;
 }else if(a.janus && a.janus=="event"){
 if(a.jsep && a.jsep.type=="answer"){
 handle_answer(a.jsep);	
-}	
 }
+if(a.transaction=="unpublish"){}
+}else if(a.janus && a.janus=="timeout"){
+if(session_id !=a.session_id)console.warn("session_id !=a.session_id");
+session_id=0;
+handle_id=0;//??
+sessid.textContent=session_id;
+hanid.textContent=handle_id;	
+}
+// {"janus": "timeout", "session_id": 6925394170560529}
 }
 sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
 function ping(){
@@ -131,6 +143,10 @@ d.handle_id=handle_id;
 d.janus="message";
 wsend(d);
 //{"janus": "ack", "session_id": 3951343692014406, "transaction": "join_room"}
+// if peerconnection OK=>
+//{"janus": "webrtcup", "session_id": 6925394170560529, "sender": 6034420809360702}
+//msg: {"janus": "media", "session_id": 6925394170560529, "sender": 6034420809360702, "type": "audio", "receiving": true}
+//msg: {"janus": "media", "session_id": 6925394170560529, "sender": 6034420809360702, "type": "video", "receiving": true}
 }
 function leave_room(){
 	//exists
@@ -142,6 +158,74 @@ d.body.room=1234;
 d.transaction="leave_room";
 d.session_id=session_id;
 d.handle_id=handle_id;
+wsend(d);	
+//{"janus": "ack", "session_id": 2361997824643607, "transaction": "leave_room"}
+//msg: {"janus": "event", "session_id": 2361997824643607,
+//	 "transaction": "leave_room", "sender": 764199550168293, "plugindata": {"plugin": "janus.plugin.videoroom",
+//	 "data": {"videoroom": "event", "room": 1234, "leaving": "ok"}}}
+}
+function exists_room(){
+let d={};
+d.body={};
+d.body.request="exists";
+d.body.room=1234;
+d.transaction="exists";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.janus="message";	
+wsend(d);
+//{"janus": "success", "session_id": 2744970438859790, 
+//"transaction": "exists", "sender": 7619702403671624, 
+//"plugindata": {"plugin": "janus.plugin.videoroom", 
+//"data": {"videoroom": "success", "room": 1234, "exists": true}}}
+}
+function unpublish(){
+let d={};
+d.body={};
+d.body.request="unpublish";
+d.body.room=1234;
+//d.body.ptype="publisher";
+//d.body.display="Globik";
+d.transaction="unpublish";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.janus="message";
+wsend(d);
+//msg: {"janus": "ack", "session_id": 7251248991408392, "transaction": "unpublish"}
+//msg: {"janus": "event", "session_id": 7251248991408392, "transaction": "unpublish",
+//	 "sender": 8200504346034280, "plugindata": 
+//	 {"plugin": "janus.plugin.videoroom", "data": {"videoroom": "event", "room": 1234, "unpublished": "ok"}}}
+//msg: {"janus": "hangup", "session_id": 7251248991408392, "sender": 8200504346034280, "reason": "Close PC"}
+}
+function list_rooms(){
+let d={};	
+d.janus="message";
+alert(0);
+d.body={};
+d.body.request="list";
+d.body.room=1234;
+d.transaction="list_rooms";
+d.session_id=session_id;
+d.handle_id=handle_id;
+wsend(d);
+//{"janus": "success", "session_id": 3729383755062524, "transaction": "list_rooms",
+// "sender": 326563683419833, 
+//"plugindata": {"plugin": "janus.plugin.videoroom", 
+//"data": {"videoroom": "success",
+// "list": [{"room": 5678, "description": "VP9-SVC Demo Room", "pin_required": false, 
+//"max_publishers": 6, "bitrate": 512000, "fir_freq": 10, "require_pvtid": false,
+// "notify_joining": false, "audiocodec": "opus", "videocodec": "vp9", "video_svc": true,
+//  "record": false, "num_participants": 0}, {"room": 1234, "description": "Demo Room", 
+//	  "pin_required": false, "max_publishers": 6, "bitrate": 128000, "fir_freq": 10, 
+//"require_pvtid": false, "notify_joining": false, "audiocodec": "opus",
+//"videocodec": "vp8", "record": false, "num_participants": 1}]}}}
+}
+function keep_alive(){
+let d={};
+d.janus="keepalive";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.transaction="keep_alive";
 wsend(d);	
 }
 var pc=null;
@@ -178,13 +262,16 @@ wsend(d);
 }	
 }
 
-pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',pc.iceConnectionState);}
-pc.onicegatheringstatechange=function(){console.log("ice gathering: ",pc.iceGatheringState);}
+pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',this.iceConnectionState);
+//disconnected failed connected completed
+if(this.iceConnectionState=="disconnected"){}	
+}
+pc.onicegatheringstatechange=function(){console.log("ice gathering: ",this.iceGatheringState);}
 pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
 
 pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
-pc.signalingstatechange=function(){console.log('signaling state: ',pc.signalingState);}
-pc.onconnectionstatechange=function(){console.warn('connection state: ', pc.connectionState);}
+pc.signalingstatechange=function(){console.log('signaling state: ',this.signalingState);}
+pc.onconnectionstatechange=function(){console.warn('connection state: ', this.connectionState);}
 localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
 pc.createOffer(offer_opts).then(set_local_desc, on_error);
 
