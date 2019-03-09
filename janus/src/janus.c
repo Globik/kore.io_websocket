@@ -4,8 +4,10 @@
 #include <kore/tasks.h>
 #include <jansson.h>
 #include "assets.h"
-//.fr
+
 int		page(struct http_request *);
+int subscriber_watch(struct http_request*);
+
 int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
 void websocket_disconnect(struct connection*);
@@ -23,7 +25,7 @@ kore_log(LOG_INFO,"kore_worker_teardown");
 printf("\n*** TEARDOWN! ***\n");	
 
 g_atomic_int_inc(&stop);
-usleep(300000);
+usleep(500000);
 }
 struct kore_task task;
 int init(int state){
@@ -61,7 +63,11 @@ page(struct http_request *req)
 	return (KORE_RESULT_OK);
 }
 
-//struct usi{guint64 sid;};
+int subscriber_watch(struct http_request*req){
+http_response_header(req,"content-type","text/html");
+http_response(req,200,asset_indexWatcher_html, asset_len_indexWatcher_html);
+return (KORE_RESULT_OK);	
+}
 
 void websocket_connect(struct connection*c){
 g_print("websocket connected %p\n",c);	

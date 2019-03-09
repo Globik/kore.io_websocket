@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Video room watcher</title>
+</head>
+<body>
+<h2>a Watcher in Videoroom</h2>
+<b>Preconfigured room in config room id=1234</b>
+1. Create session 2. Attach plugin 3. Join room 4. Leave room 5. Detach plugin 6. Destroy session<br>
+<b>Local Video </b><video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">no video supported</video>
+<br>
+	<b>session_id: <span id="sessid"></span></b><b> handle_id: <span id="hanid"></span></b><br>
+	<b>FEED </b><b id="pubid" contenteditable=true>must be feed</b>
+	<button onclick="ping();">ping janus</button>
+	<button onclick="session_create();">session create</button>
+	<button onclick="janus_info();">janus info</button>
+	<button onclick="session_destroy();">session destroy</button>
+	<button onclick="attach_plugin();">attach plugin</button>
+	<button onclick="detach_plugin();">detach plugin</button>
+	<button onclick="join_room();">join prebuild static room</button>
+	<button onclick="publish();">publish</button>
+	<button onclick="unpublish();">unpublish</button>
+	<button onclick="leave_room();">leave room</button>
+	<button onclick="keep_alive();">keep alive</button>
+	<button onclick="list_rooms();">list rooms</button>
+	<button onclick="exists_room();">exists room</button>
+	<button onclick="list_participants();">list participants</button>
+	
+	<h4>output:</h4>
+	<output id="out"></output>
+<script>
+var session_id=0;
+var handle_id=0;
+var transaction="polydor";
+var pubId=0;
+var sock=new WebSocket("ws://127.0.0.1:8888/connect");
+sock.onopen=function(){
+outi("<b class=\"green\">websocket opened</b>");
+}
+sock.onerror=function(e){outi("<b>websocket error</b>");}
+sock.onmessage=function(evt){
+console.log("message", evt.data);
+outi("<b>msg: </b>" + evt.data);
+let a;
+try{a=JSON.parse(evt.data);}catch(e){console.error(e);return;}
+if(a.janus && a.janus=="success"){
+if(a.transaction=="session_create"){
+session_id=a.data.id;//(a.data?a.data.id:0);
+sessid.textContent=session_id;
+//hanid.textContent=session_id;
+//handle_id=2;
+}else if(a.transaction=="session_destroy"){
+session_id=0;
+sessid.textContent=session_id;
+}else if(a.transaction=="attach_plugin"){
+handle_id=a.data.id;
+hanid.textContent=handle_id;	
+}else if(a.transaction=="detach_plugin"){
+handle_id=0;
+hanid.textContent=handle_id;	
+}else if(a.transaction=="list_participants"){
+if(a.plugindata.data.participants.length > 0){
+pubId=a.plugindata.data.participants[0].id;
+pubid.textContent=pubId;
+}
+}
+}else if(a.janus && a.janus=="event"){
+if(a.jsep && a.jsep.type=="answer"){
+handle_answer(a.jsep);	
+}else if(a.jsep && a.jsep.type=="offer"){
+//if(a.transaction=="subscribe_room"){
+//alert("Offer!");
+handle_offer(a.jsep);	
+//}	
+}
+if(a.transaction=="unpublish"){}
+}else if(a.janus && a.janus=="timeout"){
+if(session_id !=a.session_id)console.warn("session_id !=a.session_id");
+session_id=0;
+handle_id=0;//??
+sessid.textContent=session_id;
+hanid.textContent=handle_id;	
+}
+// {"janus": "timeout", "session_id": 6925394170560529}
+}
+sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
+function ping(){
+let d={};
+d.transaction="ping";
+d.janus="ping"
+wsend(d);
+}
+function janus_info(){
+let d={};
+d.transaction="info";
+d.janus="info";
+wsend(d);
+}
+function session_create(){
+let d={};
+d.transaction="session_create";
+d.janus="create";
+wsend(d);
+// {"janus": "success", "transaction": "polydor", "data": {"id": 1800535620133879}} => session_id
+}
+function session_destroy(){
+let d={};
+d.transaction="session_destroy";
+d.session_id=session_id;
+d.janus="destroy";
+//console.log(d);
+wsend(d);
+//{"janus": "success", "session_id": 8368784709788683, "transaction": "session_destroy"}
+}
+function attach_plugin(){
+let d={};
+d.transaction="attach_plugin";
+d.session_id=session_id;
+d.janus="attach";
+d.plugin="janus.plugin.videoroom";
+d.opaque_id="fucker";//?? any need here?
+//console.log(d);
+wsend(d);
+//{"janus": "success", "session_id": 343331563099243, "transaction": "attach_plugin", "data": {"id": 3577031667291224}}
+}
+function detach_plugin(){
+let d={};
+d.handle_id=handle_id;
+d.transaction="detach_plugin";
+d.session_id=session_id;
+d.janus="detach";
+d.plugin="janus.plugin.videoroom";
+d.opaque_id="fucker";//?? any need?
+//console.log(d);
+//{"janus": "success", "session_id": 4085346587175549, "transaction": "detach_plugin"}
+wsend(d);	
+}
+
+function join_room(){
+let d={};
+d.body={};
+d.body.request="join";
+d.body.room=1234;
+d.body.ptype="subscriber";
+d.body.feed=pubId;
+//d.body.display="Globik";
+d.transaction="subscibe_room";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.janus="message";
+wsend(d);
+//if publisher=>
+//{"janus": "ack", "session_id": 3951343692014406, "transaction": "join_room"}
+// if peerconnection OK=>
+//{"janus": "webrtcup", "session_id": 6925394170560529, "sender": 6034420809360702}
+//msg: {"janus": "media", "session_id": 6925394170560529, "sender": 6034420809360702, "type": "audio", "receiving": true}
+//msg: {"janus": "media", "session_id": 6925394170560529, "sender": 6034420809360702, "type": "video", "receiving": true}
+//###################
+//{"janus": "event", "session_id": 2070239147251063, "transaction": "join_room", "sender": 7139475795529436, 
+//"plugindata": {"plugin": "janus.plugin.videoroom", "data": {"videoroom": "joined", "room": 1234, "description": "Demo Room", 
+//"id": 7094980496866009, "private_id": 3948710195, "publishers": []}}}
+// we need here a feed id: plugindata.data.id
+// if subscriber=>
+//msg: {"janus": "success", "transaction": "session_create", "data": {"id": 8239910848073430}}
+//msg: {"janus": "success", "session_id": 8239910848073430, "transaction": "attach_plugin", "data": {"id": 1964943181496756}}
+//msg: {"janus": "ack", "session_id": 8239910848073430, "transaction": "subscibe_room"}
+//msg: {"janus": "event", "session_id": 8239910848073430, "transaction": "subscibe_room", 
+//"sender": 1964943181496756,
+//"plugindata": {"plugin": "janus.plugin.videoroom", "data": {"videoroom": "attached", "room": 1234,
+//	 "id": 7094980496866009, "display": "Globik"}},
+//"jsep": {"type": "offer" ,"sdp":etc}
+
+}
+
+function list_participants(){
+let d={};
+d.janus="message";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.transaction="list_participants";
+d.body={};
+d.body.request="listparticipants";
+d.body.room=1234;
+wsend(d);	
+// {"janus": "success", "session_id": 3758189572704366, 
+//"transaction": "list_participants", "sender": 7659999092093651, 
+//"plugindata": {"plugin": "janus.plugin.videoroom",
+//"data": {"videoroom": "participants", "room": 1234,
+// "participants": [{"id": 8895351069240132, "display": "Globik", "publisher": true, "talking": false}]}}}
+// .plugindata.data.participants[0].id
+}
+function leave_room(){
+	//exists
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="leave";
+d.body.room=1234;
+d.transaction="leave_room";
+d.session_id=session_id;
+d.handle_id=handle_id;
+wsend(d);	
+//{"janus": "ack", "session_id": 2361997824643607, "transaction": "leave_room"}
+//msg: {"janus": "event", "session_id": 2361997824643607,
+//	 "transaction": "leave_room", "sender": 764199550168293, "plugindata": {"plugin": "janus.plugin.videoroom",
+//	 "data": {"videoroom": "event", "room": 1234, "leaving": "ok"}}}
+}
+function exists_room(){
+let d={};
+d.body={};
+d.body.request="exists";
+d.body.room=1234;
+d.transaction="exists";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.janus="message";	
+wsend(d);
+//{"janus": "success", "session_id": 2744970438859790, 
+//"transaction": "exists", "sender": 7619702403671624, 
+//"plugindata": {"plugin": "janus.plugin.videoroom", 
+//"data": {"videoroom": "success", "room": 1234, "exists": true}}}
+}
+function unpublish(){
+let d={};
+d.body={};
+d.body.request="unpublish";
+d.body.room=1234;
+//d.body.ptype="publisher";
+//d.body.display="Globik";
+d.transaction="unpublish";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.janus="message";
+wsend(d);
+//msg: {"janus": "ack", "session_id": 7251248991408392, "transaction": "unpublish"}
+//msg: {"janus": "event", "session_id": 7251248991408392, "transaction": "unpublish",
+//	 "sender": 8200504346034280, "plugindata": 
+//	 {"plugin": "janus.plugin.videoroom", "data": {"videoroom": "event", "room": 1234, "unpublished": "ok"}}}
+//msg: {"janus": "hangup", "session_id": 7251248991408392, "sender": 8200504346034280, "reason": "Close PC"}
+}
+function list_rooms(){
+let d={};	
+d.janus="message";
+//alert(0);
+d.body={};
+d.body.request="list";
+d.body.room=1234;
+d.transaction="list_rooms";
+d.session_id=session_id;
+d.handle_id=handle_id;
+wsend(d);
+//{"janus": "success", "session_id": 3729383755062524, "transaction": "list_rooms",
+// "sender": 326563683419833, 
+//"plugindata": {"plugin": "janus.plugin.videoroom", 
+//"data": {"videoroom": "success",
+// "list": [{"room": 5678, "description": "VP9-SVC Demo Room", "pin_required": false, 
+//"max_publishers": 6, "bitrate": 512000, "fir_freq": 10, "require_pvtid": false,
+// "notify_joining": false, "audiocodec": "opus", "videocodec": "vp9", "video_svc": true,
+//  "record": false, "num_participants": 0}, {"room": 1234, "description": "Demo Room", 
+//	  "pin_required": false, "max_publishers": 6, "bitrate": 128000, "fir_freq": 10, 
+//"require_pvtid": false, "notify_joining": false, "audiocodec": "opus",
+//"videocodec": "vp8", "record": false, "num_participants": 1}]}}}
+}
+function keep_alive(){
+let d={};
+d.janus="keepalive";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.transaction="keep_alive";
+wsend(d);	
+}
+var pc=null;
+var localStrem;
+var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
+function publish(){
+navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
+}
+
+function gotLocalStream(stream){
+localStream=stream;
+playVideo(localVideo, stream);
+
+/*
+const audioTracks=localStream.getAudioTracks();
+if(audioTracks.length>0){
+console.warn(audioTracks[0].label);	
+}
+localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
+console.log("adding local stream to pc");
+pc.createOffer(offer_opts).then(got_local_desc, on_error);	
+*/	
+pc=new RTCPeerConnection(null);
+pc.onicecandidate=function(event){
+if(event.candidate){
+console.warn("ON ICE CANDIDATE!");
+let d={};
+d.janus="trickle";
+d.transaction="candidate"
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.candidate=event.candidate;
+wsend(d);	
+}	
+}
+
+pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',this.iceConnectionState);
+//disconnected failed connected completed
+if(this.iceConnectionState=="disconnected"){}	
+}
+pc.onicegatheringstatechange=function(){console.log("ice gathering: ",this.iceGatheringState);}
+pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
+
+pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
+pc.signalingstatechange=function(){console.log('signaling state: ',this.signalingState);}
+pc.onconnectionstatechange=function(){console.warn('connection state: ', this.connectionState);}
+localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
+pc.createOffer(offer_opts).then(set_local_desc, on_error);
+
+}
+function playVideo(element, stream){
+if('srcObject' in element){element.srcObject=stream;}
+element.play();
+element.volume=0;	
+}
+function set_local_desc(desc){
+pc.setLocalDescription(desc).then(function(){
+console.log("send offer to answer.html");
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="configure";
+d.body.audio=true;
+d.body.video=true;
+d.transaction="configure";
+d.session_id=session_id;
+d.handle_id=handle_id;
+//console.log('desc: ',JSON.stringify(desc));
+//console.log('ld: ',JSON.stringify(pc.localDescription));
+d.jsep=desc;//pc.localDescription;
+wsend(d);
+//{"janus": "event", "session_id": 7496005352925884,
+//"transaction": "configure", 
+//"sender": 6803282953445005, "plugindata": {"plugin": "janus.plugin.videoroom",
+//"data": {"videoroom": "event", "room": 1234, "configured": "ok", "audio_codec": "opus", "video_codec": "vp8"}},
+ //"jsep": {"type": "answer", "sdp": "v"}
+}, on_error)
+}
+function handle_answer(sdp){
+console.warn("handle_answer: \n",sdp);
+//if(!sdp.sdp) console.warn("What the fuck? No sdp?");
+var ax=new RTCSessionDescription({type:"answer",sdp:sdp.sdp});
+pc.setRemoteDescription(ax).then(function(){
+console.warn("settled remote sdp");
+},on_error)	
+}
+function on_error(err){console.error("creatin offer err: ", err);}
+
+function handle_offer(sdp){
+//so far repeat myself, dirty solution; just the workflow to understand for the time being
+pc=new RTCPeerConnection(null);
+pc.onicecandidate=function(event){
+if(event.candidate){
+console.warn("ON ICE CANDIDATE!");
+let d={};
+d.janus="trickle";
+d.transaction="candidate"
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.candidate=event.candidate;
+wsend(d);	
+}	
+}
+
+pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',this.iceConnectionState);
+//disconnected failed connected completed
+if(this.iceConnectionState=="disconnected"){}	
+}
+pc.onicegatheringstatechange=function(){console.log("ice gathering: ",this.iceGatheringState);}
+pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
+
+pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
+pc.signalingstatechange=function(){console.log('signaling state: ',this.signalingState);}
+pc.onconnectionstatechange=function(){console.warn('connection state: ', this.connectionState);}
+pc.ontrack=got_remote_stream;
+async function boo(){
+console.log('in boo');
+await pc.setRemoteDescription(sdp);
+let desc=await pc.createAnswer();
+await pc.setLocalDescription(desc);	
+//let a=JSON.stringify(pc.localDescription);
+//if(ws)setTimeout(function(){ws.send(a);},1000);
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="start";
+d.body.room=1234;
+d.transaction="start";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.jsep=pc.localDescription;
+wsend(d);
+}
+boo().then(function(){}).catch(function(err){console.error(err);})
+
+}
+
+function got_remote_stream(stream){
+	console.warn("GOTE_REMOTE_STREAM!");
+	//or e.streams[0];
+	//playVideo(localVideo, stream);
+localVideo.srcObject=stream.streams[0];
+//localVideo.play();?? dom exception
+localVideo.volume=0;
+}
+
+function outi(str){return out.innerHTML+=str+"<br>";}
+function wsend(obj){
+if(!sock){outi("<b class=\"red\">no websocket available</b>");return;}
+let d;
+try{d=JSON.stringify(obj);}catch(e){outi("Error sock send json: "+e);return;}	
+sock.send(d);
+}
+</script>
+</body>
+</html>
