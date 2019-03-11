@@ -1,0 +1,33 @@
+<html>
+	<head><title>admin</title></head>
+	<body>
+	<h2>admin webrtc</h2>
+	<button onclick="dowas();">info</button>
+	<script>
+	var ws=new WebSocket("ws://127.0.0.1:8888/connect");
+	ws.onopen=function(){
+	console.log("websock opened");
+	let d={};
+	d.adtype=1;
+	//d.transaction="pipka";
+	//d.janus="suka";
+	//d.admin_secret="janusoverlord";
+	wsend(d);	
+	}
+	ws.onerror=function(e){console.error(e);}
+	ws.onclose=function(){console.log("websock closed");}
+	ws.onmessage=function(ev){console.warn("data: ",ev.data);}
+	function wsend(obj){
+	let a;
+	try{a=JSON.stringify(obj);if(ws)ws.send(a);}catch(e){console.error(e);return;}	
+	}
+	function dowas(){
+		let d={};
+		d.janus="list_sessions";
+		d.transaction="list_sessions";
+		d.admin_secret="janusoverlord";
+		wsend(d);
+	}
+	</script>
+	</body>
+</html>

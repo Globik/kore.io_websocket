@@ -492,7 +492,7 @@ static void janus_session_free(const janus_refcount *session_ref) {
 	}
 	g_free(session);
 }
-
+void kore_websocket_target(guint64,u_int8_t, const void*,size_t,int);
 static gboolean janus_check_sessions(gpointer user_data) {
 	if(session_timeout < 1)		/* Session timeouts are disabled */
 		return G_SOURCE_CONTINUE;
@@ -530,7 +530,8 @@ static gboolean janus_check_sessions(gpointer user_data) {
 		size=json_dumpb(event, buf, size, 0);
 		//fwrite((char*)buf, 1, size, stdout);
 		json_decref(event);
-		kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf, size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
+		//kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf, size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
+		kore_websocket_target(session->session_id, WEBSOCKET_OP_TEXT, buf,size,9);
 				
 		}
 				
@@ -612,6 +613,91 @@ janus_session *janus_session_find(guint64 session_id) {
 	return session;
 }
 
+
+#define WEBSOCKET_PAYLOAD_SINGLE 125
+#define WEBSOCKET_PAYLOAD_EXTEND_1 126
+#define WEBSOCKET_PAYLOAD_EXTEND_2 127
+
+//void kore_websocket_target(guint64,u_int8_t, const void*,size_t,int);
+static void websocket_frame_build(struct kore_buf*,u_int8_t,const void*,size_t);
+
+void kore_websocket_target(guint64 sessid,u_int8_t op, const void*data,size_t len,int scope){
+struct connection*c;
+struct kore_buf*frame;
+frame=kore_buf_alloc(len);
+struct usi *us=NULL;
+websocket_frame_build(frame,op,data,len);
+TAILQ_FOREACH(c, &connections, list){
+	g_print("wieviel?\n");
+	//struct
+	//us=(struct usi*)c->hdlr_extra;
+	
+	if(/*us->sid==sessid && */c->proto==CONN_PROTO_WEBSOCKET){
+		us=(struct usi*)c->hdlr_extra;
+		//g_print("*** int aw: %d\n",us->aw);
+		//g_print("*** int scnu %"SCNu64"\n",us->sid);
+	//if(c->hdlr_extra !=NULL){
+	//struct usi *us=(struct usi*)c->hdlr_extra;
+	//g_print("sessid: Entering session*** %"SCNu64";=%"SCNu64"\n", us->sid,sessid);
+	//if(us->sid==sessid){
+		//g_print("after equal\n");
+	if(us->sid==sessid && us->aw==0){
+	g_print("*** OK! EQUAL!!***\n");
+	net_send_queue(c,frame->data,frame->offset);
+	net_send_flush(c);	
+	break;
+}
+//}
+	//}
+	}
+	}	
+	/*
+	if(scope==WEBSOCKET_BROADCAST_GLOBAL){
+		kore_msg_send(KORE_MSG_WORKER_ALL,KORE_MSG_WEBSOCKET,frame->data,frame->offset);
+		}*/
+		kore_buf_free(frame);
+		g_print("after kore_buf_free\n");
+	
+}
+	static void websocket_frame_build(struct kore_buf *frame, u_int8_t op, const void *data,size_t len)
+{
+	u_int8_t		len_1;
+	u_int16_t		len16;
+	u_int64_t		len64;
+
+	if (len > WEBSOCKET_PAYLOAD_SINGLE) {
+		if (len <= USHRT_MAX)
+			len_1 = WEBSOCKET_PAYLOAD_EXTEND_1;
+		else
+			len_1 = WEBSOCKET_PAYLOAD_EXTEND_2;
+	} else {
+		len_1 = len;
+	}
+
+	op |= (1 << 7);
+	kore_buf_append(frame, &op, sizeof(op));
+
+	len_1 &= ~(1 << 7);
+	kore_buf_append(frame, &len_1, sizeof(len_1));
+
+	if (len_1 > WEBSOCKET_PAYLOAD_SINGLE) {
+		switch (len_1) {
+		case WEBSOCKET_PAYLOAD_EXTEND_1:
+			net_write16((u_int8_t *)&len16, len);
+			kore_buf_append(frame, &len16, sizeof(len16));
+			break;
+		case WEBSOCKET_PAYLOAD_EXTEND_2:
+			net_write64((u_int8_t *)&len64, len);
+			kore_buf_append(frame, &len64, sizeof(len64));
+			break;
+		}
+	}
+
+	if (data != NULL && len > 0)
+		kore_buf_append(frame, data, len);
+}
+
+
 void janus_session_notify_event(janus_session *session, json_t *event) {
 	g_print("janus_session_notify_event\n");
 	if(session != NULL && !g_atomic_int_get(&session->destroyed)/* && session->source != NULL && session->source->transport != NULL*/) {
@@ -621,21 +707,28 @@ void janus_session_notify_event(janus_session *session, json_t *event) {
 		
 		
 		size_t size=json_dumpb(event, NULL,0,0);
-		if(size==0){g_print("size %d\n",size);}
+		if(size==0){g_print("size %d\n",size);
+			//json_decref(event);return;
+			}
 		g_print("after size\n");
 		char *buf=alloca(size);
 		g_print("after alloca\n");
 		size=json_dumpb(event,buf,size,0);
 		g_print("after json_dumpb\n");
 		//fwrite((char*)buf, 1, size, stdout);
-		
-		kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf,size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
+	guint64 session_id = session->session_id;
+	g_print("*** Entering session %"SCNu64"; %p\n", session_id, session);
+		//kore_websocket_broadcast(NULL, WEBSOCKET_OP_TEXT, buf,size, /*WEBSOCKET_BROADCAST_GLOBAL*/9);
+		//kore_websocket_target(guint64,u_int8_t, const void*,size_t,int);
+		kore_websocket_target(session_id, WEBSOCKET_OP_TEXT, buf,size,9);
 		g_print("after kore_websocket_broadcast\n");
 	} else {
 		//g_print(" No transport, free the event\n");
 		
 	}
+	g_print("before json_decref\n");
 	json_decref(event);
+	g_print("after json_decref\n");
 }
 
 

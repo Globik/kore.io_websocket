@@ -42,7 +42,7 @@
 #define JANUS_BUFSIZE	8192
 
 extern volatile gint stop;
-struct usi{guint64 sid;};
+struct usi{guint64 sid;int aw;};
 /*! \brief Helper to address requests and their sources (e.g., a specific HTTP connection, websocket, RabbitMQ or others) */
 typedef struct janus_request janus_request;
 

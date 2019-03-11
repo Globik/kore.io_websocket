@@ -7,6 +7,7 @@
 
 int		page(struct http_request *);
 int subscriber_watch(struct http_request*);
+int adminwebrtc(struct http_request*);
 
 int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
@@ -48,8 +49,9 @@ return (json_t*)0;
 
 int page_ws_connect(struct http_request*req){
 	g_print("websocket connected %s %p\n", req->path, req);
+	//g_print("YES connect\n");
 	kore_websocket_handshake(req,"websocket_connect", "websocket_message", "websocket_disconnect");
-	return (KORE_RESULT_OK);
+return (KORE_RESULT_OK);
 }
 
 int
@@ -68,14 +70,18 @@ http_response_header(req,"content-type","text/html");
 http_response(req,200,asset_indexWatcher_html, asset_len_indexWatcher_html);
 return (KORE_RESULT_OK);	
 }
-
+int adminwebrtc(struct http_request*req){
+http_response_header(req,"content-type","text/html");
+http_response(req,200,asset_adminwebrtc_html, asset_len_adminwebrtc_html);
+return (KORE_RESULT_OK);	
+}
 void websocket_connect(struct connection*c){
-g_print("websocket connected %p\n",c);	
-
+g_print("websocket connected %p\n",c);
 if(c->hdlr_extra==NULL){
 struct usi* us=kore_malloc(sizeof(*us));
 if(us==NULL)return;
 us->sid=0;
+us->aw=0;
 c->hdlr_extra=us;
 }
 
@@ -95,11 +101,29 @@ void websocket_message(struct connection*c,u_int8_t op, void* vdata, size_t vlen
 //JANUS_LOG(LOG_VERB, "[message] janus log\n");
 g_print("message: g_print\n");
 int send_to_clients=0;
+int abba_id=0;
+
+struct usi* usa=NULL;
+if(c->hdlr_extra !=NULL){
+usa=(struct usi*)c->hdlr_extra;
+}
 json_t *root=load_json((const char*)vdata,vlen);//ll
 if(root){
+json_t *sasha = json_object_get(root, "adtype");
+if(sasha && json_is_integer(sasha)){
+abba_id = json_integer_value(sasha);
+if(usa) usa->aw=abba_id;
+json_decref(root);
+return;
+}
+if(usa->aw==0){
 int abi=janus_process_incoming_request(c, root);
 //JANUS_LOG(LOG_VERB, "janus process incoming request %d",abi);
 g_print("g_print: janus process incoming request %d\n",abi);
+}else if(usa->aw==1){
+int ab2=janus_process_incoming_admin_request(c,root);
+g_print("process admin request %d\n", ab2);	
+}
 send_to_clients=1;
 }else{kore_log(LOG_INFO,"no json root in ws message");}
 if(send_to_clients==0)kore_websocket_send(c, op, vdata, vlen);

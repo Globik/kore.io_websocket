@@ -39,6 +39,8 @@ var pubId=0;
 var sock=new WebSocket("ws://127.0.0.1:8888/connect");
 sock.onopen=function(){
 outi("<b class=\"green\">websocket opened</b>");
+//let d={};
+//wsend();
 }
 sock.onerror=function(e){outi("<b>websocket error</b>");}
 sock.onmessage=function(evt){
