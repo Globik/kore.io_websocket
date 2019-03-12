@@ -36,6 +36,7 @@ var session_id=0;
 var handle_id=0;
 var transaction="polydor";
 var pubId=0;
+var owner=false;
 var sock=new WebSocket("ws://127.0.0.1:8888/connect");
 sock.onopen=function(){
 outi("<b class=\"green\">websocket opened</b>");
@@ -282,20 +283,33 @@ navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStre
 }
 
 function gotLocalStream(stream){
+console.log('for owner');
 localStream=stream;
 playVideo(localVideo, stream);
-
-/*
-const audioTracks=localStream.getAudioTracks();
-if(audioTracks.length>0){
-console.warn(audioTracks[0].label);	
+pc=createPeer();
+pc.createOffer(offer_opts).then(set_local_desc, on_error);
 }
-localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
-console.log("adding local stream to pc");
-pc.createOffer(offer_opts).then(got_local_desc, on_error);	
-*/	
+function playVideo(element, stream){
+// for owner
+if('srcObject' in element){element.srcObject=stream;}
+element.play();
+element.volume=0;	
+}
+function createPeer(){
+// for both
 pc=new RTCPeerConnection(null);
-pc.onicecandidate=function(event){
+pc.onicecandidate = on_ice_candidate;
+pc.oniceconnectionstatechange = on_ice_connection_state_change;
+pc.onicegatheringstatechange = on_ice_gathering_state_change;
+pc.onicecandidaterror = on_ice_candidate_error;
+pc.onnegotiationneeded = on_negotiation_needed;
+pc.signalingstatechange = signaling_state_change;
+pc.onconnectionstatechange = on_connection_state_change;
+return pc;
+}
+//session create, atach plugin, list participants, join room
+
+function on_ice_candidate(event){
 if(event.candidate){
 console.warn("ON ICE CANDIDATE!");
 let d={};
@@ -308,26 +322,19 @@ wsend(d);
 }	
 }
 
-pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',this.iceConnectionState);
+function on_ice_connection_state_change(){
+console.log('ice connection state: ',this.iceConnectionState);
 //disconnected failed connected completed
 if(this.iceConnectionState=="disconnected"){}	
 }
-pc.onicegatheringstatechange=function(){console.log("ice gathering: ",this.iceGatheringState);}
-pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
+function on_ice_gathering_state_change(){console.log("ice gathering: ",this.iceGatheringState);}
+function on_ice_candidate_error(err){console.error('ice candidate err: ', err);}
+function on_negotiation_needed(){console.warn("ON NEGOTIATION NEEDED!");}
+function signaling_state_change(){console.log('signaling state: ',this.signalingState);}
+function on_connection_state_change(){console.warn('connection state: ', this.connectionState);}
 
-pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
-pc.signalingstatechange=function(){console.log('signaling state: ',this.signalingState);}
-pc.onconnectionstatechange=function(){console.warn('connection state: ', this.connectionState);}
-localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
-pc.createOffer(offer_opts).then(set_local_desc, on_error);
-
-}
-function playVideo(element, stream){
-if('srcObject' in element){element.srcObject=stream;}
-element.play();
-element.volume=0;	
-}
 function set_local_desc(desc){
+	//for owner
 pc.setLocalDescription(desc).then(function(){
 console.log("send offer to answer.html");
 let d={};
@@ -351,6 +358,7 @@ wsend(d);
 }, on_error)
 }
 function handle_answer(sdp){
+//for owner true - publisher
 console.warn("handle_answer: \n",sdp);
 //if(!sdp.sdp) console.warn("What the fuck? No sdp?");
 var ax=new RTCSessionDescription({type:"answer",sdp:sdp.sdp});
@@ -361,39 +369,16 @@ console.warn("settled remote sdp");
 function on_error(err){console.error("creatin offer err: ", err);}
 
 function handle_offer(sdp){
-//so far repeat myself, dirty solution; just the workflow to understand for the time being
-pc=new RTCPeerConnection(null);
-pc.onicecandidate=function(event){
-if(event.candidate){
-console.warn("ON ICE CANDIDATE!");
-let d={};
-d.janus="trickle";
-d.transaction="candidate"
-d.session_id=session_id;
-d.handle_id=handle_id;
-d.candidate=event.candidate;
-wsend(d);	
-}	
-}
-
-pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',this.iceConnectionState);
-//disconnected failed connected completed
-if(this.iceConnectionState=="disconnected"){}	
-}
-pc.onicegatheringstatechange=function(){console.log("ice gathering: ",this.iceGatheringState);}
-pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
-
-pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
-pc.signalingstatechange=function(){console.log('signaling state: ',this.signalingState);}
-pc.onconnectionstatechange=function(){console.warn('connection state: ', this.connectionState);}
+//if owner false
+//set remote sdp,create answer,set local description, start
+pc=createPeer();
 pc.ontrack=got_remote_stream;
-async function boo(){
-console.log('in boo');
-await pc.setRemoteDescription(sdp);
-let desc=await pc.createAnswer();
-await pc.setLocalDescription(desc);	
-//let a=JSON.stringify(pc.localDescription);
-//if(ws)setTimeout(function(){ws.send(a);},1000);
+
+console.log('setRemoteDescription');
+pc.setRemoteDescription(sdp).then(function(){;
+return pc.createAnswer();
+}).then(function(answer){
+return pc.setLocalDescription(answer);}).then(function(){
 let d={};
 d.janus="message";
 d.body={};
@@ -404,13 +389,13 @@ d.session_id=session_id;
 d.handle_id=handle_id;
 d.jsep=pc.localDescription;
 wsend(d);
-}
-boo().then(function(){}).catch(function(err){console.error(err);})
+}).catch(function(er){console.error(er);})
 
 }
 
 function got_remote_stream(stream){
-	console.warn("GOTE_REMOTE_STREAM!");
+	//owner false - subscriber
+console.warn("GOTE_REMOTE_STREAM!");
 	//or e.streams[0];
 	//playVideo(localVideo, stream);
 localVideo.srcObject=stream.streams[0];

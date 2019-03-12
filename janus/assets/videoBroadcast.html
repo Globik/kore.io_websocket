@@ -1,11 +1,30 @@
-<html><head><title>title</title><style>.red{color:red;} #out{border: 1px solid rgba(0,255,0,0.3);}</style></head>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>VideoBroadcast</title>
+<style>.red{color:red;} .green{color:green;}</style>
+</head>
 <body>
-	<h1>websocket and janus. Publisher.</h1>
-<b>Preconfigured room in config room id=1234</b>
-1. Create session 2. Attach plugin 3. Join room 4. Leave room 5. Detach plugin 6. Destroy session<br>
+<h2>VideoBroadcast</h2>
+<h3>Choose your nick:</h3>
+<input id="yourNick" type="text" value="Bob"/><button onclick="set_user();">set nick</button>
+<b>you: </b><span id="spanYourNick"></span>&nbsp;
+<b>he(she): </b><span id="spanHisNick"></span><br>
+<h4>Wanna broadcast a video? Check it</h4>
+<input type="checkbox" id="chek" onchange="on_chek(this);"/><br>
+<b>Preconfigured room in config file, a room with id=1234</b><br>
+<p><h3>Subscriber workflows</h3>
+1. Create session 2. Attach plugin 3.List participants 3. Join room 4. Leave room 5. Detach plugin 6. Destroy session
+<h3>Publisher workflows</h3>
+1. Create session 2. Attach plugin 3. Join room 4. publish
+</p>
 <b>Local Video </b><video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">no video supported</video>
 <br>
 	<b>session_id: <span id="sessid"></span></b><b> handle_id: <span id="hanid"></span></b><br>
+	<b>FEED: </b><b id="pubid" contenteditable=true>must be feed</b>
 	<button onclick="ping();">ping janus</button>
 	<button onclick="session_create();">session create</button>
 	<button onclick="janus_info();">janus info</button>
@@ -19,27 +38,25 @@
 	<button onclick="keep_alive();">keep alive</button>
 	<button onclick="list_rooms();">list rooms</button>
 	<button onclick="exists_room();">exists room</button>
+	<button onclick="list_participants();">list participants</button>
 	
-	<h4>output:</h4>
-	<output id="out"></output>
+<h4>output:</h4>
+<output id="out"></output>
 <script>
-/*
-Preconfigured room in config room id=1234
-1. Create session
-2. Attach plugin
-3. Join room
-4.publish
-5. Leave room
-6. Detach plugin
-7. Destroy session
-*/
 var session_id=0;
 var handle_id=0;
-var transaction="polydor";
-
-var sock=new WebSocket("ws://127.0.0.1:8888/connect");
+var transaction="polydor";//??
+var pubId=0;
+var owner=false;
+var sock;
+var who_am_i;
+var who_is_he;
+function open_sock(){
+sock=new WebSocket("ws://127.0.0.1:8888/connect");
+}
+open_sock();
 sock.onopen=function(){
-outi("<b>websocket opened</b>");
+outi("<b class=\"green\">websocket opened</b>");
 }
 sock.onerror=function(e){outi("<b>websocket error</b>");}
 sock.onmessage=function(evt){
@@ -62,11 +79,23 @@ hanid.textContent=handle_id;
 }else if(a.transaction=="detach_plugin"){
 handle_id=0;
 hanid.textContent=handle_id;	
+}else if(a.transaction=="list_participants"){
+// for subscribers
+if(a.plugindata.data.participants.length > 0){
+pubId=a.plugindata.data.participants[0].id;
+pubid.textContent=pubId;
+who_is_he=a.plugindata.data.participants[0].display;
+spanHisNick=who_is_he;
+}
 }
 }else if(a.janus && a.janus=="event"){
 if(a.jsep && a.jsep.type=="answer"){
-	
 handle_answer(a.jsep);	
+}else if(a.jsep && a.jsep.type=="offer"){
+//if(a.transaction=="subscribe_room"){
+//alert("Offer!");
+handle_offer(a.jsep);	
+//}	
 }
 if(a.transaction=="unpublish"){}
 }else if(a.janus && a.janus=="timeout"){
@@ -79,6 +108,33 @@ hanid.textContent=handle_id;
 // {"janus": "timeout", "session_id": 6925394170560529}
 }
 sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
+
+function set_user(){
+//alert(1);
+let a=yourNick.value;
+if(!a){alert("set your name!");return;}
+who_am_i=a;
+spanYourNick.textContent=who_am_i;
+}
+
+function is_owner(){
+if(!owner){return false;}else{return true;}	
+}
+
+function on_chek(el){
+//alert("chek!"+el.checked);
+if(el.checked)
+{
+owner=true;	
+do_owner();
+}else{
+owner=false;
+undo_owner();	
+}
+}
+function do_owner(){}
+function undo_owner(){}
+
 function ping(){
 let d={};
 d.transaction="ping";
@@ -103,7 +159,6 @@ let d={};
 d.transaction="session_destroy";
 d.session_id=session_id;
 d.janus="destroy";
-//console.log(d);
 wsend(d);
 //{"janus": "success", "session_id": 8368784709788683, "transaction": "session_destroy"}
 }
@@ -114,7 +169,6 @@ d.session_id=session_id;
 d.janus="attach";
 d.plugin="janus.plugin.videoroom";
 d.opaque_id="fucker";//?? any need here?
-//console.log(d);
 wsend(d);
 //{"janus": "success", "session_id": 343331563099243, "transaction": "attach_plugin", "data": {"id": 3577031667291224}}
 }
@@ -136,18 +190,53 @@ let d={};
 d.body={};
 d.body.request="join";
 d.body.room=1234;
-d.body.ptype="publisher";
-d.body.display="Globik";
-d.transaction="join_room";
+d.body.ptype="subscriber";
+d.body.feed=pubId;
+//d.body.display="Globik";
+d.transaction="subscibe_room";
 d.session_id=session_id;
 d.handle_id=handle_id;
 d.janus="message";
 wsend(d);
+//if publisher=>
 //{"janus": "ack", "session_id": 3951343692014406, "transaction": "join_room"}
 // if peerconnection OK=>
 //{"janus": "webrtcup", "session_id": 6925394170560529, "sender": 6034420809360702}
 //msg: {"janus": "media", "session_id": 6925394170560529, "sender": 6034420809360702, "type": "audio", "receiving": true}
 //msg: {"janus": "media", "session_id": 6925394170560529, "sender": 6034420809360702, "type": "video", "receiving": true}
+//###################
+//{"janus": "event", "session_id": 2070239147251063, "transaction": "join_room", "sender": 7139475795529436, 
+//"plugindata": {"plugin": "janus.plugin.videoroom", "data": {"videoroom": "joined", "room": 1234, "description": "Demo Room", 
+//"id": 7094980496866009, "private_id": 3948710195, "publishers": []}}}
+// we need here a feed id: plugindata.data.id
+// if subscriber=>
+//msg: {"janus": "success", "transaction": "session_create", "data": {"id": 8239910848073430}}
+//msg: {"janus": "success", "session_id": 8239910848073430, "transaction": "attach_plugin", "data": {"id": 1964943181496756}}
+//msg: {"janus": "ack", "session_id": 8239910848073430, "transaction": "subscibe_room"}
+//msg: {"janus": "event", "session_id": 8239910848073430, "transaction": "subscibe_room", 
+//"sender": 1964943181496756,
+//"plugindata": {"plugin": "janus.plugin.videoroom", "data": {"videoroom": "attached", "room": 1234,
+//	 "id": 7094980496866009, "display": "Globik"}},
+//"jsep": {"type": "offer" ,"sdp":etc}
+
+}
+
+function list_participants(){
+let d={};
+d.janus="message";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.transaction="list_participants";
+d.body={};
+d.body.request="listparticipants";
+d.body.room=1234;
+wsend(d);	
+// {"janus": "success", "session_id": 3758189572704366, 
+//"transaction": "list_participants", "sender": 7659999092093651, 
+//"plugindata": {"plugin": "janus.plugin.videoroom",
+//"data": {"videoroom": "participants", "room": 1234,
+// "participants": [{"id": 8895351069240132, "display": "Globik", "publisher": true, "talking": false}]}}}
+// .plugindata.data.participants[0].id
 }
 function leave_room(){
 	//exists
@@ -201,7 +290,7 @@ wsend(d);
 function list_rooms(){
 let d={};	
 d.janus="message";
-alert(0);
+//alert(0);
 d.body={};
 d.body.request="list";
 d.body.room=1234;
@@ -230,29 +319,40 @@ d.transaction="keep_alive";
 wsend(d);	
 }
 var pc=null;
-var localStream;
-var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};//owner true
+var localStrem;
+var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
 function publish(){
-// owner true
 navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
 }
 
 function gotLocalStream(stream){
-//owner true
+console.log('for owner');
 localStream=stream;
 playVideo(localVideo, stream);
-
-/*
-const audioTracks=localStream.getAudioTracks();
-if(audioTracks.length>0){
-console.warn(audioTracks[0].label);	
+pc=createPeer();
+pc.createOffer(offer_opts).then(set_local_desc, on_error);
 }
-localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
-console.log("adding local stream to pc");
-pc.createOffer(offer_opts).then(got_local_desc, on_error);	
-*/	
+function playVideo(element, stream){
+// for owner
+if('srcObject' in element){element.srcObject=stream;}
+element.play();
+element.volume=0;	
+}
+function createPeer(){
+// for both
 pc=new RTCPeerConnection(null);
-pc.onicecandidate=function(event){
+pc.onicecandidate = on_ice_candidate;
+pc.oniceconnectionstatechange = on_ice_connection_state_change;
+pc.onicegatheringstatechange = on_ice_gathering_state_change;
+pc.onicecandidaterror = on_ice_candidate_error;
+pc.onnegotiationneeded = on_negotiation_needed;
+pc.signalingstatechange = signaling_state_change;
+pc.onconnectionstatechange = on_connection_state_change;
+return pc;
+}
+//session create, atach plugin, list participants, join room
+
+function on_ice_candidate(event){
 if(event.candidate){
 console.warn("ON ICE CANDIDATE!");
 let d={};
@@ -265,27 +365,19 @@ wsend(d);
 }	
 }
 
-pc.oniceconnectionstatechange=function(){console.log('ice connection state: ',this.iceConnectionState);
+function on_ice_connection_state_change(){
+console.log('ice connection state: ',this.iceConnectionState);
 //disconnected failed connected completed
 if(this.iceConnectionState=="disconnected"){}	
 }
-pc.onicegatheringstatechange=function(){console.log("ice gathering: ",this.iceGatheringState);}
-pc.onicecandidaterror=function(err){console.error('ice candidate err: ', err);}
+function on_ice_gathering_state_change(){console.log("ice gathering: ",this.iceGatheringState);}
+function on_ice_candidate_error(err){console.error('ice candidate err: ', err);}
+function on_negotiation_needed(){console.warn("ON NEGOTIATION NEEDED!");}
+function signaling_state_change(){console.log('signaling state: ',this.signalingState);}
+function on_connection_state_change(){console.warn('connection state: ', this.connectionState);}
 
-pc.onnegotiationneeded=function(){console.warn("ON NEGOTIATION NEEDED!");}
-pc.signalingstatechange=function(){console.log('signaling state: ',this.signalingState);}
-pc.onconnectionstatechange=function(){console.warn('connection state: ', this.connectionState);}
-localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});//owner true
-pc.createOffer(offer_opts).then(set_local_desc, on_error);//owner true
-
-}
-function playVideo(element, stream){
-	//owner true
-if('srcObject' in element){element.srcObject=stream;}
-element.play();
-element.volume=0;	
-}
-function set_local_desc(desc){//owner true
+function set_local_desc(desc){
+	//for owner
 pc.setLocalDescription(desc).then(function(){
 console.log("send offer to answer.html");
 let d={};
@@ -297,6 +389,8 @@ d.body.video=true;
 d.transaction="configure";
 d.session_id=session_id;
 d.handle_id=handle_id;
+//console.log('desc: ',JSON.stringify(desc));
+//console.log('ld: ',JSON.stringify(pc.localDescription));
 d.jsep=desc;//pc.localDescription;
 wsend(d);
 //{"janus": "event", "session_id": 7496005352925884,
@@ -307,9 +401,7 @@ wsend(d);
 }, on_error)
 }
 function handle_answer(sdp){
-//owner true
-//create session,atach plugin,join room, publish
-//first media, local stream, createOffer, set local description, request configure< then from janus handle answer set remote desc
+//for owner true - publisher
 console.warn("handle_answer: \n",sdp);
 //if(!sdp.sdp) console.warn("What the fuck? No sdp?");
 var ax=new RTCSessionDescription({type:"answer",sdp:sdp.sdp});
@@ -318,6 +410,42 @@ console.warn("settled remote sdp");
 },on_error)	
 }
 function on_error(err){console.error("creatin offer err: ", err);}
+
+function handle_offer(sdp){
+//if owner false
+//set remote sdp,create answer,set local description, start
+pc=createPeer();
+pc.ontrack=got_remote_stream;
+
+console.log('setRemoteDescription');
+pc.setRemoteDescription(sdp).then(function(){;
+return pc.createAnswer();
+}).then(function(answer){
+return pc.setLocalDescription(answer);}).then(function(){
+let d={};
+d.janus="message";
+d.body={};
+d.body.request="start";
+d.body.room=1234;
+d.transaction="start";
+d.session_id=session_id;
+d.handle_id=handle_id;
+d.jsep=pc.localDescription;
+wsend(d);
+}).catch(function(er){console.error(er);})
+
+}
+
+function got_remote_stream(stream){
+	//owner false - subscriber
+console.warn("GOTE_REMOTE_STREAM!");
+	//or e.streams[0];
+	//playVideo(localVideo, stream);
+localVideo.srcObject=stream.streams[0];
+//localVideo.play();?? dom exception
+localVideo.volume=0;
+}
+
 function outi(str){return out.innerHTML+=str+"<br>";}
 function wsend(obj){
 if(!sock){outi("<b class=\"red\">no websocket available</b>");return;}

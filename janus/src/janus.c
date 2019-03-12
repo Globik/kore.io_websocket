@@ -1,4 +1,4 @@
-//#include <kore/kore.h>
+// see assets folder index.html for videoroom plugin
 #include <kore/http.h>
 #include "janus.h"
 #include <kore/tasks.h>
@@ -60,8 +60,9 @@ page(struct http_request *req)
 	//http_response(req, 200, NULL, 0);
 	http_response_header(req,"content-type","text/html");
 	
-	http_response(req,200, asset_index_html, asset_len_index_html);//janus.plugin.videoroom
+	//http_response(req,200, asset_index_html, asset_len_index_html);//janus.plugin.videoroom
 	//http_response(req, 200, asset_echotest_html, asset_len_echotest_html);
+	http_response(req, 200, asset_videoBroadcast_html, asset_len_videoBroadcast_html);// two in one
 	return (KORE_RESULT_OK);
 }
 
@@ -82,23 +83,23 @@ struct usi* us=kore_malloc(sizeof(*us));
 if(us==NULL)return;
 us->sid=0;
 us->aw=0;
+us->hid=0;
 c->hdlr_extra=us;
 }
 
 }
 void websocket_disconnect(struct connection*c){
-//kore_log(LOG_INFO,"websocket disconnected %p", c);	
-//JANUS_LOG(LOG_VERB, "websocket disconnected %p\n",c);
 g_print("g_print: websocket disconnected %p\n",c);
 if(c->hdlr_extra !=NULL){
-kore_free(c->hdlr_extra);
+struct usi*us=(struct usi*)c->hdlr_extra;
+
+if(us->sid > 0 && us->hid == 0)del_sess(us->sid);
+if(us->sid > 0 && us->hid > 0){int a=del_han(us->hid, us->sid);g_print("IS OK Sid and hid deleted? %d\n", a);}
+if(us)kore_free(us);
 c->hdlr_extra=NULL;	
 }
 }
 void websocket_message(struct connection*c,u_int8_t op, void* vdata, size_t vlen){
-//kore_log(LOG_INFO,"message");
-//printf("message: \n");
-//JANUS_LOG(LOG_VERB, "[message] janus log\n");
 g_print("message: g_print\n");
 int send_to_clients=0;
 int abba_id=0;

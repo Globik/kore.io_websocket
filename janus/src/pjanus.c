@@ -727,7 +727,7 @@ void janus_session_notify_event(janus_session *session, json_t *event) {
 		
 	}
 	g_print("before json_decref\n");
-	json_decref(event);
+	if(event)json_decref(event);
 	g_print("after json_decref\n");
 }
 
@@ -736,10 +736,11 @@ void janus_session_notify_event(janus_session *session, json_t *event) {
 gint janus_session_destroy(janus_session *session) {
 	guint64 session_id = session->session_id;
 	JANUS_LOG(LOG_INFO, "Destroying session %"SCNu64"; %p\n", session_id, session);
+	g_print("Destroying session %"SCNu64"; %p\n", session_id, session);
 	if(!g_atomic_int_compare_and_exchange(&session->destroyed, 0, 1))
 		return 0;
 	janus_session_handles_clear(session);
-	/* The session will actually be destroyed when the counter gets to 0 */
+	g_print(" The session will actually be destroyed when the counter gets to 0 \n");
 	janus_refcount_decrease(&session->ref);
 
 	return 0;
@@ -869,6 +870,33 @@ static int janus_request_check_secret(struct connection *request, guint64 sessio
 	return 0;
 }
 
+void del_sess(guint64 sessid){
+	janus_session*session=NULL;
+	session=janus_session_find(sessid);
+	if(!session){g_print("876: couldn't find any session %"SCNu64"...\n",sessid);return;}
+	janus_mutex_lock(&sessions_mutex);
+	g_hash_table_remove(sessions,&session->session_id);
+	janus_mutex_unlock(&sessions_mutex);
+	janus_session_destroy(session);
+	g_print("OK, deleted a session\n");
+}
+int del_han(guint64 hid, guint64 sid){
+janus_ice_handle *handle=NULL;
+janus_session*session=NULL;
+session=janus_session_find(sid);
+if(!session){g_print("887: couldn't find any session %"SCNu64"...\n", sid);return 1;}
+handle=janus_session_handles_find(session, hid);
+if(!handle){g_print("no handles??\n");return 1;}
+int error = janus_session_handles_remove(session, handle);
+if(error != 0) {return 1;}
+janus_mutex_lock(&sessions_mutex);
+g_hash_table_remove(sessions,&session->session_id);
+janus_mutex_unlock(&sessions_mutex);
+janus_session_destroy(session);
+g_print("OK, deleted a session\n");
+g_print("OK deleted handle\n");
+return 0;
+}
 static void janus_request_ice_handle_answer(janus_ice_handle *handle, int audio, int video, int data, char *jsep_sdp) {
 	/* We got our answer */
 	janus_flags_clear(&handle->webrtc_flags, JANUS_ICE_HANDLE_WEBRTC_PROCESSING_OFFER);
@@ -1127,6 +1155,7 @@ goto jsondone;
 		}
 		json_t *opaque = json_object_get(root, "opaque_id");
 		const char *opaque_id = opaque ? json_string_value(opaque) : NULL;
+		if(opaque_id)g_print("OPAQUE: %s\n",opaque_id);
 		/* Create handle */
 		handle = janus_ice_handle_create(session, opaque_id);
 		if(handle == NULL) {
@@ -1134,6 +1163,10 @@ goto jsondone;
 			goto jsondone;
 		}
 		handle_id = handle->handle_id;
+		if(request->hdlr_extra !=NULL){
+		struct usi*us=(struct usi*)request->hdlr_extra;
+		if(us->hid==0)us->hid=handle_id;	
+		}
 		/* We increase the counter as this request is using the handle */
 		janus_refcount_increase(&handle->ref);
 		/* Attach to the plugin */
@@ -1196,6 +1229,10 @@ goto jsondone;
 			ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_PLUGIN_DETACH, "Couldn't detach from plugin: error '%d'", error);
 			/* TODO Delete handle instance */
 			goto jsondone;
+		}
+		if(request->hdlr_extra !=NULL){
+		struct usi*us=(struct usi*)request->hdlr_extra;
+		us->hid=0;	
 		}
 		/* Prepare JSON reply */
 		json_t *reply = janus_create_message("success", session_id, transaction_text);
@@ -2436,28 +2473,6 @@ jsondone:
 	return ret;
 }
 
-/*
- int janus_process_success(struct connection *request, json_t *payload)
-{
-	if(!request || !payload)
-		return -1;
-// Pass to the right transport plugin 
-//JANUS_LOG(LOG_HUGE, "Sending %s API response to %s (%p)\n", request->admin ? "admin" : "Janus", request->transport->get_package(), request->instance);
-//return request->transport->send_message(request->instance, request->request_id, request->admin, payload);
-size_t size=json_dumpb(payload, NULL, 0, 0);
-	if(size==0){
-	JANUS_LOG(LOG_VERB,"not enough size for json buf %d", size);
-	//json_decref(error_data);
-	json_decref(payload);
-	return -1;
-}
-char *buf=alloca(size);
-size=json_dumpb(payload, buf, size, 0);
-kore_websocket_send(request, 1, buf, size);
-json_decref(payload);
-return 0;
-}
-*/ 
 
 int janus_process_success(struct connection *request, json_t *payload)
 {
@@ -2481,41 +2496,7 @@ return 0;
 }
 
 
-//struct connection*, guint64 session_id, const char* transaction,gint error_code,gchar* error_cause)
 
-/*
-static int janus_process_error_string(struct connection *c, uint64_t session_id, 
-const char *transaction, gint error, gchar *error_string)
-{
-	if(!request)
-		return -1;
-	// Done preparing error 
-	//JANUS_LOG(LOG_VERB, "[%s] Returning %s API error %d (%s)\n", transaction, request->admin ? "admin" : "Janus", error, error_string);
-	JANUS_LOG(LOG_VERB,"error string\n");
-	// Prepare JSON error 
-	json_t *reply = janus_create_message("error", session_id, transaction);
-	json_t *error_data = json_object();
-	json_object_set_new(error_data, "code", json_integer(error));
-	json_object_set_new(error_data, "reason", json_string(error_string));
-	json_object_set_new(reply, "error", error_data);
-	// Pass to the right transport plugin 
-	size_t size=json_dumpb(reply,NULL,0,0);
-	if(size==0){
-	JANUS_LOG(LOG_VERB,"not enough size for json buf %d", size);
-	json_decref(error_data);
-	json_decref(reply);
-	return -1;
-}
-char *buf=alloca(size);
-size=json_dumpb(reply,buf,size,0);
-json_decref(error_data);
-json_decref(reply);
-kore_websocket_send(c,1,buf,size);
-
-return 0;
-//return request->transport->send_message(request->instance, request->request_id, request->admin, reply);
-}
-*/
 static int janus_process_error_string(struct connection *request, uint64_t session_id, 
 const char *transaction, gint error, gchar *error_string)
 {
@@ -2548,29 +2529,6 @@ return 0;
 //return request->transport->send_message(request->instance, request->request_id, request->admin, reply);
 }
 
-/*
-
-int janus_process_error(struct connection *request, uint64_t session_id, const char *transaction, gint error, const char *format, ...)
-{
-	if(!request)
-		return -1;
-	gchar *error_string = NULL;
-	gchar error_buf[512];
-	if(format == NULL) {
-		//No error string provided, use the default one 
-		error_string = (gchar *)janus_get_api_error(error);
-	} else {
-		// This callback has variable arguments (error string) 
-		va_list ap;
-		va_start(ap, format);
-		g_vsnprintf(error_buf, sizeof(error_buf), format, ap);
-		va_end(ap);
-		error_string = error_buf;
-	}
-	return janus_process_error_string(request, session_id, transaction, error, error_string);
-}
-
-*/
 int janus_process_error(struct connection *request, uint64_t session_id, const char *transaction, gint error, const char *format, ...)
 {
 	if(!request)
@@ -2852,8 +2810,8 @@ void *request_id, gboolean admin, json_t *message, json_error_t *error) {
 }
 
 void janus_transport_gone(janus_transport *plugin, janus_transport_session *transport) {
-	/* Get rid of sessions this transport was handling */
-	JANUS_LOG(LOG_VERB, "A %s transport instance has gone away (%p)\n", plugin->get_package(), transport);
+	g_print(" Get rid of sessions this transport was handling. Transport gone away\n");
+	//JANUS_LOG(LOG_VERB, "A %s transport instance has gone away (%p)\n", plugin->get_package(), transport);
 	janus_mutex_lock(&sessions_mutex);
 	if(sessions && g_hash_table_size(sessions) > 0) {
 		GHashTableIter iter;
@@ -2863,22 +2821,25 @@ void janus_transport_gone(janus_transport *plugin, janus_transport_session *tran
 			janus_session *session = (janus_session *) value;
 			if(!session || g_atomic_int_get(&session->destroyed) || g_atomic_int_get(&session->timeout) || session->last_activity == 0)
 				continue;
+				g_print("before instance transport");
 			if(session->source && session->source->instance == transport) {
 				JANUS_LOG(LOG_VERB, "  -- Session %"SCNu64" will be over if not reclaimed\n", session->session_id);
 				JANUS_LOG(LOG_VERB, "  -- Marking Session %"SCNu64" as over\n", session->session_id);
 				if(reclaim_session_timeout < 1) { /* Reclaim session timeouts are disabled */
-					/* Mark the session as destroyed */
+					g_print("Mark the session as destroyed\n");
 					janus_session_destroy(session);
 					g_hash_table_iter_remove(&iter);
 				} else {
-					/* Set flag for transport_gone. The Janus sessions watchdog will clean this up if not reclaimed*/
-					g_atomic_int_set(&session->transport_gone, 1);
+g_print("Set flag for transport_gone. The Janus sessions watchdog will clean this up if not reclaimed\n");
+g_atomic_int_set(&session->transport_gone, 1);
 				}
 			}
 		}
 	}
 	janus_mutex_unlock(&sessions_mutex);
 }
+
+
 
 gboolean janus_transport_is_api_secret_needed(janus_transport *plugin) {
 	return api_secret != NULL;
@@ -3078,20 +3039,20 @@ const char *transaction, json_t *message, json_t *jsep) {
 	json_object_set_new(event, "plugindata", plugin_data);
 	if(merged_jsep != NULL)
 		json_object_set_new(event, "jsep", merged_jsep);
-	/* Send the event */
+	g_print(" Send the event\n");
 	JANUS_LOG(LOG_VERB, "[%"SCNu64"] Sending event to transport...\n", ice_handle->handle_id);
 	janus_session_notify_event(session, event);
 
 	if((restart || janus_flags_is_set(&ice_handle->webrtc_flags, JANUS_ICE_HANDLE_WEBRTC_RESEND_TRICKLES))
 			&& janus_ice_is_full_trickle_enabled()) {
-		/* We're restarting ICE, send our trickle candidates again */
+		g_print("We're restarting ICE, send our trickle candidates again\n");
 		janus_ice_resend_trickles(ice_handle);
 	}
 
 	if(jsep != NULL && janus_events_is_enabled()) {
 		const char *merged_sdp_type = json_string_value(json_object_get(merged_jsep, "type"));
 		const char *merged_sdp = json_string_value(json_object_get(merged_jsep, "sdp"));
-		/* Notify event handlers as well */
+		g_print("Notify event handlers as well\n");
 		janus_events_notify_handlers(JANUS_EVENT_TYPE_JSEP,
 			session->session_id, ice_handle->handle_id, ice_handle->opaque_id, "local", merged_sdp_type, merged_sdp);
 	}

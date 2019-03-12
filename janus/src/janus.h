@@ -37,12 +37,16 @@
 #include "plugins/plugin.h"
 #include <kore/kore.h>
 
-#include <kore/kore.h>
+
 
 #define JANUS_BUFSIZE	8192
 
 extern volatile gint stop;
-struct usi{guint64 sid;int aw;};
+// session_id -sid, is admin request -aw,  hid - handle_id
+struct usi{guint64 sid; guint64 hid; int aw;};
+
+void del_sess(guint64);
+int del_han(guint64 hid, guint64 sid);
 /*! \brief Helper to address requests and their sources (e.g., a specific HTTP connection, websocket, RabbitMQ or others) */
 typedef struct janus_request janus_request;
 
