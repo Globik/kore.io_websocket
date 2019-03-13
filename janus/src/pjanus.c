@@ -2271,11 +2271,11 @@ int janus_process_incoming_admin_request(struct connection *request, json_t*root
 
 	/* Go on with the processing */
 	if(admin_api_secret != NULL) {
-		/* There's an API secret, check that the client provided it */
+		g_print("*** ADMIN *** There's an API secret, check that the client provided it\n");
 		json_t *secret = json_object_get(root, "admin_secret");
-		if(!secret || !json_is_string(secret) || !janus_strcmp_const_time(json_string_value(secret), admin_api_secret)) {
-			ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_UNAUTHORIZED, NULL);
-			goto jsondone;
+if(!secret || !json_is_string(secret) || !janus_strcmp_const_time(json_string_value(secret), admin_api_secret)) {
+ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_UNAUTHORIZED, NULL);
+goto jsondone;
 		}
 	}
 

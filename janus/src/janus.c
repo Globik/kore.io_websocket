@@ -60,9 +60,9 @@ page(struct http_request *req)
 	//http_response(req, 200, NULL, 0);
 	http_response_header(req,"content-type","text/html");
 	
-	//http_response(req,200, asset_index_html, asset_len_index_html);//janus.plugin.videoroom
+	http_response(req,200, asset_index_html, asset_len_index_html);//janus.plugin.videoroom
 	//http_response(req, 200, asset_echotest_html, asset_len_echotest_html);
-	http_response(req, 200, asset_videoBroadcast_html, asset_len_videoBroadcast_html);// two in one
+	//http_response(req, 200, asset_videoBroadcast_html, asset_len_videoBroadcast_html);// two in one
 	return (KORE_RESULT_OK);
 }
 
@@ -122,6 +122,7 @@ int abi=janus_process_incoming_request(c, root);
 //JANUS_LOG(LOG_VERB, "janus process incoming request %d",abi);
 g_print("g_print: janus process incoming request %d\n",abi);
 }else if(usa->aw==1){
+g_print("*** ENTERING ADMIN REQUEST ***\n");
 int ab2=janus_process_incoming_admin_request(c,root);
 g_print("process admin request %d\n", ab2);	
 }

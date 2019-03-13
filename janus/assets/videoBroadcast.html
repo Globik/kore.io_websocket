@@ -97,7 +97,9 @@ handle_answer(a.jsep);
 handle_offer(a.jsep);	
 //}	
 }
-if(a.transaction=="unpublish"){}
+if(a.transaction=="unpublish"){
+//publisher	
+}
 }else if(a.janus && a.janus=="timeout"){
 if(session_id !=a.session_id)console.warn("session_id !=a.session_id");
 session_id=0;
@@ -186,18 +188,25 @@ wsend(d);
 }
 
 function join_room(){
+if(!who_am_i){alert("No who am I?");return;}
 let d={};
 d.body={};
 d.body.request="join";
 d.body.room=1234;
-d.body.ptype="subscriber";
+d.body.ptype=is_owner()?"publisher":"subscriber";
+if(!is_owner()){
+if(!pubid){alert("No pubid feed?");return;}
 d.body.feed=pubId;
-//d.body.display="Globik";
-d.transaction="subscibe_room";
+}
+if(is_owner()){
+d.body.display="Globik";
+}
+d.transaction=is_owner()?"join_room":"subscibe_room";
 d.session_id=session_id;
 d.handle_id=handle_id;
 d.janus="message";
 wsend(d);
+
 //if publisher=>
 //{"janus": "ack", "session_id": 3951343692014406, "transaction": "join_room"}
 // if peerconnection OK=>
@@ -210,8 +219,7 @@ wsend(d);
 //"id": 7094980496866009, "private_id": 3948710195, "publishers": []}}}
 // we need here a feed id: plugindata.data.id
 // if subscriber=>
-//msg: {"janus": "success", "transaction": "session_create", "data": {"id": 8239910848073430}}
-//msg: {"janus": "success", "session_id": 8239910848073430, "transaction": "attach_plugin", "data": {"id": 1964943181496756}}
+
 //msg: {"janus": "ack", "session_id": 8239910848073430, "transaction": "subscibe_room"}
 //msg: {"janus": "event", "session_id": 8239910848073430, "transaction": "subscibe_room", 
 //"sender": 1964943181496756,
@@ -222,6 +230,7 @@ wsend(d);
 }
 
 function list_participants(){
+// mainly for subscriber
 let d={};
 d.janus="message";
 d.session_id=session_id;
@@ -270,6 +279,7 @@ wsend(d);
 //"data": {"videoroom": "success", "room": 1234, "exists": true}}}
 }
 function unpublish(){
+//for pblisher
 let d={};
 d.body={};
 d.body.request="unpublish";
@@ -319,13 +329,15 @@ d.transaction="keep_alive";
 wsend(d);	
 }
 var pc=null;
-var localStrem;
+var localStream;
 var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
 function publish(){
+//for publisher
 navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
 }
 
 function gotLocalStream(stream){
+	//for publisher
 console.log('for owner');
 localStream=stream;
 playVideo(localVideo, stream);
