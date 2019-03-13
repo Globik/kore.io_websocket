@@ -6,6 +6,7 @@
 #include "assets.h"
 
 int		page(struct http_request *);
+int testev(struct http_request*);
 int subscriber_watch(struct http_request*);
 int adminwebrtc(struct http_request*);
 
@@ -46,7 +47,41 @@ kore_log(LOG_INFO,"json buffer parse err: %d %s",error.line,error.text);
 return (json_t*)0;	
 }	
 }
-
+int testev(struct http_request*req){
+const char*custom;const char* custom2;
+char*body;
+ssize_t ret;
+struct kore_buf*buf;
+u_int8_t data[BUFSIZ];
+if(req->method !=HTTP_METHOD_POST){
+http_response(req,HTTP_STATUS_METHOD_NOT_ALLOWED,"ono",3);
+return (KORE_RESULT_OK);	
+}
+if(http_request_header(req,"X-Requested-With",&custom)){
+g_print("%s\n",custom);	
+//kix
+}
+if(http_request_header(req,"Content-Type",&custom2)){
+g_print("%s\n",custom2);	
+}
+buf=kore_buf_alloc(128);
+for(;;){
+ret=http_body_read(req,data,sizeof(data));
+if(ret==-1){
+kore_buf_free(buf);
+g_print("err reading body\n");
+http_response(req,500,"nob",3);
+return (KORE_RESULT_OK);	
+}	
+if(ret==0)break;
+kore_buf_append(buf,data,ret);
+}
+body=kore_buf_stringify(buf,NULL);
+g_print("body: %s\n",body);
+kore_buf_free(buf);
+http_response(req,200,"ok\n",3);
+return (KORE_RESULT_OK);
+}
 int page_ws_connect(struct http_request*req){
 	g_print("websocket connected %s %p\n", req->path, req);
 	//g_print("YES connect\n");

@@ -4675,7 +4675,7 @@ int Janusmain(int argc, char *argv[])
 	g_async_queue_push(requests, &exit_message);
 	g_thread_join(requests_thread);
 	requests_thread = NULL;
-	g_async_queue_unref(requests);
+	g_async_queue_unref(requests);sss
 	*/ 
 
 	JANUS_LOG(LOG_INFO, "Destroying sessions...\n");
@@ -4702,40 +4702,45 @@ int Janusmain(int argc, char *argv[])
 	}
 
 	JANUS_LOG(LOG_INFO, "Closing event handlers:\n");
+	g_print("CLOSING EVENT HANDLERS: SUKA\n");
 	janus_events_deinit();
 	if(eventhandlers != NULL && g_hash_table_size(eventhandlers) > 0) {
 		g_hash_table_foreach(eventhandlers, janus_eventhandler_close, NULL);
-		g_hash_table_destroy(eventhandlers);
+		g_hash_table_destroy(eventhandlers);g_print("suka3\n");
 	}
 	if(eventhandlers_so != NULL && g_hash_table_size(eventhandlers_so) > 0) {
 		g_hash_table_foreach(eventhandlers_so, janus_eventhandlerso_close, NULL);
-		g_hash_table_destroy(eventhandlers_so);
+		g_hash_table_destroy(eventhandlers_so);g_print("kuku**\n");
 	}
 
 	janus_recorder_deinit();
 	g_free(local_ip);
-
+g_print("SUKA!\n");
 	if(janus_ice_get_static_event_loops() > 0)
 		janus_ice_stop_static_event_loops();
-
+printf("SUKA,\n");
 #ifdef REFCOUNT_DEBUG
 	/* Any reference counters that are still up while we're leaving? (debug-mode only) */
 	janus_mutex_lock(&counters_mutex);
 	if(counters && g_hash_table_size(counters) > 0) {
 		JANUS_PRINT("Debugging reference counters: %d still allocated\n", g_hash_table_size(counters));
+		g_print("debugging\n");
 		GHashTableIter iter;
 		gpointer value;
 		g_hash_table_iter_init(&iter, counters);
 		while(g_hash_table_iter_next(&iter, NULL, &value)) {
-			JANUS_PRINT("  -- %p\n", value);
+		JANUS_PRINT("  -- %p\n", value);
 		}
 	} else {
 		JANUS_PRINT("Debugging reference counters: 0 still allocated\n");
+		g_print("fagajajaj\n");
 	}
 	janus_mutex_unlock(&counters_mutex);
 #endif
 
 	JANUS_PRINT("Bye!\n");
+	g_print("*** BYE!****\n");
+	printf("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n");
 return 0;
 	//exit(0);
 }

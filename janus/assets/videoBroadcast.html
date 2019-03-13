@@ -38,7 +38,8 @@
 	<button onclick="keep_alive();">keep alive</button>
 	<button onclick="list_rooms();">list rooms</button>
 	<button onclick="exists_room();">exists room</button>
-	<button onclick="list_participants();">list participants</button>
+	<button onclick="list_participants();">list participants</button><br>
+	<button onclick="ajax();">post ajax</button>
 	
 <h4>output:</h4>
 <output id="out"></output>
@@ -465,6 +466,20 @@ if(!sock){outi("<b class=\"red\">no websocket available</b>");return;}
 let d;
 try{d=JSON.stringify(obj);}catch(e){outi("Error sock send json: "+e);return;}	
 sock.send(d);
+}
+function ajax(){
+var xhr=new XMLHttpRequest();
+xhr.open("post","/testEvent");
+xhr.setRequestHeader('Content-Type','application/json','utf-8');
+xhr.setRequestHeader('X-Requested-Width','XMLHttpRequest');
+xhr.onload=function(s){
+if(xhr.status==200){alert(this.response);}else{alert(this.response);}	
+}
+xhr.onerror=function(e){console.error(e);}
+let a={};
+a.hello="world";
+let b=JSON.stringify(a);
+xhr.send(b);
 }
 </script>
 </body>

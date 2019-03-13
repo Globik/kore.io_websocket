@@ -13,7 +13,7 @@
 # sudo leafpad /usr/local/etc/janus/janus.transport.pfunix.cfg
 sudo leafpad /usr/local/etc/janus/janus.cfg
 2019.02
- ./configure --disable-plugin-videocall --disable-plugin-recordplay --disable-plugin-voicemail --disable-plugin-sip --disable-plugin-sipre --disable-plugin-nosip JANUS_CFLAGS="-v -Wall -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" JANUS_LIBS="-L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0  -L/usr/lib/i386-linux-gnu -lglib-2.0 -lconfig -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto"
+ ./configure --disable-plugin-videocall --disable-plugin-recordplay --disable-plugin-voicemail --disable-plugin-sip --disable-plugin-sipre --disable-plugin-nosip JANUS_CFLAGS="-v -Wall -fpic -rdynamic -I/usr/local/ssl/include -I/usr/local/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/local/include/nice -pthread" JANUS_LIBS="-L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -lm -L/usr/lib/i386-linux-gnu -lglib-2.0 -lconfig -lm -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -lm"
     
     
     /usr/lib/i386-linux-gnu/glib-2.0/include/glibconfig.h
@@ -23,14 +23,17 @@ sudo leafpad /usr/local/etc/janus/janus.cfg
     
 
 
-JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp"
+JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib 
+-lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp"
 
 SRTP15X_CFLAGS
               C compiler flags for SRTP15X, overriding pkg-config
   SRTP15X_LIBS
 
 JANUS_CFLAGS=-I/usr/local/ssl/include
-JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
+JANUS_LIBS="-L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lssl -L/usr/local/ssl/lib 
+-Wl,-rpath /usr/local/ssl/lib -lcrypto -L/usr/local/lib -ljansson -lsrtp2 -lusrsctp 
+-lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0"
 
 -L/usr/lib/i386-linux-gnu -lglib-2.0
 -L/usr/local/lib -lnice -lgio-2.0 -lgobject-2.0 -L/usr/lib/i386-linux-gnu -lglib-2.0
@@ -72,7 +75,29 @@ OLLECT_GCC_OPTIONS='-D' 'PACKAGE_NAME="Janus Gateway"' '-D' 'PACKAGE_TARNAME="ja
 GNU assembler version 2.24 (i686-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.24
 COMPILER_PATH=/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/4.8/:/usr/lib/gcc/i686-linux-gnu/4.8/../../../i386-linux-gnu/:/usr/lib/gcc/i686-linux-gnu/4.8/../../../../lib/:/lib/i386-linux-gnu/:/lib/../lib/:/usr/lib/i386-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/i686-linux-gnu/4.8/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-D' 'PACKAGE_NAME="Janus Gateway"' '-D' 'PACKAGE_TARNAME="janus-gateway"' '-D' 'PACKAGE_VERSION="0.3.1"' '-D' 'PACKAGE_STRING="Janus Gateway 0.3.1"' '-D' 'PACKAGE_BUGREPORT="https://github.com/meetecho/janus-gateway"' '-D' 'PACKAGE_URL="https://janus.conf.meetecho.com"' '-D' 'PACKAGE="janus-gateway"' '-D' 'VERSION="0.3.1"' '-D' 'STDC_HEADERS=1' '-D' 'HAVE_SYS_TYPES_H=1' '-D' 'HAVE_SYS_STAT_H=1' '-D' 'HAVE_STDLIB_H=1' '-D' 'HAVE_STRING_H=1' '-D' 'HAVE_MEMORY_H=1' '-D' 'HAVE_STRINGS_H=1' '-D' 'HAVE_INTTYPES_H=1' '-D' 'HAVE_STDINT_H=1' '-D' 'HAVE_UNISTD_H=1' '-D' '__EXTENSIONS__=1' '-D' '_ALL_SOURCE=1' '-D' '_GNU_SOURCE=1' '-D' '_POSIX_PTHREAD_SEMANTICS=1' '-D' '_TANDEM_SOURCE=1' '-D' 'HAVE_DLFCN_H=1' '-D' 'LT_OBJDIR=".libs/"' '-D' 'HAVE_PORTRANGE=1' '-D' 'HAVE_LIBNICE_TCP=1' '-D' 'HAVE_SRTP_2=1' '-D' 'HAVE_SRTP_AESGCM=1' '-D' 'HAVE_SCTP=1' '-D' 'HAVE_SAMPLEEVH=1' '-D' 'HAVE_WEBSOCKETS=1' '-D' 'HAVE_LIBWEBSOCKETS_PEER_SIMPLE=1' '-I' '.' '-Wmissing-prototypes' '-Wmissing-declarations' '-Wunused' '-fstrict-aliasing' '-Wextra' '-Wformat=2' '-Winit-self' '-Winline' '-Wpacked' '-Wpointer-arith' '-Wsuggest-attribute=format' '-Wsuggest-attribute=noreturn' '-Wnested-externs' '-Wstrict-prototypes' '-Wunsafe-loop-optimizations' '-Wwrite-strings' '-Wno-missing-field-initializers' '-Wno-unused-parameter' '-Wcast-align' '-Wformat-nonliteral' '-Wformat-security' '-Wswitch-default' '-Wmissing-include-dirs' '-Wno-aggregate-return' '-Wunused-but-set-variable' '-Warray-bounds' '-Wold-style-definition' '-Wsign-compare' '-Wlarger-than=65537' '-Wno-undef' '-Wno-redundant-decls' '-Wno-override-init' '-fstack-protector-all' '-g' '-ggdb' '-fPIC' '-rdynamic' '-pthread' '-v' '-Wall' '-I' '/usr/local/ssl/include' '-I' '/usr/local/include' '-I' '/usr/include/glib-2.0' '-I' '/usr/lib/i386-linux-gnu/glib-2.0/include' '-I' '/usr/local/include/nice' '-pthread' '-D' 'PLUGINDIR="/usr/local/lib/janus/plugins"' '-D' 'TRANSPORTDIR="/usr/local/lib/janus/transports"' '-D' 'EVENTDIR="/usr/local/lib/janus/events"' '-D' 'CONFDIR="/usr/local/etc/janus"' '-g' '-O2' '-MT' 'janus-ip-utils.o' '-MD' '-MP' '-MF' '.deps/janus-ip-utils.Tpo' '-c' '-o' 'janus-ip-utils.o' '-mtune=generic' '-march=i686'
+COLLECT_GCC_OPTIONS='-D' 'PACKAGE_NAME="Janus Gateway"' '-D' 'PACKAGE_TARNAME="janus-gateway"' 
+'-D' 'PACKAGE_VERSION="0.3.1"' '-D' 'PACKAGE_STRING="Janus Gateway 0.3.1"' '-D'
+ 'PACKAGE_BUGREPORT="https://github.com/meetecho/janus-gateway"' '-D' 
+ 'PACKAGE_URL="https://janus.conf.meetecho.com"' '-D' 'PACKAGE="janus-gateway"' '-D'
+  'VERSION="0.3.1"' '-D' 'STDC_HEADERS=1' '-D' 'HAVE_SYS_TYPES_H=1' '-D' 'HAVE_SYS_STAT_H=1'
+   '-D' 'HAVE_STDLIB_H=1' '-D' 'HAVE_STRING_H=1' '-D' 'HAVE_MEMORY_H=1' '-D' 'HAVE_STRINGS_H=1'
+    '-D' 'HAVE_INTTYPES_H=1' '-D' 'HAVE_STDINT_H=1' '-D' 'HAVE_UNISTD_H=1' '-D' '__EXTENSIONS__=1' '-D' 
+    '_ALL_SOURCE=1' '-D' '_GNU_SOURCE=1' '-D' '_POSIX_PTHREAD_SEMANTICS=1' '-D' '_TANDEM_SOURCE=1' '-D' 
+    'HAVE_DLFCN_H=1' '-D' 'LT_OBJDIR=".libs/"' '-D' 'HAVE_PORTRANGE=1' '-D' 'HAVE_LIBNICE_TCP=1' '-D' 
+    'HAVE_SRTP_2=1' '-D' 'HAVE_SRTP_AESGCM=1' '-D' 'HAVE_SCTP=1' '-D' 'HAVE_SAMPLEEVH=1' '-D' 'HAVE_WEBSOCKETS=1' '-D' 
+    'HAVE_LIBWEBSOCKETS_PEER_SIMPLE=1' '-I' '.' '-Wmissing-prototypes' '-Wmissing-declarations' '-Wunused' '-fstrict-aliasing'
+     '-Wextra' '-Wformat=2' '-Winit-self' '-Winline' '-Wpacked' '-Wpointer-arith' '-Wsuggest-attribute=format' 
+     '-Wsuggest-attribute=noreturn' '-Wnested-externs' '-Wstrict-prototypes' '-Wunsafe-loop-optimizations' '-Wwrite-strings'
+      '-Wno-missing-field-initializers' '-Wno-unused-parameter' '-Wcast-align' '-Wformat-nonliteral' '-Wformat-security' 
+      '-Wswitch-default' '-Wmissing-include-dirs' '-Wno-aggregate-return' '-Wunused-but-set-variable' '-Warray-bounds'
+       '-Wold-style-definition' '-Wsign-compare' '-Wlarger-than=65537' '-Wno-undef' '-Wno-redundant-decls' 
+       '-Wno-override-init' '-fstack-protector-all' '-g' '-ggdb' '-fPIC' '-rdynamic' '-pthread' '-v' '-Wall'
+        '-I' '/usr/local/ssl/include' '-I' '/usr/local/include' '-I' '/usr/include/glib-2.0'
+         '-I' '/usr/lib/i386-linux-gnu/glib-2.0/include' '-I' '/usr/local/include/nice' '-pthread' '-D' 
+         'PLUGINDIR="/usr/local/lib/janus/plugins"' '-D' 'TRANSPORTDIR="/usr/local/lib/janus/transports"'
+          '-D' 'EVENTDIR="/usr/local/lib/janus/events"' '-D' 'CONFDIR="/usr/local/etc/janus"' '-g'
+           '-O2' '-MT' 'janus-ip-utils.o' '-MD' '-MP' '-MF' '.deps/janus-ip-utils.Tpo' '-c' '-o' 
+           'janus-ip-utils.o' '-mtune=generic' '-march=i686'
   CC       janus-turnrest.o
 Using built-in specs.
 COLLECT_GCC=gcc

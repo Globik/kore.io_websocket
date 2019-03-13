@@ -7,7 +7,7 @@ OB = $(P)janus-ice.o  $(P)janus-events.o $(P)janus-dtls.o $(P)janus-dtls-bio.o \
  $(P)janus-apierror.o $(P)janus-auth.o $(P)janus-config.o $(P)janus-cmdline.o $(PI)
 MIR = -L/usr/local/ssl/lib -Wl,-rpath /usr/local/ssl/lib -lcrypto -lssl
 a: a
-	gcc -shared -rdynamic -fpic -o libpjanus.so $(OB) -lconfig
+	gcc -shared -rdynamic -fpic -o libpjanus.so $(OB) -lm -lconfig
 #janus-text2pcap.o            
 #    janus-turnrest.o       
 #    janus-utils.o       janus-version.o
