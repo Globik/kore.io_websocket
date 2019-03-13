@@ -331,6 +331,7 @@ wsend(d);
 var pc=null;
 var localStream;
 var offer_opts={offerToReceiveAudio:0, offerToReceiveVideo:0};
+
 function publish(){
 //for publisher
 navigator.mediaDevices.getUserMedia({audio: true,video: true}).then(gotLocalStream).catch(function(e){console.error(e.name, e)})
@@ -341,7 +342,9 @@ function gotLocalStream(stream){
 console.log('for owner');
 localStream=stream;
 playVideo(localVideo, stream);
+
 pc=createPeer();
+localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});//owner true
 pc.createOffer(offer_opts).then(set_local_desc, on_error);
 }
 function playVideo(element, stream){
@@ -391,7 +394,7 @@ function on_connection_state_change(){console.warn('connection state: ', this.co
 function set_local_desc(desc){
 	//for owner
 pc.setLocalDescription(desc).then(function(){
-console.log("send offer to answer.html");
+console.log("send offer to janus");
 let d={};
 d.janus="message";
 d.body={};
@@ -451,8 +454,6 @@ wsend(d);
 function got_remote_stream(stream){
 	//owner false - subscriber
 console.warn("GOTE_REMOTE_STREAM!");
-	//or e.streams[0];
-	//playVideo(localVideo, stream);
 localVideo.srcObject=stream.streams[0];
 //localVideo.play();?? dom exception
 localVideo.volume=0;

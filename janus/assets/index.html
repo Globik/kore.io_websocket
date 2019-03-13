@@ -242,15 +242,6 @@ function gotLocalStream(stream){
 localStream=stream;
 playVideo(localVideo, stream);
 
-/*
-const audioTracks=localStream.getAudioTracks();
-if(audioTracks.length>0){
-console.warn(audioTracks[0].label);	
-}
-localStream.getTracks().forEach(function(track){pc.addTrack(track, localStream)});
-console.log("adding local stream to pc");
-pc.createOffer(offer_opts).then(got_local_desc, on_error);	
-*/	
 pc=new RTCPeerConnection(null);
 pc.onicecandidate=function(event){
 if(event.candidate){
