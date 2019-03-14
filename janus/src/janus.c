@@ -1,14 +1,21 @@
 // see assets folder index.html for videoroom plugin
+#include <signal.h>
 #include <kore/http.h>
 #include "janus.h"
 #include <kore/tasks.h>
 #include <jansson.h>
 #include "assets.h"
+#include "../event/kore_msg.h"
 
+static volatile int parent_fuck=0;
+
+void do_hell(int);
 int		page(struct http_request *);
 int testev(struct http_request*);
 int subscriber_watch(struct http_request*);
 int adminwebrtc(struct http_request*);
+
+void received_message(struct kore_msg*,const void*);
 
 int page_ws_connect(struct http_request*);
 void websocket_connect(struct connection*);
@@ -19,24 +26,56 @@ int janus_task(struct kore_task*);
 void data_available(struct kore_task*);
 json_t*load_json(const char*, size_t);
 void kore_worker_configure(){
-printf("CONFIGURE WORKER!\n");	
+printf("CONFIGURE WORKER! \n");	
 }
-
+int saka=0;
+void do_hell(int num){
+g_print("do hell occured\n");
+g_atomic_int_inc(&parent_fuck);	
+}
 void kore_worker_teardown(void){
 kore_log(LOG_INFO,"kore_worker_teardown");
 printf("\n*** TEARDOWN! ***\n");	
 
 g_atomic_int_inc(&stop);
-usleep(500000);
+while(!g_atomic_int_get(&parent_fuck)){
+usleep(200000); 
+g_print("saka %d\n",saka);
+saka+=1;
+if(saka==10){g_print("saka %d\n", saka);break;}
+}
+//usleep(500000);
 }
 struct kore_task task;
 int init(int state){
-if(state==KORE_MODULE_UNLOAD)return (KORE_RESULT_ERROR);	
+if(state==KORE_MODULE_UNLOAD)return (KORE_RESULT_ERROR);
+(void)kore_msg_register(MY_MESSAGE_ID, received_message);	
 kore_task_create(&task, janus_task);
 kore_task_bind_callback(&task, data_available);
 kore_task_run(&task, 0);
 return (KORE_RESULT_OK);
 }
+
+
+void received_message(struct kore_msg*msg, const void*data){
+	g_print("[%s:%d]Got message! from %u (%d bytes): %.*s\n",__FILE__,__LINE__,msg->src, msg->length, msg->length, (const char*)data);
+//kore_log(LOG_INFO,green "[%s:%d] Got message from %u (%d bytes): %.*s" rst, __FILE__, __LINE__, msg->src, msg->length, msg->length, (const char*)data);
+	
+	/*if(janus_plugin==NULL){
+	kore_log(LOG_INFO,"[%s:%d] JANUS_PLUGIN IS NULL!!!", __FILE__, __LINE__);
+	}else{
+	kore_log(LOG_INFO,"[%s:%d] JANUS_PLUGIN IS NOT NULL!! SENDING SOME INFO TO ECHO PLUGIN", __FILE__, __LINE__);
+	kore_log(LOG_INFO,"[%s:%d] Worker id: %d", __FILE__, __LINE__, worker->id);
+	//go_handle_message();
+		
+	}
+	if(msg->src==1){
+	kore_log(LOG_INFO,"[%s:%d] sending global for websocket", __FILE__, __LINE__);
+	//kore_websocket_broadcast(NULL,WEBSOCKET_OP_TEXT,"rafa\0",5,WEBSOCKET_BROADCAST_GLOBAL);
+	}
+	*/ 
+}
+
 
 json_t *load_json(const char*text, size_t buflen){
 json_t *root;
@@ -127,9 +166,10 @@ void websocket_disconnect(struct connection*c){
 g_print("g_print: websocket disconnected %p\n",c);
 if(c->hdlr_extra !=NULL){
 struct usi*us=(struct usi*)c->hdlr_extra;
-
+if(saka==0){
 if(us->sid > 0 && us->hid == 0)del_sess(us->sid);
 if(us->sid > 0 && us->hid > 0){int a=del_han(us->hid, us->sid);g_print("IS OK Sid and hid deleted? %d\n", a);}
+}
 if(us)kore_free(us);
 c->hdlr_extra=NULL;	
 }
@@ -168,9 +208,11 @@ if(root)json_decref(root);
 }
 int janus_task(struct kore_task* t){
 //gint Janusmain(int argc, char *argv[])
+signal(SIGUSR1,do_hell);
 Janusmain(1, (char*[3]){"-Nii","1", "1"});
+raise(SIGUSR1);
 //kore_log(LOG_INFO,"*** bye from janus task ***");
-printf("*** BYE ***\n");
+//printf("*** BYE ***\n");
 return (KORE_RESULT_OK);	
 }
 void data_available(struct kore_task*t){

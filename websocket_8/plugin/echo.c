@@ -12,7 +12,7 @@ static j_plugin p_m=J_PLUGIN_INIT(
 		.handle_message=plugin_handle_message,
 		);
 j_plugin *plugin_create(void){
-printf("Created!\n");
+printf("[%s:%d] Plugin Created!\n", __FILE__, __LINE__);
 return &p_m;
 }
 static volatile gint initialized=0,stopping=0;
@@ -26,12 +26,12 @@ static GAsyncQueue *messages=NULL;
 static j_message exit_message;
 
 static void plugin_message_free(j_message *msg){
-g_print("ENTERING plugin_message_free\n");
+g_print("[%s:%d] ENTERING plugin_message_free\n",__FILE__, __LINE__);
 if(!msg || msg==&exit_message) return;
 	g_free(msg->transaction);
 	msg->transaction=NULL;
 	g_free(msg);
-	g_print("plugin_message_free\n");
+	g_print("[%s:%d] plugin_message_free\n",__FILE__, __LINE__);
 }
 
 int plugin_init(j_cbs *cbs,struct kore_task*t){
@@ -42,13 +42,13 @@ messages=g_async_queue_new_full((GDestroyNotify)plugin_message_free);
 	gw=cbs;
 	g_atomic_int_set(&initialized,1);
 	GError *error=NULL;
-	handler_thread=g_thread_try_new("echotest",plugin_handler,/*NULL*/t,&error);
+	handler_thread=g_thread_try_new("echotest", plugin_handler,/*NULL*/t,&error);
 	if(error !=NULL){
 	g_atomic_int_set(&initialized,0);
 	printf("got error handler_thread: %d\n",error->code);
 	return -1;
 	}
-	g_print("Echo Plugin Initialized!\n");
+	g_print("[%s:%d] Echo Plugin Initialized!\n");
 	kore_task_channel_write(t,"INIT!\0",6);
 return 0;
 }
@@ -79,11 +79,11 @@ if(g_atomic_int_get(&stopping) || !g_atomic_int_get(&initialized))
 
 static void*plugin_handler(void*data){
 j_message *msg=NULL;
-	struct kore_task*t=(struct kore_task*)data;
-	if(t==NULL)g_print("kore_task is NULL\n");
-	g_print("mem %p\n",t);
-	kore_task_channel_write(t,"LUKA!\0",6);
-	kore_task_channel_write(t,"LUKA!\0",6);
+struct kore_task*t=(struct kore_task*)data;
+if(t==NULL)g_print("kore_task is NULL\n");
+	//g_print("mem %p\n",t);
+//	kore_task_channel_write(t,"LUKA!\0",6);//doesn't work
+
 	
 	while(g_atomic_int_get(&initialized) && !g_atomic_int_get(&stopping)){
 	msg=g_async_queue_pop(messages);
@@ -92,17 +92,14 @@ j_message *msg=NULL;
 		plugin_message_free(msg);
 			continue;
 		}
-		g_print("got a message: %s\n",msg->transaction);
-		//int res=gw->push_event("FUCKER_Fucker_AS_ANSWER FROM ECHO PLUGIN");
-		int res=gw->push_event(&p_m,"FUCKER_Fucker_AS_ANSWER_FROM_ECHO_PLUGIN",t);
-		//("res of gw->push_event(FUCKER_fucker): %d\n",res);
-		//plugin_message_free(msg);
+		g_print("[%s:%d] We got a transaction: %s\n", __FILE__, __LINE__, msg->transaction);
+		int res=gw->push_event(&p_m,"HALI HALO FROM ECHO_PLUGIN!",t);
+
+		kore_msg_send(0,MY_MESSAGE_ID,"GLOBIK", 6);
 		continue;
-		
-		//plugin_message_free(msg); ???
 		
 	}
 	plugin_message_free(msg);
-	g_print("leaving thread from PLUGIN_HANDLER\n");
+	g_print("[%s:%d] leaving thread from PLUGIN_HANDLER\n", __FILE__, __LINE__);
 	return NULL;
 }

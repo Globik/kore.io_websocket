@@ -3407,7 +3407,7 @@ void janus_plugin_end_session(janus_plugin_session *plugin_session) {
 }
 
 void janus_plugin_notify_event(janus_plugin *plugin, janus_plugin_session *plugin_session, json_t *event) {
-	/* A plugin asked to notify an event to the handlers */
+	g_print("*** A plugin asked to notify an event to the handlers ***\n");
 	if(!plugin || !event || !json_is_object(event))
 		return;
 	guint64 session_id = 0, handle_id = 0;
@@ -3431,8 +3431,14 @@ void janus_plugin_notify_event(janus_plugin *plugin, janus_plugin_session *plugi
 		}
 		session_id = session->session_id;
 	}
-	/* Notifyfe event handlers */
+	g_print("*** Notifyfe event handlers ***\n");
 	if(janus_events_is_enabled()) {
+		g_print("*** Notifying?\n");
+		size_t size=json_dumpb(event,NULL,0,0);
+		
+		char *buf=alloca(size);
+		size=json_dumpb(event,buf,size,0);
+		fwrite((char*)buf,1,size,stdout);
 		janus_events_notify_handlers(JANUS_EVENT_TYPE_PLUGIN,
 			session_id, handle_id, opaque_id, plugin->get_package(), event);
 	} else {
@@ -4638,7 +4644,7 @@ int Janusmain(int argc, char *argv[])
 		usleep(250000); /* A signal will cancel usleep() but not g_usleep() */
 	}
 
-	/* If the Event Handlers mechanism is enabled, notify handlers that Janus is hanging up */
+	/* If the gg Event Handlers mechanism is enabled, notify handlers that Janus is hanging up */
 	if(janus_events_is_enabled()) {
 		json_t *info = json_object();
 		json_object_set_new(info, "status", json_string("shutdown"));
@@ -4702,7 +4708,7 @@ int Janusmain(int argc, char *argv[])
 	}
 
 	JANUS_LOG(LOG_INFO, "Closing event handlers:\n");
-	g_print("CLOSING EVENT HANDLERS: SUKA\n");
+//	g_print("CLOSING EVENT HANDLERS: SUKA\n");
 	janus_events_deinit();
 	if(eventhandlers != NULL && g_hash_table_size(eventhandlers) > 0) {
 		g_hash_table_foreach(eventhandlers, janus_eventhandler_close, NULL);
@@ -4715,16 +4721,16 @@ int Janusmain(int argc, char *argv[])
 
 	janus_recorder_deinit();
 	g_free(local_ip);
-g_print("SUKA!\n");
+//g_print("SUKA!\n");
 	if(janus_ice_get_static_event_loops() > 0)
 		janus_ice_stop_static_event_loops();
-printf("SUKA,\n");
+//printf("SUKA,\n");
 #ifdef REFCOUNT_DEBUG
 	/* Any reference counters that are still up while we're leaving? (debug-mode only) */
 	janus_mutex_lock(&counters_mutex);
 	if(counters && g_hash_table_size(counters) > 0) {
 		JANUS_PRINT("Debugging reference counters: %d still allocated\n", g_hash_table_size(counters));
-		g_print("debugging\n");
+		//g_print("debugging\n");
 		GHashTableIter iter;
 		gpointer value;
 		g_hash_table_iter_init(&iter, counters);
@@ -4733,14 +4739,12 @@ printf("SUKA,\n");
 		}
 	} else {
 		JANUS_PRINT("Debugging reference counters: 0 still allocated\n");
-		g_print("fagajajaj\n");
+		//g_print("fagajajaj\n");
 	}
 	janus_mutex_unlock(&counters_mutex);
 #endif
 
 	JANUS_PRINT("Bye!\n");
-	g_print("*** BYE!****\n");
-	printf("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\n");
 return 0;
 	//exit(0);
 }

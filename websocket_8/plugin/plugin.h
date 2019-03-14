@@ -9,6 +9,8 @@
 #include <kore/kore.h>
 #include <kore/tasks.h>
 
+#define MY_MESSAGE_ID 	100
+
 #define J_PLUGIN_INIT(...){ \
 .init=NULL, \
 .destroy=NULL, \
