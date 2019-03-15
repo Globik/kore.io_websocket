@@ -3468,9 +3468,8 @@ int Janusmain(int argc, char *argv[])
 
 	struct gengetopt_args_info args_info;
 	/* Let's call our cmdline parser */
-	if(cmdline_parser(argc, argv, &args_info) != 0)
-		exit(1);
-
+	if(cmdline_parser(argc, argv, &args_info) != 0)return (KORE_RESULT_OK);
+//exit(1);
 	/* Any configuration to open? */
 	if(args_info.config_given) {
 		config_fileD = g_strdup(args_info.config_arg);
@@ -3500,14 +3499,16 @@ int Janusmain(int argc, char *argv[])
 			if(args_info.config_given) {
 				/* We only give up if the configuration file was explicitly provided */
 				g_print("Error reading configuration from %s\n", config_fileD);
-				exit(1);
+				//exit(1);
+				return (KORE_RESULT_OK);
 			}
 			g_print("Error reading/parsing the configuration file in %s, going on with the defaults and the command line arguments\n",
 				configs_folder);
 			config = janus_config_create("janus.cfg");
 			if(config == NULL) {
 				/* If we can't even create an empty configuration, something's definitely wrong */
-				exit(1);
+				//exit(1);
+				return (KORE_RESULT_OK);
 			}
 		}
 	}
@@ -3558,7 +3559,8 @@ int Janusmain(int argc, char *argv[])
 	}
 	if(daemonize && logfile == NULL) {
 		g_print("Running Janus as a daemon but no log file provided, giving up...\n");
-		exit(1);
+		//exit(1);
+		return (KORE_RESULT_OK);
 	}
 	/* Daemonize now, if we need to */
 	if(daemonize) {
@@ -3567,14 +3569,16 @@ int Janusmain(int argc, char *argv[])
 		/* Create a pipe for parent<->child communication during the startup phase */
 		if(pipe(pipefd) == -1) {
 			g_print("pipe error!\n");
-			exit(1);
+			return (KORE_RESULT_OK);
+			//exit(1);
 		}
 
 		/* Fork off the parent process */
 		pid_t pid = fork();
 		if(pid < 0) {
 			g_print("Fork error!\n");
-			exit(1);
+			return (KORE_RESULT_OK);
+			//exit(1);
 		}
 		if(pid > 0) {
 			/* Ok, we're the parent: let's wait for the child to tell us everything started fine */
@@ -3603,7 +3607,8 @@ int Janusmain(int argc, char *argv[])
 			/* Leave the parent and return the exit code we received from the child */
 			if(code)
 				g_print("Error launching Janus (error code %d), check the logs for more details\n", code);
-			exit(code);
+			//exit(code);
+			return (KORE_RESULT_OK);
 		}
 		/* Child here */
 		close(pipefd[0]);
@@ -3615,19 +3620,21 @@ int Janusmain(int argc, char *argv[])
 		pid_t sid = setsid();
 		if(sid < 0) {
 			g_print("Error setting SID!\n");
-			exit(1);
+			//exit(1);
+			return (KORE_RESULT_OK);
 		}
 		/* Change the current working directory */
 		if((chdir("/")) < 0) {
 			g_print("Error changing the current working directory!\n");
-			exit(1);
+			//exit(1);
+			return (KORE_RESULT_OK);
 		}
 		/* We close stdin/stdout/stderr when initializing the logger */
 	}
 
 	/* Initialize logger */
-	if(janus_log_init(daemonize, use_stdout, logfile) < 0)
-		exit(1);
+	if(janus_log_init(daemonize, use_stdout, logfile) < 0)return (KORE_RESULT_OK);
+		//exit(1);
 
 	JANUS_PRINT("---------------------------------------------------\n");
 	JANUS_PRINT("  Starting Meetecho Janus (WebRTC Server) v%s\n", janus_version_string);
@@ -3666,8 +3673,8 @@ int Janusmain(int argc, char *argv[])
 		if(item && item->value)
 			pidfile = item->value;
 	}
-	if(janus_pidfile_create(pidfile) < 0)
-		exit(1);
+	if(janus_pidfile_create(pidfile) < 0)return (KORE_RESULT_OK);
+		//exit(1);
 
 	/* Proceed with the rest of the configuration */
 	janus_config_print(config);
@@ -4057,11 +4064,13 @@ int Janusmain(int argc, char *argv[])
 	janus_ice_init(ice_lite, ice_tcp, full_trickle, ipv6, rtp_min_port, rtp_max_port);
 	if(janus_ice_set_stun_server(stun_server, stun_port) < 0) {
 		JANUS_LOG(LOG_FATAL, "Invalid STUN address %s:%u\n", stun_server, stun_port);
-		exit(1);
+		return 0;
+		//exit(1);
 	}
 	if(janus_ice_set_turn_server(turn_server, turn_port, turn_type, turn_user, turn_pwd) < 0) {
 		JANUS_LOG(LOG_FATAL, "Invalid TURN address %s:%u\n", turn_server, turn_port);
-		exit(1);
+		//exit(1);
+		return 0;
 	}
 #ifndef HAVE_TURNRESTAPI
 	if(turn_rest_api != NULL || turn_rest_api_key != NULL) {
@@ -4169,7 +4178,8 @@ int Janusmain(int argc, char *argv[])
 	if(item && item->value)
 		dtls_timeout = atoi(item->value);
 	if(janus_dtls_srtp_init(server_pem, server_key, password, dtls_timeout) < 0) {
-		exit(1);
+		//exit(1);
+		return (KORE_RESULT_OK);
 	}
 	/* Check if there's any custom value for the starting MTU to use in the BIO filter */
 	item = janus_config_get(config, config_media, janus_config_type_item, "dtls_mtu");
@@ -4179,7 +4189,8 @@ int Janusmain(int argc, char *argv[])
 #ifdef HAVE_SCTP
 	/* Initialize SCTP for DataChannels */
 	if(janus_sctp_init() < 0) {
-		exit(1);
+		return (KORE_RESULT_OK);
+		//exit(1);
 	}
 #else
 	JANUS_LOG(LOG_WARN, "Data Channels support not compiled\n");
@@ -4195,7 +4206,8 @@ int Janusmain(int argc, char *argv[])
 	GThread *watchdog = g_thread_try_new("timeout watchdog", &janus_sessions_watchdog, watchdog_loop, &error);
 	if(error != NULL) {
 		JANUS_LOG(LOG_FATAL, "Got error %d (%s) trying to start sessions timeout watchdog...\n", error->code, error->message ? error->message : "??");
-		exit(1);
+	//	exit(1);
+	return (KORE_RESULT_OK);
 	}
 	/* Start the thread that will dispatch incoming requests */
 	//NOTICE
@@ -4369,7 +4381,8 @@ int Janusmain(int argc, char *argv[])
 		/* Initialize the event broadcaster */
 		if(janus_events_init(enable_events, (server_name ? server_name : (char *)JANUS_SERVER_NAME), eventhandlers) < 0) {
 			JANUS_LOG(LOG_FATAL, "Error initializing the Event handlers mechanism...\n");
-			exit(1);
+			//exit(1);
+			return (KORE_RESULT_OK);
 		}
 	}
 
@@ -4382,7 +4395,8 @@ int Janusmain(int argc, char *argv[])
 	dir = opendir(path);
 	if(!dir) {
 		JANUS_LOG(LOG_FATAL, "\tCouldn't access plugins folder...\n");
-		exit(1);
+		//exit(1);
+		return (KORE_RESULT_OK);
 	}
 	/* Any plugin to ignore? */
 	gchar **disabled_plugins = NULL;
@@ -4644,13 +4658,13 @@ int Janusmain(int argc, char *argv[])
 		usleep(250000); /* A signal will cancel usleep() but not g_usleep() */
 	}
 
-	/* If the gg Event Handlers mechanism is enabled, notify handlers that Janus is hanging up */
+	/* If the gg Event Handlers mechanism is enabled, notify handlers that Janus is hanging up 
 	if(janus_events_is_enabled()) {
 		json_t *info = json_object();
 		json_object_set_new(info, "status", json_string("shutdown"));
 		json_object_set_new(info, "signum", json_integer(stop_signal));
 		janus_events_notify_handlers(JANUS_EVENT_TYPE_CORE, 0, info);
-	}
+	}*/
 
 	/* Done */
 	JANUS_LOG(LOG_INFO, "Ending sessions timeout watchdog...\n");

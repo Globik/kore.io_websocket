@@ -38,13 +38,13 @@ kore_log(LOG_INFO,"kore_worker_teardown");
 printf("\n*** TEARDOWN! ***\n");	
 
 g_atomic_int_inc(&stop);
-while(!g_atomic_int_get(&parent_fuck)){
-usleep(200000); 
+//while(!g_atomic_int_get(&parent_fuck)){
+//usleep(200000); 
 g_print("saka %d\n",saka);
 saka+=1;
-if(saka==10){g_print("saka %d\n", saka);break;}
-}
-//usleep(500000);
+//if(saka==10){g_print("saka %d\n", saka);break;}
+//}
+usleep(500000);
 }
 struct kore_task task;
 int init(int state){
@@ -209,10 +209,14 @@ if(root)json_decref(root);
 int janus_task(struct kore_task* t){
 //gint Janusmain(int argc, char *argv[])
 signal(SIGUSR1,do_hell);
-Janusmain(1, (char*[3]){"-Nii","1", "1"});
+int fg=Janusmain(2, (char*[2]){"janus", "-d 4"});//ok TODO dynamically, not hardcoded
+//int fg=Janusmain(3, (char*[3]){"janus","-h","-o"});//not ok, hangs out ; don't use -V and -h
+//int fg=Janusmain(3,(char*[3]){"janus","-d 5","-o"});//ok
+g_print("fg: %d\n", fg);
 raise(SIGUSR1);
 //kore_log(LOG_INFO,"*** bye from janus task ***");
 //printf("*** BYE ***\n");
+// cd kore.io_websocket/janus
 return (KORE_RESULT_OK);	
 }
 void data_available(struct kore_task*t){
