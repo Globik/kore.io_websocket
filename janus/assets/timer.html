@@ -1,0 +1,52 @@
+<html>
+<body>
+<output id="out"></output>
+<button onclick="do_go();">set keep alive</button><br><br>
+<button onclick="stop_it();">stop</button>
+<button onclick="insert_was(outsess,[1,2,3,4,5]);">insert was</button>
+<b>sessions:</b><br>
+<section id="outsess"></section>
+<script>
+const suka="suka";
+var t;
+var tid=null;
+function keep_alive(){
+console.warn("tick!");
+}
+function do_go(){
+tid=setTimeout(function tick(){
+keep_alive();
+tid=setTimeout(tick,1000);
+},1000);
+}
+
+
+function stop_it(){
+
+console.log("sto pit()");
+clearTimeout(tid);
+tid=null;
+}
+function insert_was(el,arr){
+if(el.hasChildNodes()){
+while(el.hasChildNodes()){
+el.removeChild(outsess.firstChild);	
+}}
+for(var i=0;i<arr.length;i++){
+let div=document.createElement("div");
+let span=document.createElement("span");
+span.setAttribute("data-s",1);
+span.setAttribute("onclick","dura(this);");
+let t=document.createTextNode("suka");
+span.appendChild(t);
+div.appendChild(span);
+el.appendChild(div);	
+}
+}
+function dura(ev){
+let a=ev.getAttribute("data-s");
+alert(a);	
+}
+</script>
+</body>
+</html>

@@ -1,3 +1,12 @@
+
+# disclamer
+
+Oh, no, it's suck. To much undefined behavour and segfaul as a result.
+
+I must stop it here. Sorry to say.
+
+There is segfault in kore webframework segfault net_send() - it sucks from time to time(undefined). Shit!
+
 # Janus Core within kore.c web framework
 
 Trying intergate Janus Core int kore.c web framwork just for fun.

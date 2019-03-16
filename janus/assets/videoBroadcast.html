@@ -21,7 +21,8 @@
 <h3>Publisher workflows</h3>
 1. Create session 2. Attach plugin 3. Join room 4. publish
 </p>
-<b>Local Video </b><video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">no video supported</video>
+<b>Local Video </b>
+<video id="localVideo" autoplay style="width: 160px;height: 120px; border:1px solid black;">no video supported</video>
 <br>
 	<b>session_id: <span id="sessid"></span></b><b> handle_id: <span id="hanid"></span></b><br>
 	<b>FEED: </b><b id="pubid" contenteditable=true>must be feed</b>
@@ -52,6 +53,8 @@ var owner=false;
 var sock;
 var who_am_i;
 var who_is_he;
+//var j_interval;//keepalive
+var j_timer=null;
 function open_sock(){
 sock=new WebSocket("ws://127.0.0.1:8888/connect");
 }
@@ -69,14 +72,14 @@ if(a.janus && a.janus=="success"){
 if(a.transaction=="session_create"){
 session_id=a.data.id;//(a.data?a.data.id:0);
 sessid.textContent=session_id;
-//hanid.textContent=session_id;
-//handle_id=2;
 }else if(a.transaction=="session_destroy"){
 session_id=0;
 sessid.textContent=session_id;
 }else if(a.transaction=="attach_plugin"){
 handle_id=a.data.id;
-hanid.textContent=handle_id;	
+hanid.textContent=handle_id;
+if(session_id==0){console.warn("why sessin_id is 0?");}
+set_keep_alive({session:session_id,handle:handle_id});	
 }else if(a.transaction=="detach_plugin"){
 handle_id=0;
 hanid.textContent=handle_id;	
@@ -101,6 +104,8 @@ handle_offer(a.jsep);
 if(a.transaction=="unpublish"){
 //publisher	
 }
+}else if(a.janus && a.janus=="webrtcup"){
+
 }else if(a.janus && a.janus=="timeout"){
 if(session_id !=a.session_id)console.warn("session_id !=a.session_id");
 session_id=0;
@@ -110,7 +115,10 @@ hanid.textContent=handle_id;
 }
 // {"janus": "timeout", "session_id": 6925394170560529}
 }
-sock.onclose=function(){outi("<b class=\"red\">Websocket closed</b>");}
+sock.onclose=function(){
+outi("<b class=\"red\">Websocket closed</b>");
+clear_keep_alive();
+}
 
 function set_user(){
 //alert(1);
@@ -321,13 +329,34 @@ wsend(d);
 //"require_pvtid": false, "notify_joining": false, "audiocodec": "opus",
 //"videocodec": "vp8", "record": false, "num_participants": 1}]}}}
 }
-function keep_alive(){
+
+//set_keep_alive({session:session_id,handle:handle_id});
+function set_keep_alive(obj){
+console.warn("on handle_id(on attach)");
+if(j_timer !=null){console.warn("why j_timer is not null?");}
+j_timer=setTimeout(function tick(){	
+  keep_alive(obj);
+j_timer=setTimeout(tick, 10000);//50 sec
+}, 10000);
+// "bytes-received": 1344533,
+
+}	
+function clear_keep_alive(){
+console.log("clear_keep_alive");
+if(j_timer==null){console.warn("Why j_timer is null??");}
+clearTimeout(j_timer);
+j_timer=null;	
+}
+
+function keep_alive(obj){
+if(session_id==0 || handle_id==0){console.warn("what the fuck?");return;}
+console.log("sess: ",obj.session," handl: ",obj.handle);
 let d={};
 d.janus="keepalive";
 d.session_id=session_id;
 d.handle_id=handle_id;
 d.transaction="keep_alive";
-wsend(d);	
+wsend(d);
 }
 var pc=null;
 var localStream;
@@ -386,7 +415,9 @@ console.log('ice connection state: ',this.iceConnectionState);
 //disconnected failed connected completed
 if(this.iceConnectionState=="disconnected"){}	
 }
-function on_ice_gathering_state_change(){console.log("ice gathering: ",this.iceGatheringState);}
+function on_ice_gathering_state_change(){console.log("ice gathering: ",this.iceGatheringState);
+//	if("complete"  set timeout if one minute pass and no webrtcup make retour close all
+}
 function on_ice_candidate_error(err){console.error('ice candidate err: ', err);}
 function on_negotiation_needed(){console.warn("ON NEGOTIATION NEEDED!");}
 function signaling_state_change(){console.log('signaling state: ',this.signalingState);}
@@ -465,7 +496,8 @@ function wsend(obj){
 if(!sock){outi("<b class=\"red\">no websocket available</b>");return;}
 let d;
 try{d=JSON.stringify(obj);}catch(e){outi("Error sock send json: "+e);return;}	
-sock.send(d);
+console.log("readyState: ", sock.readyState);
+if(sock.readyState==1)sock.send(d);
 }
 function ajax(){
 var xhr=new XMLHttpRequest();

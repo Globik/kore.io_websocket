@@ -425,10 +425,9 @@ size_t size=json_dumpb(reply,NULL,0,0);
 	if(size==0){kore_log(LOG_INFO, "json_dumpb Size is null\n");}
 	char*buf=alloca(size);
 	size=json_dumpb(reply,buf,size,0);
-	//kore_log(LOG_INFO, "buffer: %s\n", buf);swweeddddds
 	kore_websocket_send(c, 1, buf,size);
 	send_to_clients=1;
-		}else if(!strcmp(t_txt,"detach")){
+}else if(!strcmp(t_txt,"detach")){
 			
 			
 		kore_log(LOG_NOTICE,"type detach");

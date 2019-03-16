@@ -2366,6 +2366,7 @@ goto jsondone;
 		}
 		/* If this is not a request to start/stop debugging to text2pcap, it must be a handle_info */
 		if(strcasecmp(message_text, "handle_info")) {
+			g_print("*** HANDLE_INFO! ***\n");
 			ret = janus_process_error(request, session_id, transaction_text, JANUS_ERROR_INVALID_REQUEST_PATH, "Unhandled request '%s' at this path", message_text);
 			goto jsondone;
 		}

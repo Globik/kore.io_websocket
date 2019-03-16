@@ -2,26 +2,105 @@
 	<head><title>admin</title></head>
 	<body>
 	<h2>admin webrtc</h2>
-	<button onclick="dowas();">info</button>
+	<button onclick="listSessions();">list sessions</button>
+	<!-- <button onclick="listHandles();">list handles</button> -->
+	<br><b>sessions:</b><br>
+	<output id="outsess"></output>
+	<br><b>handles:</b><br>
+	<output id="outhans"></output>
 	<script>
 	var ws=new WebSocket("ws://127.0.0.1:8888/connect");
 	ws.onopen=function(){
 	console.log("websock opened");
 	let d={};
 	d.adtype=1;
-	//d.transaction="pipka";
-	//d.janus="suka";
-	//d.admin_secret="janusoverlord";
 	wsend(d);	
 	}
 	ws.onerror=function(e){console.error(e);}
 	ws.onclose=function(){console.log("websock closed");}
-	ws.onmessage=function(ev){console.warn("data: ",ev.data);}
+	ws.onmessage=function(ev){
+	console.warn("data: ",ev.data);
+	var msg;
+	try{msg=JSON.parse(ev.data);}catch(e){console.error(e);return;}
+	if(msg.janus=="success"){
+	if(msg.transaction=="list_sessions"){
+	//{"janus": "success", "transaction": "list_sessions", "sessions": [2212866801377696]}
+	if(msg.sessions.length>0)insert_sess(outsess,msg.sessions);
+	}else if(msg.transaction=="list_handles"){
+	//{"janus": "success", "session_id": 2195567469248885, "transaction": "list_handles", "handles": [2337069404677402]}
+	if(msg.handles.length>0)insert_hans(outhans, msg.session_id, msg.handles);
+	}else if(msg.transaction=="list_info"){
+//if no webrtc up{"janus": "success", "session_id": 2863389352935818, "transaction": "handle_info", "handles": [370903010340382]} 
+//with 
+	}else{}	
+	}
+	}
+	
+function insert_sess(el,arr){
+if(el.hasChildNodes()){
+while(el.hasChildNodes()){
+el.removeChild(el.firstChild);	
+}}
+for(var i=0;i<arr.length;i++){
+let div=document.createElement("div");
+let span=document.createElement("span");
+span.setAttribute("data-s", arr[i]);
+span.setAttribute("onclick","listHandles(this);");
+let t=document.createTextNode(arr[i]);
+span.appendChild(t);
+div.appendChild(span);
+el.appendChild(div);	
+}	
+}
+
+function listHandles(el){
+let a=el.getAttribute('data-s');
+if(!a)console.warn("why not a sess??", a);
+console.log("session: ", a);
+let d={};
+d.janus="list_handles";
+d.transaction="list_handles"
+d.session_id=Number(a);
+d.admin_secret="janusoverlord";
+wsend(d);
+}
+function insert_hans(el, sess_id, arr){
+if(el.hasChildNodes()){
+while(el.hasChildNodes()){
+el.removeChild(el.firstChild);	
+}}
+for(var i=0;i<arr.length;i++){
+let div=document.createElement("div");
+let span=document.createElement("span");
+span.setAttribute("data-sess", sess_id);
+span.setAttribute("data-hans", arr[i]);
+span.setAttribute("onclick","handleInfo(this);");
+let t=document.createTextNode(arr[i]);
+span.appendChild(t);
+div.appendChild(span);
+el.appendChild(div);	
+}	
+}
+function handleInfo(el){
+//alert("what?");
+let a=el.getAttribute("data-sess");
+let b=el.getAttribute("data-hans");
+if(!b && !a)console.warn("no attribs??");
+let d={};
+d.janus="handle_info";
+d.transaction="handle_info"
+d.session_id=Number(a);
+d.handles_id=Number(b);
+d.admin_secret="janusoverlord";
+console.log(d);
+wsend(d);
+}
+	
 	function wsend(obj){
 	let a;
-	try{a=JSON.stringify(obj);if(ws)ws.send(a);}catch(e){console.error(e);return;}	
+	try{a=JSON.stringify(obj);if(ws && ws.readyState==1)ws.send(a);}catch(e){console.error(e);return;}	
 	}
-	function dowas(){
+	function listSessions(){
 		let d={};
 		d.janus="list_sessions";
 		d.transaction="list_sessions";
@@ -29,5 +108,13 @@
 		wsend(d);
 	}
 	</script>
+	#0  0x08054764 in net_send ()
+#1  0x080547b6 in net_send_flush ()
+#2  0x080536ea in kore_msg_send ()
+#3  0xb5b7faf5 in janus_sampleevh_handler (data=0x0) at kore_msg.c:694
+#4  0xb6f239ea in ?? () from /lib/i386-linux-gnu/libglib-2.0.so.0
+#5  0xb752ff72 in start_thread (arg=0xb27fab40) at pthread_create.c:312
+#6  0xb746043e in clone () at ../sysdeps/unix/sysv/linux/i386/clone.S:129
+
 	</body>
 </html>

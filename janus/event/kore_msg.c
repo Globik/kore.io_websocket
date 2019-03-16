@@ -668,7 +668,7 @@ static void *janus_sampleevh_handler(void *data) {
 						*/
 						break;
 					default:
-						JANUS_LOG(LOG_WARN, "Unknown type of event '%d'\n", type);
+						//JANUS_LOG(LOG_WARN, "Unknown type of event '%d'\n", type);
 						break;
 				}
 				if(!group_events) {
@@ -692,8 +692,23 @@ static void *janus_sampleevh_handler(void *data) {
 	g_print(" Since this a simple plugin, it does the same for all events: so just convert to string... \n");
 			event_text = json_dumps(output, json_format);
 			size_t vleni=strlen(event_text);
-			kore_msg_send(0,MY_MESSAGE_ID, event_text, vleni);
-			goto done;
+			g_print("size vleni: %d\n", vleni);
+			kore_msg_send(0, MY_MESSAGE_ID, event_text, vleni);
+			//free(event_text);
+			// "bytes-received": 1344533,
+
+			
+		/*	
+	size_t size=json_dumpb(output,NULL,0,0);
+	if(size==0){g_print("json_dumpb Size is null\n");}
+	char*buf=alloca(size);
+	size=json_dumpb(output,buf,size,0);
+	kore_msg_send(0, MY_MESSAGE_ID, buf, size);
+		*/	
+			
+		
+			json_decref(output);
+			//goto done;
 			
 		}
 		/* Whether we just prepared the event or this is a retransmission, send it via HTTP POST */
